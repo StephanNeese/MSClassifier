@@ -1,4 +1,7 @@
+package Main;
 
+
+import Spectrum.Spectrum;
 import java.io.IOException;
 
 

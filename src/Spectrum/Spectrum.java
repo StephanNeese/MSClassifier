@@ -1,3 +1,4 @@
+package Spectrum;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,6 +17,13 @@ public class Spectrum {
 		readCSV(path, bin);
 	}
 	
+	/**
+	 * 
+	 * @param path
+	 * @param bin
+	 * @throws FileNotFoundException
+	 * @throws IOException 
+	 */
 	private void readCSV(String path, int bin) throws FileNotFoundException, IOException{
 		File csv = new File(path);
 		BufferedReader buff = new BufferedReader(new FileReader(csv));
