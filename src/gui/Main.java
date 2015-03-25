@@ -52,7 +52,7 @@ public class Main extends JFrame {
 		main.setLayout(null); 
 		main.setBounds(0, 0, 400, 300);
 		
-		newDB = new JButton("create new Database");
+		newDB = new JButton("create new profile");
 		newDB.setBounds(10, 30, 380, 50);
 		main.add(newDB);
 		

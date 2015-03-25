@@ -38,7 +38,7 @@ public class newDatabaseWindow extends JFrame {
 			InstantiationException, 
 			IllegalAccessException, 
 			UnsupportedLookAndFeelException {
-		super("Creation of a new database");
+		super("Creation of a new profile");
 		initGui();
 	}
 	
@@ -64,7 +64,7 @@ public class newDatabaseWindow extends JFrame {
 		main.setLayout(null); 
 		main.setBounds(0, 0, 640, 320);
 		
-		nameLabel = new JLabel("Name of the Database");
+		nameLabel = new JLabel("Name of the profile");
 		name = new JTextField();
 		nameLabel.setBounds(10, 10, 200, 15);
 		name.setBounds(10, 30, 300, 30);
