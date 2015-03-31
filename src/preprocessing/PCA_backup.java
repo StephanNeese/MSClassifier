@@ -1,4 +1,4 @@
-package Spectrum;
+package preprocessing;
 
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.factory.DecompositionFactory;
@@ -7,7 +7,7 @@ import org.ejml.ops.CommonOps;
 import org.ejml.ops.NormOps;
 import org.ejml.ops.SingularOps;
 
-public class PCA {
+public class PCA_backup {
 
     // principal component subspace is stored in the rows
     private DenseMatrix64F V_t;
@@ -25,7 +25,7 @@ public class PCA {
 	 * @param numSamples Number of samples that will be processed.
 	 * @param sampleSize Number of elements in each sample.
 	 */
-    public PCA(int numSamples , int sampleSize) {
+    public PCA_backup(int numSamples , int sampleSize) {
 		mean = new double[ sampleSize ];
         A.reshape(numSamples,sampleSize,false);
         sampleIndex = 0;
@@ -100,10 +100,10 @@ public class PCA {
     }
 
     /**
-     * Returns a vector from the PCA's basis.
+     * Returns a vector from the PCA_backup's basis.
      *
      * @param which Which component's vector is to be returned.
-     * @return Vector from the PCA basis.
+     * @return Vector from the PCA_backup basis.
      */
     public double[] getBasisVector( int which ) {
         if( which < 0 || which >= numComponents )

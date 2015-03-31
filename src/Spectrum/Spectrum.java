@@ -12,6 +12,11 @@ public class Spectrum {
 	
 	private double[] mz;
 	private double[] voltage;
+	private int length;
+	
+	public Spectrum(double[] mz, double[] voltage){
+		
+	}
 	
 	public Spectrum(String path, int bin) throws FileNotFoundException, IOException{
 		readCSV(path, bin);
@@ -75,6 +80,8 @@ public class Spectrum {
 			mz[i] = mzTmp2.get(i);
 			voltage[i] = voltageTmp2.get(i);
 		}
+		
+		length = mzTmp2.size();
 	}
 	
 	
@@ -112,6 +119,18 @@ public class Spectrum {
 
 	public void setVoltage(double[] voltage) {
 		this.voltage = voltage;
+	}
+	
+	public double getVoltage(int index) {
+		return voltage[index];
+	}
+
+	public void setVoltage(double voltage, int index) {
+		this.voltage[index] = voltage;
+	}
+	
+	public int getLength(){
+		return length;
 	}
 
 	@Override
