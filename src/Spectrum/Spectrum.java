@@ -15,7 +15,9 @@ public class Spectrum {
 	private int length;
 	
 	public Spectrum(double[] mz, double[] voltage){
-		
+		this.mz = mz;
+		this.voltage = voltage;
+		length = mz.length;
 	}
 	
 	public Spectrum(String path, int bin) throws FileNotFoundException, IOException{
@@ -82,27 +84,6 @@ public class Spectrum {
 		}
 		
 		length = mzTmp2.size();
-	}
-	
-	
-	public void normalizationMeanSubstraction(){
-		double sum = 0.0;
-		double mean = 0.0;
-		// calculate mean of intensities
-		for(int i=0; i<voltage.length; i++){
-			sum += voltage[i];
-		}
-		mean = sum/voltage.length;
-		
-		// substract mean from every value in voltage
-		// or set 0 if negative value would arise
-		for(int i=0; i<voltage.length; i++){
-			if((voltage[i] - mean)>0){
-				voltage[i] = voltage[i] - mean;
-			}else{
-				voltage[i] = 0;
-			}
-		}
 	}
 
 	public double[] getMz() {

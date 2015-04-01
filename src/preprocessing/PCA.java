@@ -5,7 +5,7 @@ import Spectrum.SpectraMatrix;
 public class PCA {
 	
 	public static SpectraMatrix performPCA(SpectraMatrix data){
-		substractMean(data);
+		data.substractMean();
 		double[][] covarianceMatrix = calcCovarianceMatrix(data);
 		EigenVector[] eigenVectors = calcEigenVectors(covarianceMatrix);
 		double[] eigenValues = calcEigenValues(eigenVectors, covarianceMatrix);
@@ -14,12 +14,42 @@ public class PCA {
 		return transposeBack(features, transposed);
 	}
 
-	private static void substractMean(SpectraMatrix data) {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
-
 	private static double[][] calcCovarianceMatrix(SpectraMatrix data) {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+		double[][] covariance = new double[data.getNumDimensions()][data.getNumDimensions()];
+		
+		int n = data.getNumSpectra();
+		// loop through dimension twice to create the matrix
+		for(int i=0; i<data.getNumDimensions(); i++){
+			// get dimension x for covariance calc
+			double[] x = data.getDimension(i);
+			// calc mean of dimension
+			double xMean = 0;
+			double xSum = 0;
+			for(int k=0; k<x.length; k++){
+				xSum += x[k];
+			}
+			xMean = xSum/x.length;
+			
+			for(int j=0; j<data.getNumDimensions(); j++){
+				// get dimension y for covariance calc
+				double[] y = data.getDimension(j);
+				// calc mean of dimension
+				double yMean = 0;
+				double ySum = 0;
+				for(int k=0; k<y.length; k++){
+					ySum += y[k];
+				}
+				yMean = ySum/y.length;
+				// calculate covariance
+				double num = 0;
+				for(int k=0; k<x.length; k++){
+					num += (x[k] - xMean)*(y[k] - yMean);
+				}
+				covariance[i][j] = num/(n-1);
+			}
+		}
+		
+		return covariance;
 	}
 
 	private static EigenVector[] calcEigenVectors(double[][] covarianceMatrix) {

@@ -18,7 +18,8 @@ public class Main {
 		
 		// read data from a folder
 		SpectraMatrix data = Reader.readData("/home/wens/pflaume");
+		data.normalizationDivideByMean();
 		// transform data via PCA
-		SpectraMatrix transformed = PCA.performPCA(data);
+		//SpectraMatrix transformed = PCA.performPCA(data);
 	}
 }
