@@ -6,12 +6,14 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class Spectrum {
 	
 	private double[] mz;
 	private double[] voltage;
+	HashMap<Integer, Double> values;
 	private int length;
 	
 	public Spectrum(double[] mz, double[] voltage){
@@ -78,9 +80,11 @@ public class Spectrum {
 		/** parse from hashmap to arrays **/
 		mz = new double[mzTmp2.size()];
 		voltage = new double[voltageTmp2.size()];
+		values = new HashMap<>();
 		for(int i=0; i<mzTmp2.size(); i++){
 			mz[i] = mzTmp2.get(i);
 			voltage[i] = voltageTmp2.get(i);
+			values.put(mzTmp2.get(i), voltageTmp2.get(i));
 		}
 		
 		length = mzTmp2.size();
@@ -88,6 +92,10 @@ public class Spectrum {
 
 	public double[] getMz() {
 		return mz;
+	}
+	
+	public double getMZ(int index){
+		return mz[index];
 	}
 
 	public void setMz(double[] mz) {

@@ -16,9 +16,6 @@ public class SpectraMatrix {
 		for(int i=0; i<spectra.length; i++){
 			voltage[i] = spectra[i].getVoltage();
 		}
-		
-		
-		
 	}
 	
 	public void normalizationDivideByMean(){
@@ -78,6 +75,10 @@ public class SpectraMatrix {
 
 	public int getNumDimensions() {
 		return numDimensions;
+	}
+	
+	public double[][] getData(){
+		return voltage;
 	}
 
 	@Override
