@@ -14,11 +14,13 @@ public class Spectrum {
 	private double[] mz;
 	private double[] voltage;
 	HashMap<Integer, Double> values;
+	private String filename;
 	private int length;
 	
-	public Spectrum(double[] mz, double[] voltage){
+	public Spectrum(double[] mz, double[] voltage, String filename){
 		this.mz = mz;
 		this.voltage = voltage;
+		this.filename = filename;
 		length = mz.length;
 	}
 	
@@ -87,6 +89,9 @@ public class Spectrum {
 			values.put(mzTmp2.get(i), voltageTmp2.get(i));
 		}
 		
+		String[] pathTmp = path.split(File.separator);
+		filename = pathTmp[pathTmp.length-1];
+		
 		length = mzTmp2.size();
 	}
 
@@ -116,6 +121,10 @@ public class Spectrum {
 
 	public void setVoltage(double voltage, int index) {
 		this.voltage[index] = voltage;
+	}
+	
+	public String getFilename(){
+		return filename;
 	}
 	
 	public int getLength(){

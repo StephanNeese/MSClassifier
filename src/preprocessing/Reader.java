@@ -12,7 +12,7 @@ public class Reader {
 		String[] csv = readFolder(path);
 		Spectrum[] spectra = new Spectrum[csv.length];
 		for(int i=0; i<csv.length; i++){
-			spectra[i] = new Spectrum(csv[i], 1);
+			spectra[i] = new Spectrum(csv[i], 4);
 		}
 		return new SpectraMatrix(spectra);
 	} 

@@ -1,20 +1,27 @@
 package Spectrum;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+
 public class SpectraMatrix {
 	
 	private double[] mz;
+	private String[] samples;
 	private double[][] voltage;		// [spectrum][mz]
 	private final int numSpectra;
 	private final int numDimensions;
 	
 	public SpectraMatrix(Spectrum[] spectra){
 		this.mz = spectra[0].getMz();
+		this.samples = new String[spectra.length];
 		numSpectra = spectra.length;
 		numDimensions = mz.length;
 		voltage = new double[numSpectra][numDimensions];
 		
 		for(int i=0; i<spectra.length; i++){
 			voltage[i] = spectra[i].getVoltage();
+			samples[i] = spectra[i].getFilename();
 		}
 	}
 	
@@ -42,15 +49,29 @@ public class SpectraMatrix {
 		return sum/num;
 	}
 	
-	public void substractMean(){
-		// get mean value of all values in the matrix
-		double mean = calculateMean();
-		// substract mean value from all values
+	public double calculateMean(int dimension){
+		double sum = 0;
+		double mean = 0;
+		int num = voltage.length;
+		// calculate mean of all values in the matrix
 		for(int i=0; i<voltage.length; i++){
-			for(int j=0; j<voltage[0].length; j++){
-				voltage[i][j] = voltage[i][j]-mean;
+			sum += voltage[i][dimension];
+		}
+		return sum/num;
+	}
+	
+	public void center(){
+		// substract dimension-mean value from all dimensions
+		for(int dim=0; dim<voltage[0].length; dim++){
+			double mean = calculateMean(dim);			// mean of dimension j
+			for(int sampl=0; sampl<voltage.length; sampl++){
+				voltage[sampl][dim] = voltage[sampl][dim]-mean;
 			}
 		}
+	}
+	
+	public double[] getMz(){
+		return mz;
 	}
 	
 	public void setSpectrum(Spectrum spectrum, int index){
@@ -58,7 +79,7 @@ public class SpectraMatrix {
 	}
 	
 	public Spectrum getSpectrum(int index){
-		return new Spectrum(mz, voltage[index]);
+		return new Spectrum(mz, voltage[index], samples[index]);
 	}
 	
 	public double[] getDimension(int index){
@@ -93,5 +114,27 @@ public class SpectraMatrix {
 		}
 		
 		return res;
+	}
+	
+	public void toCSV(String path) throws FileNotFoundException, UnsupportedEncodingException{
+		String res = "";
+		
+		PrintWriter writer = new PrintWriter(path, "UTF-8");
+		// header with mz bins
+		for(int i=0; i<mz.length; i++){
+			writer.print("\t" + mz[i]);
+		}
+		writer.println();
+		
+		// datatable
+		for(int spec=0; spec<voltage.length; spec++){
+			writer.print(samples[spec]);
+			for(int mzVal=0; mzVal<voltage[0].length; mzVal++){
+				writer.print("\t" + voltage[spec][mzVal]);
+			}
+			writer.println();
+		}
+		
+		writer.close();
 	}
 }
