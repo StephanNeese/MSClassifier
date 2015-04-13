@@ -12,6 +12,10 @@ public class SpectraMatrix {
 	private final int numSpectra;
 	private final int numDimensions;
 	
+	/**
+	 * 
+	 * @param spectra 
+	 */
 	public SpectraMatrix(Spectrum[] spectra){
 		this.mz = spectra[0].getMz();
 		this.samples = new String[spectra.length];
@@ -25,6 +29,9 @@ public class SpectraMatrix {
 		}
 	}
 	
+	/**
+	 * 
+	 */
 	public void normalizationDivideByMean(){
 		// get mean value of all values in the matrix
 		double mean = calculateMean();
@@ -36,6 +43,10 @@ public class SpectraMatrix {
 		}
 	}
 	
+	/**
+	 * 
+	 * @return 
+	 */
 	public double calculateMean(){
 		double sum = 0;
 		double mean = 0;
@@ -49,6 +60,11 @@ public class SpectraMatrix {
 		return sum/num;
 	}
 	
+	/**
+	 * 
+	 * @param dimension
+	 * @return 
+	 */
 	public double calculateMean(int dimension){
 		double sum = 0;
 		double mean = 0;
@@ -60,6 +76,9 @@ public class SpectraMatrix {
 		return sum/num;
 	}
 	
+	/**
+	 * 
+	 */
 	public void center(){
 		// substract dimension-mean value from all dimensions
 		for(int dim=0; dim<voltage[0].length; dim++){
@@ -70,34 +89,65 @@ public class SpectraMatrix {
 		}
 	}
 	
+	/**
+	 * 
+	 * @return 
+	 */
 	public double[] getMz(){
 		return mz;
 	}
 	
+	/**
+	 * 
+	 * @param spectrum
+	 * @param index 
+	 */
 	public void setSpectrum(Spectrum spectrum, int index){
 		voltage[index] = spectrum.getVoltage();
 	}
 	
+	/**
+	 * 
+	 * @param index
+	 * @return 
+	 */
 	public Spectrum getSpectrum(int index){
 		return new Spectrum(mz, voltage[index], samples[index]);
 	}
 	
+	/**
+	 * 
+	 * @param index
+	 * @return 
+	 */
 	public double[] getDimension(int index){
 		double[] res = new double[voltage.length];
 		for(int i=0; i<voltage.length; i++){
-			res[0] = voltage[i][index];
+			res[i] = voltage[i][index];
 		}
 		return res;
 	}
 
+	/**
+	 * 
+	 * @return 
+	 */
 	public int getNumSpectra() {
 		return numSpectra;
 	}
 
+	/**
+	 * 
+	 * @return 
+	 */
 	public int getNumDimensions() {
 		return numDimensions;
 	}
 	
+	/**
+	 * 
+	 * @return 
+	 */
 	public double[][] getData(){
 		return voltage;
 	}
@@ -116,6 +166,12 @@ public class SpectraMatrix {
 		return res;
 	}
 	
+	/**
+	 * 
+	 * @param path
+	 * @throws FileNotFoundException
+	 * @throws UnsupportedEncodingException 
+	 */
 	public void toCSV(String path) throws FileNotFoundException, UnsupportedEncodingException{
 		String res = "";
 		

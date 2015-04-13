@@ -17,6 +17,12 @@ public class Spectrum {
 	private String filename;
 	private int length;
 	
+	/**
+	 * 
+	 * @param mz
+	 * @param voltage
+	 * @param filename 
+	 */
 	public Spectrum(double[] mz, double[] voltage, String filename){
 		this.mz = mz;
 		this.voltage = voltage;
@@ -24,6 +30,13 @@ public class Spectrum {
 		length = mz.length;
 	}
 	
+	/**
+	 * 
+	 * @param path
+	 * @param bin
+	 * @throws FileNotFoundException
+	 * @throws IOException 
+	 */
 	public Spectrum(String path, int bin) throws FileNotFoundException, IOException{
 		readCSV(path, bin);
 	}
@@ -95,38 +108,77 @@ public class Spectrum {
 		length = mzTmp2.size();
 	}
 
+	/**
+	 * 
+	 * @return 
+	 */
 	public double[] getMz() {
 		return mz;
 	}
 	
+	/**
+	 * 
+	 * @param index
+	 * @return 
+	 */
 	public double getMZ(int index){
 		return mz[index];
 	}
 
+	/**
+	 * 
+	 * @param mz 
+	 */
 	public void setMz(double[] mz) {
 		this.mz = mz;
 	}
 
+	/**
+	 * 
+	 * @return 
+	 */
 	public double[] getVoltage() {
 		return voltage;
 	}
 
+	/**
+	 * 
+	 * @param voltage 
+	 */
 	public void setVoltage(double[] voltage) {
 		this.voltage = voltage;
 	}
 	
+	/**
+	 * 
+	 * @param index
+	 * @return 
+	 */
 	public double getVoltage(int index) {
 		return voltage[index];
 	}
 
+	/**
+	 * 
+	 * @param voltage
+	 * @param index 
+	 */
 	public void setVoltage(double voltage, int index) {
 		this.voltage[index] = voltage;
 	}
 	
+	/**
+	 * 
+	 * @return 
+	 */
 	public String getFilename(){
 		return filename;
 	}
 	
+	/**
+	 * 
+	 * @return 
+	 */
 	public int getLength(){
 		return length;
 	}

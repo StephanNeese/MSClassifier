@@ -6,14 +6,29 @@ import weka.core.Matrix;
 
 public class PCA {
 	
-	public static void performPCA(SpectraMatrix data, double varianceCovered) throws Exception{
+	/**
+	 * 
+	 * @param data
+	 * @param varianceCovered
+	 * @return
+	 * @throws Exception 
+	 */
+	public static double[][] performPCA(SpectraMatrix data, double varianceCovered) throws Exception{
 		data.center();
 		double[][] covarianceMatrix = calcCovarianceMatrix(data);
 		EigenVector[] eigenVectors = calcEigenVectors(covarianceMatrix);
 		EigenVector[] features = choseFeatures(eigenVectors, varianceCovered);
+		System.out.println(features.length);
 		double[][] finalData = getFinalData(features, data);
+		
+		return finalData;
 	}
 
+	/**
+	 * 
+	 * @param data
+	 * @return 
+	 */
 	private static double[][] calcCovarianceMatrix(SpectraMatrix data) {
 		double[][] covariance = new double[data.getNumDimensions()][data.getNumDimensions()];
 		
@@ -25,10 +40,10 @@ public class PCA {
 			// calc mean of dimension
 			double xMean = 0;
 			double xSum = 0;
-			for(int k=0; k<x.length; k++){
+			for(int k=0; k<n; k++){
 				xSum += x[k];
 			}
-			xMean = xSum/x.length;
+			xMean = xSum/n;
 			
 			for(int j=0; j<data.getNumDimensions(); j++){
 				// get dimension y for covariance calc
@@ -36,13 +51,13 @@ public class PCA {
 				// calc mean of dimension
 				double yMean = 0;
 				double ySum = 0;
-				for(int k=0; k<y.length; k++){
+				for(int k=0; k<n; k++){
 					ySum += y[k];
 				}
-				yMean = ySum/y.length;
+				yMean = ySum/n;
 				// calculate covariance
 				double num = 0;
-				for(int k=0; k<x.length; k++){
+				for(int k=0; k<n; k++){
 					num += (x[k] - xMean)*(y[k] - yMean);
 				}
 				covariance[i][j] = num/(n-1);
@@ -52,6 +67,12 @@ public class PCA {
 		return covariance;
 	}
 
+	/**
+	 * 
+	 * @param covarianceMatrix
+	 * @return
+	 * @throws Exception 
+	 */
 	private static EigenVector[] calcEigenVectors(double[][] covarianceMatrix) throws Exception {
 		// let WEKA Package calculate the eigenvalues and eigenvectors
 		Matrix covariance = new Matrix(covarianceMatrix);
@@ -72,6 +93,12 @@ public class PCA {
 		return res;
 	}
 
+	/**
+	 * 
+	 * @param eigenVectors
+	 * @param variance
+	 * @return 
+	 */
 	private static EigenVector[] choseFeatures(EigenVector[] eigenVectors, double variance) {
 		// sort eigenvectors by eigenvalue
 		Arrays.sort(eigenVectors);
@@ -100,6 +127,12 @@ public class PCA {
 		return featureVectors;
 	}
 
+	/**
+	 * 
+	 * @param features
+	 * @param data
+	 * @return 
+	 */
 	private static double[][] getFinalData(EigenVector[] features, SpectraMatrix data) {
 		double[][] originalData = data.getData();
 		double[][] originalDataTransposed = transpose(originalData);
@@ -110,12 +143,43 @@ public class PCA {
 		}
 		
 		// multiply the matrices
-		double[][] finalData = new double[features.length][data.getNumSpectra()];
-		
+		double[][] finalData = new double[featuresTransposed.length][originalData[0].length];
+		finalData = multiply(featuresTransposed, originalDataTransposed);
 		
 		return finalData;
 	}
 	
+	/**
+	 * 
+	 * @param a
+	 * @param b
+	 * @return 
+	 */
+	public static double[][] multiply(double[][] a, double[][] b){
+		double[][] res = new double[a.length][b[0].length];
+//		
+//		System.out.println("A rows: " + a.length + " cols: " + a[0].length);
+//		System.out.println("B rows: " + b.length + " cols: " + b[0].length);
+//		System.out.println("C rows: " + res.length + " cols: " + res[0].length);
+		
+		for(int rows=0; rows<a.length; rows++){
+			for(int cols=0; cols<b[0].length; cols++){
+				// multiplication of a cell takes place here
+				res[rows][cols] = 0;
+				for(int s=0; s<b.length; s++){
+					res[rows][cols] += a[rows][s] * b[s][cols];
+				}
+			}
+		}
+		
+		return res;
+	}
+	
+	/**
+	 * 
+	 * @param matrix
+	 * @return 
+	 */
 	private static double[][] transpose(double[][] matrix){
 		double[][] res = new double[matrix[0].length][matrix.length];
 		
@@ -126,9 +190,5 @@ public class PCA {
 		}
 		
 		return res;
-	}
-
-	private static SpectraMatrix transposeBack(EigenVector[] features, SpectraMatrix transposed) {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 	}
 }

@@ -1,6 +1,5 @@
 package Main;
 
-
 import Spectrum.SpectraMatrix;
 import java.io.FileNotFoundException;
 import preprocessing.PCA;
@@ -8,11 +7,6 @@ import preprocessing.Reader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import preprocessing.ProfileBuilder;
-import weka.core.Instance;
-import weka.core.Instances;
-import weka.core.converters.ConverterUtils.DataSource;
-
 
 public class Main {
 	
@@ -24,7 +18,8 @@ public class Main {
 //		System.out.println(x.toString());
 //		
 //		 read data from a folder
-		SpectraMatrix data = Reader.readData("/home/wens/MINI_samples");
+		SpectraMatrix data = Reader.readData("/home/wens/MINI_samples", 1);
+		double[][] res = PCA.performPCA(data, 0.9);
 		//data.toCSV("/home/wens/samples4u.csv");
 		
 //		 transform data via PCA
@@ -33,19 +28,26 @@ public class Main {
 //		ProfileBuilder.build(data);
 		
 		// WEKA PCA Test
-		writeToARFF(data, "/home/wens/test.arff");
-		weka.core.Instances PCA_dataset = new Instances(new DataSource("/home/wens/test.arff").getDataSet());
-		weka.attributeSelection.PrincipalComponents PCA = new weka.attributeSelection.PrincipalComponents();
-		PCA.setTransformBackToOriginal(false);
-		PCA.setCenterData(true);
-		PCA.setVarianceCovered(0.5);
-		PCA.buildEvaluator(PCA_dataset);
-		weka.core.Instances transformed_data = PCA.transformedData(PCA_dataset);
-		PrintWriter writer = new PrintWriter("/home/wens/pcaResult.arff", "UTF-8");
-		writer.print(transformed_data.toString());
-		writer.close();
+//		writeToARFF(data, "/home/wens/test.arff");
+//		weka.core.Instances PCA_dataset = new Instances(new DataSource("/home/wens/test.arff").getDataSet());
+//		weka.attributeSelection.PrincipalComponents PCA = new weka.attributeSelection.PrincipalComponents();
+//		PCA.setTransformBackToOriginal(false);
+//		PCA.setCenterData(true);
+//		PCA.setVarianceCovered(0.9);
+//		PCA.buildEvaluator(PCA_dataset);
+//		weka.core.Instances transformed_data = PCA.transformedData(PCA_dataset);
+//		PrintWriter writer = new PrintWriter("/home/wens/pcaResult_4u_var09.arff", "UTF-8");
+//		writer.print(transformed_data.toString());
+//		writer.close();
 	}
 	
+	/**
+	 * 
+	 * @param data
+	 * @param filepath
+	 * @throws FileNotFoundException
+	 * @throws UnsupportedEncodingException 
+	 */
 	private static void writeToARFF(SpectraMatrix data, String filepath) 
 			throws FileNotFoundException, 
 			UnsupportedEncodingException{
