@@ -5,36 +5,36 @@ public class EigenVector implements Comparable<EigenVector> {
 	private final double[] data;
 	private double eigenValue;
 	
-	/**
+	/** consructs a EigenVector from a data array and an eigenvalue
 	 * 
-	 * @param data
-	 * @param eigenValue 
+	 * @param data double array with the data of the dimensions
+	 * @param eigenValue the corresponding eigenvalue for the vector
 	 */
 	public EigenVector(double[] data, double eigenValue){
 		this.data = data;
 		this.eigenValue = eigenValue;
 	}
 	
-	/**
+	/** returns the data array
 	 * 
-	 * @return 
+	 * @return the data as double array
 	 */
 	public double[] getData(){
 		return data;
 	}
 	
-	/**
+	/** returns a specific element from the data array
 	 * 
-	 * @param index
-	 * @return 
+	 * @param index the index for the element
+	 * @return the element as double
 	 */
 	public double getData(int index){
 		return data[index];
 	}
 	
-	/**
+	/** returns the eigenvalue of the eigenvector
 	 * 
-	 * @return 
+	 * @return the eigenvalue
 	 */
 	public double getEigenValue(){
 		return eigenValue;

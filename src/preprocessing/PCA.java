@@ -6,11 +6,11 @@ import weka.core.Matrix;
 
 public class PCA {
 	
-	/**
+	/** performs a principal component analysis on a SpectraMatrix
 	 * 
-	 * @param data
-	 * @param varianceCovered
-	 * @return
+	 * @param data the SpectraMatrix
+	 * @param varianceCovered the variance that should be covered with the resulting dataset
+	 * @return a data matrix as 2d double array with samples in columns and dimensions along rows
 	 * @throws Exception 
 	 */
 	public static double[][] performPCA(SpectraMatrix data, double varianceCovered) throws Exception{
@@ -18,16 +18,15 @@ public class PCA {
 		double[][] covarianceMatrix = calcCovarianceMatrix(data);
 		EigenVector[] eigenVectors = calcEigenVectors(covarianceMatrix);
 		EigenVector[] features = choseFeatures(eigenVectors, varianceCovered);
-		System.out.println(features.length);
 		double[][] finalData = getFinalData(features, data);
 		
 		return finalData;
 	}
 
-	/**
+	/** calculates a covariance matrix from the spectra data
 	 * 
-	 * @param data
-	 * @return 
+	 * @param data the SpectraMatrix for which to calculate the covariance matrix
+	 * @return covariance matrix as 2d double array
 	 */
 	private static double[][] calcCovarianceMatrix(SpectraMatrix data) {
 		double[][] covariance = new double[data.getNumDimensions()][data.getNumDimensions()];
@@ -67,10 +66,10 @@ public class PCA {
 		return covariance;
 	}
 
-	/**
+	/** calculates the eigenvectors and eigenvalues for a covariance matrix
 	 * 
-	 * @param covarianceMatrix
-	 * @return
+	 * @param covarianceMatrix the covariance matrix as 2d double array
+	 * @return an array of Eigenvector objects
 	 * @throws Exception 
 	 */
 	private static EigenVector[] calcEigenVectors(double[][] covarianceMatrix) throws Exception {
@@ -93,11 +92,11 @@ public class PCA {
 		return res;
 	}
 
-	/**
+	/** choses as many features as needed to cover a given proportion of the variance
 	 * 
-	 * @param eigenVectors
-	 * @param variance
-	 * @return 
+	 * @param eigenVectors the array of calculated eigenvectors
+	 * @param variance the proportion of variance to be covered
+	 * @return an array of the most significant eigenvectors
 	 */
 	private static EigenVector[] choseFeatures(EigenVector[] eigenVectors, double variance) {
 		// sort eigenvectors by eigenvalue
@@ -127,11 +126,12 @@ public class PCA {
 		return featureVectors;
 	}
 
-	/**
+	/** returns the final dataset transformed into PCA space
 	 * 
-	 * @param features
-	 * @param data
-	 * @return 
+	 * @param features the feature matrix with the chosen eigenvectors
+	 * @param data the raw data as SpectraMatrix object
+	 * @return the final data as 2d double array 
+	 * with samples in columns and dimensions along rows
 	 */
 	private static double[][] getFinalData(EigenVector[] features, SpectraMatrix data) {
 		double[][] originalData = data.getData();
@@ -149,11 +149,11 @@ public class PCA {
 		return finalData;
 	}
 	
-	/**
+	/** multiplies two matrices
 	 * 
-	 * @param a
-	 * @param b
-	 * @return 
+	 * @param a matrix on the left
+	 * @param b matrix on the right
+	 * @return new matrix as 2d double array
 	 */
 	public static double[][] multiply(double[][] a, double[][] b){
 		double[][] res = new double[a.length][b[0].length];
@@ -175,10 +175,10 @@ public class PCA {
 		return res;
 	}
 	
-	/**
+	/** transposes a matrix
 	 * 
-	 * @param matrix
-	 * @return 
+	 * @param matrix matrix to transpose
+	 * @return transposed matrix
 	 */
 	private static double[][] transpose(double[][] matrix){
 		double[][] res = new double[matrix[0].length][matrix.length];

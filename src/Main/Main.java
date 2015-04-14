@@ -41,10 +41,10 @@ public class Main {
 //		writer.close();
 	}
 	
-	/**
+	/** writes a SpectraMatrix to a WEKA ARFF file
 	 * 
-	 * @param data
-	 * @param filepath
+	 * @param data the SpectraMatrix to write
+	 * @param filepath the complete path to the file
 	 * @throws FileNotFoundException
 	 * @throws UnsupportedEncodingException 
 	 */

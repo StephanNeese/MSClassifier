@@ -17,11 +17,11 @@ public class Spectrum {
 	private String filename;
 	private int length;
 	
-	/**
+	/** constructs a spectrum from given values
 	 * 
-	 * @param mz
-	 * @param voltage
-	 * @param filename 
+	 * @param mz array with mz values
+	 * @param voltage array with voltage values
+	 * @param filename the filename as identifier
 	 */
 	public Spectrum(double[] mz, double[] voltage, String filename){
 		this.mz = mz;
@@ -30,10 +30,10 @@ public class Spectrum {
 		length = mz.length;
 	}
 	
-	/**
+	/** constructs a spectrum from a file
 	 * 
-	 * @param path
-	 * @param bin
+	 * @param path path to the csv file containing the spectral data
+	 * @param bin size of a bin
 	 * @throws FileNotFoundException
 	 * @throws IOException 
 	 */
@@ -41,10 +41,10 @@ public class Spectrum {
 		readCSV(path, bin);
 	}
 	
-	/**
+	/** reads a csv file and initializes the spectrum object (called in constructor)
 	 * 
-	 * @param path
-	 * @param bin
+	 * @param path the complete path to the csv file
+	 * @param bin size of a bin
 	 * @throws FileNotFoundException
 	 * @throws IOException 
 	 */
@@ -108,76 +108,76 @@ public class Spectrum {
 		length = mzTmp2.size();
 	}
 
-	/**
+	/** returns the mz values
 	 * 
-	 * @return 
+	 * @return mz values
 	 */
 	public double[] getMz() {
 		return mz;
 	}
 	
-	/**
+	/** returns an mz value for a given index
 	 * 
-	 * @param index
-	 * @return 
+	 * @param index index of the mz value
+	 * @return the mz value
 	 */
 	public double getMZ(int index){
 		return mz[index];
 	}
 
-	/**
+	/** sets the mz values for this spectrum
 	 * 
-	 * @param mz 
+	 * @param mz the mz values as double array
 	 */
 	public void setMz(double[] mz) {
 		this.mz = mz;
 	}
 
-	/**
+	/** returns the voltages as array
 	 * 
-	 * @return 
+	 * @return the voltage values as double array
 	 */
 	public double[] getVoltage() {
 		return voltage;
 	}
 
-	/**
+	/** sets the voltage values of this object
 	 * 
-	 * @param voltage 
+	 * @param voltage the voltage values as array
 	 */
 	public void setVoltage(double[] voltage) {
 		this.voltage = voltage;
 	}
 	
-	/**
+	/** returns a specific voltage value for this object
 	 * 
-	 * @param index
-	 * @return 
+	 * @param index index of the value
+	 * @return the voltage value given by the index
 	 */
 	public double getVoltage(int index) {
 		return voltage[index];
 	}
 
-	/**
+	/** sets a specific voltage value
 	 * 
-	 * @param voltage
-	 * @param index 
+	 * @param voltage the voltage value
+	 * @param index the index in the spectrum
 	 */
 	public void setVoltage(double voltage, int index) {
 		this.voltage[index] = voltage;
 	}
 	
-	/**
+	/** returns the filename of this objects csv data
 	 * 
-	 * @return 
+	 * @return the filename
 	 */
 	public String getFilename(){
 		return filename;
 	}
 	
-	/**
+	/** returns the size of this object in bins
 	 * 
-	 * @return 
+	 * @return the size/length
 	 */
 	public int getLength(){
 		return length;

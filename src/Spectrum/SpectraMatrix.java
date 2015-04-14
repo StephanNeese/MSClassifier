@@ -12,9 +12,9 @@ public class SpectraMatrix {
 	private final int numSpectra;
 	private final int numDimensions;
 	
-	/**
+	/** constructs a SpectraMatrix from a Spectrum array
 	 * 
-	 * @param spectra 
+	 * @param spectra the spectrum array
 	 */
 	public SpectraMatrix(Spectrum[] spectra){
 		this.mz = spectra[0].getMz();
@@ -29,8 +29,8 @@ public class SpectraMatrix {
 		}
 	}
 	
-	/**
-	 * 
+	/** Normalizes the data by division of each value
+	 * by the mean over the whole matrix
 	 */
 	public void normalizationDivideByMean(){
 		// get mean value of all values in the matrix
@@ -43,9 +43,9 @@ public class SpectraMatrix {
 		}
 	}
 	
-	/**
+	/** calculates the mean value over the whole SpectraMatrix
 	 * 
-	 * @return 
+	 * @return the mean value
 	 */
 	public double calculateMean(){
 		double sum = 0;
@@ -60,10 +60,10 @@ public class SpectraMatrix {
 		return sum/num;
 	}
 	
-	/**
+	/** calculates the mean for a given dimension
 	 * 
-	 * @param dimension
-	 * @return 
+	 * @param dimension the index of the dimension
+	 * @return the mean as double
 	 */
 	public double calculateMean(int dimension){
 		double sum = 0;
@@ -76,7 +76,7 @@ public class SpectraMatrix {
 		return sum/num;
 	}
 	
-	/**
+	/** centers the dataset for PCA processing
 	 * 
 	 */
 	public void center(){
@@ -89,36 +89,36 @@ public class SpectraMatrix {
 		}
 	}
 	
-	/**
+	/** returns the mz array
 	 * 
-	 * @return 
+	 * @return mz values as double array
 	 */
 	public double[] getMz(){
 		return mz;
 	}
 	
-	/**
+	/** sets a spectrum at a given index
 	 * 
-	 * @param spectrum
-	 * @param index 
+	 * @param spectrum the spectrum object
+	 * @param index the index in the spectraMatrix
 	 */
 	public void setSpectrum(Spectrum spectrum, int index){
 		voltage[index] = spectrum.getVoltage();
 	}
 	
-	/**
+	/** returns a spectrum for a given index
 	 * 
-	 * @param index
-	 * @return 
+	 * @param index the index in the spectraMatrix
+	 * @return the specified spectrum
 	 */
 	public Spectrum getSpectrum(int index){
 		return new Spectrum(mz, voltage[index], samples[index]);
 	}
 	
-	/**
+	/** returns a dimension given by an index
 	 * 
-	 * @param index
-	 * @return 
+	 * @param index the index of the dimension
+	 * @return the specified dimension as double array
 	 */
 	public double[] getDimension(int index){
 		double[] res = new double[voltage.length];
@@ -128,25 +128,26 @@ public class SpectraMatrix {
 		return res;
 	}
 
-	/**
+	/** returns the number of spectra in the matrix
 	 * 
-	 * @return 
+	 * @return the number of spectra
 	 */
 	public int getNumSpectra() {
 		return numSpectra;
 	}
 
-	/**
+	/** returns the number of dimensions in the matrix
 	 * 
-	 * @return 
+	 * @return the number of dimensions
 	 */
 	public int getNumDimensions() {
 		return numDimensions;
 	}
 	
-	/**
+	/** returns the data as a 2d array 
+	 * in the form [spectrum][mz-value]
 	 * 
-	 * @return 
+	 * @return the data array
 	 */
 	public double[][] getData(){
 		return voltage;
@@ -166,9 +167,9 @@ public class SpectraMatrix {
 		return res;
 	}
 	
-	/**
+	/** writes the spectraMatrix to a csv file
 	 * 
-	 * @param path
+	 * @param path the complete path to the csv file
 	 * @throws FileNotFoundException
 	 * @throws UnsupportedEncodingException 
 	 */
