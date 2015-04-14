@@ -53,4 +53,8 @@ public class Reader {
 		}
 		return res;
 	}
+	
+	public static void readProfile(String path){
+		
+	}
 }

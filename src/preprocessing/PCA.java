@@ -13,12 +13,12 @@ public class PCA {
 	 * @return a data matrix as 2d double array with samples in columns and dimensions along rows
 	 * @throws Exception 
 	 */
-	public static double[][] performPCA(SpectraMatrix data, double varianceCovered) throws Exception{
+	public static PCADataSet performPCA(SpectraMatrix data, double varianceCovered) throws Exception{
 		data.center();
 		double[][] covarianceMatrix = calcCovarianceMatrix(data);
 		EigenVector[] eigenVectors = calcEigenVectors(covarianceMatrix);
 		EigenVector[] features = choseFeatures(eigenVectors, varianceCovered);
-		double[][] finalData = getFinalData(features, data);
+		PCADataSet finalData = getFinalData(features, data);
 		
 		return finalData;
 	}
@@ -133,7 +133,7 @@ public class PCA {
 	 * @return the final data as 2d double array 
 	 * with samples in columns and dimensions along rows
 	 */
-	private static double[][] getFinalData(EigenVector[] features, SpectraMatrix data) {
+	private static PCADataSet getFinalData(EigenVector[] features, SpectraMatrix data) {
 		double[][] originalData = data.getData();
 		double[][] originalDataTransposed = transpose(originalData);
 		// already transposed when extracted
@@ -146,7 +146,8 @@ public class PCA {
 		double[][] finalData = new double[featuresTransposed.length][originalData[0].length];
 		finalData = multiply(featuresTransposed, originalDataTransposed);
 		
-		return finalData;
+		PCADataSet res = new PCADataSet(finalData, data.getSamples(), featuresTransposed);
+		return res;
 	}
 	
 	/** multiplies two matrices

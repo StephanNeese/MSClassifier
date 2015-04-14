@@ -7,6 +7,8 @@ import preprocessing.Reader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import preprocessing.PCADataSet;
+import preprocessing.ProfileBuilder;
 
 public class Main {
 	
@@ -19,7 +21,8 @@ public class Main {
 //		
 //		 read data from a folder
 		SpectraMatrix data = Reader.readData("/home/wens/MINI_samples", 1);
-		double[][] res = PCA.performPCA(data, 0.9);
+		PCADataSet pca_data = PCA.performPCA(data, 0.5);
+		ProfileBuilder.build(pca_data, "/home/wens/testprofile");
 		//data.toCSV("/home/wens/samples4u.csv");
 		
 //		 transform data via PCA

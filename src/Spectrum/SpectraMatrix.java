@@ -97,6 +97,14 @@ public class SpectraMatrix {
 		return mz;
 	}
 	
+	/** returns the sample names of the spectra matrix
+	 * 
+	 * @return the sample names as string array
+	 */
+	public String[] getSamples(){
+		return samples;
+	}
+	
 	/** sets a spectrum at a given index
 	 * 
 	 * @param spectrum the spectrum object
