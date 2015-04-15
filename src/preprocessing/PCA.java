@@ -18,7 +18,7 @@ public class PCA {
 		double[][] covarianceMatrix = calcCovarianceMatrix(data);
 		EigenVector[] eigenVectors = calcEigenVectors(covarianceMatrix);
 		EigenVector[] features = choseFeatures(eigenVectors, varianceCovered);
-		PCADataSet finalData = getFinalData(features, data);
+		PCADataSet finalData = getFinalData(features, data, varianceCovered);
 		
 		return finalData;
 	}
@@ -133,7 +133,7 @@ public class PCA {
 	 * @return the final data as 2d double array 
 	 * with samples in columns and dimensions along rows
 	 */
-	private static PCADataSet getFinalData(EigenVector[] features, SpectraMatrix data) {
+	private static PCADataSet getFinalData(EigenVector[] features, SpectraMatrix data, double varianceCovered) {
 		double[][] originalData = data.getData();
 		double[][] originalDataTransposed = transpose(originalData);
 		// already transposed when extracted
@@ -146,7 +146,11 @@ public class PCA {
 		double[][] finalData = new double[featuresTransposed.length][originalData[0].length];
 		finalData = multiply(featuresTransposed, originalDataTransposed);
 		
-		PCADataSet res = new PCADataSet(finalData, data.getSamples(), featuresTransposed);
+		PCADataSet res = new PCADataSet(
+				finalData, 
+				data.getSamples(), 
+				featuresTransposed, 
+				varianceCovered);
 		return res;
 	}
 	

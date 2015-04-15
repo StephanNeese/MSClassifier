@@ -5,6 +5,7 @@ public class PCADataSet {
 	private double[][] data;						// data[dimensions][samples]
 	private String[] classes;						// classes of the samples
 	private double[][] transformedFeatureMatrix;	// [vectors][dimensions]
+	private final double variance;
 
 	/** constructs a PCADataSet from a given array of data 
 	 * and a given array of the feature matrix
@@ -12,10 +13,15 @@ public class PCADataSet {
 	 * @param data the PCA transformed data 
 	 * @param transformedFeatureMatrix the feature matrix used for transformation
 	 */
-	public PCADataSet(double[][] data, String[] classes, double[][] transformedFeatureMatrix) {
+	public PCADataSet(
+			double[][] data, 
+			String[] classes, 
+			double[][] transformedFeatureMatrix, 
+			double variance) {
 		this.data = data;
 		this.classes = classes;
 		this.transformedFeatureMatrix = transformedFeatureMatrix;
+		this.variance = variance;
 	}
 
 	/** returns the data
@@ -64,5 +70,13 @@ public class PCADataSet {
 	 */
 	public void setTransformedFeatureMatrix(double[][] transformedFeatureMatrix) {
 		this.transformedFeatureMatrix = transformedFeatureMatrix;
+	}
+	
+	/** returns the variance covered by this PCA transformed dataset
+	 * 
+	 * @return the variance covered
+	 */
+	public double getVariance(){
+		return variance;
 	}
 }

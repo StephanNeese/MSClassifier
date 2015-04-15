@@ -1,5 +1,6 @@
 package Main;
 
+import Spectrum.Profile;
 import Spectrum.SpectraMatrix;
 import java.io.FileNotFoundException;
 import preprocessing.PCA;
@@ -20,9 +21,11 @@ public class Main {
 //		System.out.println(x.toString());
 //		
 //		 read data from a folder
-		SpectraMatrix data = Reader.readData("/home/wens/MINI_samples", 1);
-		PCADataSet pca_data = PCA.performPCA(data, 0.5);
-		ProfileBuilder.build(pca_data, "/home/wens/testprofile");
+//		SpectraMatrix data = Reader.readData("/home/wens/MINI_samples", 1);
+//		PCADataSet pca_data = PCA.performPCA(data, 0.5);
+//		ProfileBuilder.build(pca_data, "MINI11", "/home/wens/MINI_samples", "/home/wens/testprofile");
+		Profile profile = Reader.readProfile("/home/wens/testprofile");
+		System.out.println(profile.toString());
 		//data.toCSV("/home/wens/samples4u.csv");
 		
 //		 transform data via PCA
