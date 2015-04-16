@@ -7,14 +7,15 @@ public class PCADataSet {
 	private double[][] transformedFeatureMatrix;	// [vectors][dimensions]
 	private final double variance;
 
-	/** constructs a PCADataSet from a given array of data 
-	 * and a given array of the feature matrix
+	/** constructs a PCADataSet from given parameters
 	 * 
 	 * @param data the PCA transformed data 
+	 * @param classes 
 	 * @param transformedFeatureMatrix the feature matrix used for transformation
+	 * @param variance
 	 */
 	public PCADataSet(
-			double[][] data, 
+			double[][] data,
 			String[] classes, 
 			double[][] transformedFeatureMatrix, 
 			double variance) {

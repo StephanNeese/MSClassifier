@@ -81,6 +81,9 @@ public class Reader {
 		String inputPath = null;
 		double variance = 0.0;
 		String[] filenames = null;
+		double[] originalMeans = null;
+		double originalMean = 0;
+		double binSize = 0;
 		double[][] data = null;
 		double[][] features = null;
 		double[][] mean = null;
@@ -91,6 +94,7 @@ public class Reader {
 				String[] content = segment[i].split("\t");
 				classes = new String[content.length-1];
 				for(int j=1; j<content.length; j++){
+					content[j] = content[j].replaceAll("\n", "");
 					classes[j-1] = content[j];
 				}
 			}else if(tmp.startsWith("date:")){
@@ -100,10 +104,10 @@ public class Reader {
 				date = (Date)formatter.parse(dt);
 			}else if(tmp.startsWith("device:")){
 				String[] content = segment[i].split("\t");
-				device = content[1];
+				device = content[1].replaceAll("\n", "");
 			}else if(tmp.startsWith("path:")){
 				String[] content = segment[i].split("\t");
-				inputPath = content[1];
+				inputPath = content[1].replaceAll("\n", "");
 			}else if(tmp.startsWith("variance:")){
 				String[] content = segment[i].split("\t");
 				variance = Double.parseDouble(content[1]);
@@ -113,6 +117,18 @@ public class Reader {
 				for(int j=1; j<content.length; j++){
 					filenames[j-1] = content[j];
 				}
+			}else if(tmp.startsWith("original-means:")){
+				String[] content = segment[i].split("\n");
+				originalMeans = new double[content.length-1];
+				for(int j=1; j<content.length; j++){
+					originalMeans[j-1] = Double.parseDouble(content[j]);
+				}
+			}else if(tmp.startsWith("original-mean:")){
+				String[] content = segment[i].split("\t");
+				originalMean = Double.parseDouble(content[1]);
+			}else if(tmp.startsWith("bin:")){
+				String[] content = segment[i].split("\t");
+				binSize = Double.parseDouble(content[1]);
 			}else if(tmp.startsWith("data:")){
 				String[] row = segment[i].split("\n");
 				data = new double[row.length-1][row[1].split("\t").length];
@@ -143,6 +159,18 @@ public class Reader {
 			}
 		}
 		
-		return new Profile(classes, date, device, inputPath, variance, filenames, data, features, mean);
+		return new Profile(
+				classes, 
+				date, 
+				device, 
+				inputPath, 
+				variance, 
+				filenames, 
+				data, 
+				features, 
+				mean, 
+				originalMeans, 
+				originalMean, 
+				binSize);
 	}
 }

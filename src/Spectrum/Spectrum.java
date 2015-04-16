@@ -13,7 +13,6 @@ public class Spectrum {
 	
 	private double[] mz;
 	private double[] voltage;
-	HashMap<Integer, Double> values;
 	private String filename;
 	private int length;
 	
@@ -95,11 +94,9 @@ public class Spectrum {
 		/** parse from hashmap to arrays **/
 		mz = new double[mzTmp2.size()];
 		voltage = new double[voltageTmp2.size()];
-		values = new HashMap<>();
 		for(int i=0; i<mzTmp2.size(); i++){
 			mz[i] = mzTmp2.get(i);
 			voltage[i] = voltageTmp2.get(i);
-			values.put(mzTmp2.get(i), voltageTmp2.get(i));
 		}
 		
 		String[] pathTmp = path.split(File.separator);
@@ -192,5 +189,33 @@ public class Spectrum {
 		}
 		
 		return res;
+	}
+	
+	/** takes the mean from a spectraMatrix 
+	 * and normalizes the spectrum over this mean
+	 * 
+	 * @param mean the mean from a SpectraMatrix
+	 */
+	public void normalizationDivideByMean(double mean){
+		for(int i=0; i<voltage.length; i++){
+			voltage[i] = voltage[i]/mean;
+		}
+	}
+	
+	/** takes the means of the dimensions of a specific spectraMatrix
+	 * and substracts the mean values from the spectrums values
+	 * to center the data along the axes
+	 * 
+	 * @param means the mean values of the dimensions of a spectraMatrix
+	 */
+	public void center(double[] means){
+		if(voltage.length!=means.length){
+			throw new IllegalArgumentException("Spectrum and Data in the profile do not have the same M/Z range. "
+			+ "Please adjust the device.");
+		}else{
+			for(int i=0; i<voltage.length; i++){
+				voltage[i] = voltage[i] - means[i];
+			}
+		}
 	}
 }

@@ -11,6 +11,8 @@ public class SpectraMatrix {
 	private double[][] voltage;		// [spectrum][mz]
 	private final int numSpectra;
 	private final int numDimensions;
+	private double mean;
+	private double[] dimensionsMean;
 	
 	/** constructs a SpectraMatrix from a Spectrum array
 	 * 
@@ -27,14 +29,15 @@ public class SpectraMatrix {
 			voltage[i] = spectra[i].getVoltage();
 			samples[i] = spectra[i].getFilename();
 		}
+		
+		mean = calculateMean();
+		dimensionsMean = calculateDimensionMeans();
 	}
 	
 	/** Normalizes the data by division of each value
 	 * by the mean over the whole matrix
 	 */
 	public void normalizationDivideByMean(){
-		// get mean value of all values in the matrix
-		double mean = calculateMean();
 		// divide all values by mean
 		for(int i=0; i<voltage.length; i++){
 			for(int j=0; j<voltage[0].length; j++){
@@ -47,9 +50,8 @@ public class SpectraMatrix {
 	 * 
 	 * @return the mean value
 	 */
-	public double calculateMean(){
+	private double calculateMean(){
 		double sum = 0;
-		double mean = 0;
 		int num = voltage.length * voltage[0].length;
 		// calculate mean of all values in the matrix
 		for(int i=0; i<voltage.length; i++){
@@ -60,14 +62,28 @@ public class SpectraMatrix {
 		return sum/num;
 	}
 	
+	/** calculates the mean values for all dimensions
+	 * represented in the spectraMatrix
+	 * 
+	 * @return the mean values as double array
+	 */
+	private double[] calculateDimensionMeans(){
+		double[] res = new double[voltage[0].length];
+		// loop though dimensions
+		for(int dim=0; dim<voltage[0].length; dim++){
+			res[dim] = calculateMean(dim);
+		}
+		
+		return res;
+	}
+	
 	/** calculates the mean for a given dimension
 	 * 
 	 * @param dimension the index of the dimension
 	 * @return the mean as double
 	 */
-	public double calculateMean(int dimension){
+	private double calculateMean(int dimension){
 		double sum = 0;
-		double mean = 0;
 		int num = voltage.length;
 		// calculate mean of all values in the matrix
 		for(int i=0; i<voltage.length; i++){
@@ -160,6 +176,15 @@ public class SpectraMatrix {
 	public double[][] getData(){
 		return voltage;
 	}
+
+	public double getMean() {
+		return mean;
+	}
+
+	public double[] getDimensionsMean() {
+		return dimensionsMean;
+	}
+	
 
 	@Override
 	public String toString() {

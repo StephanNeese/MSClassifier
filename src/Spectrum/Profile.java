@@ -1,6 +1,7 @@
 package Spectrum;
 
 import java.util.Date;
+import preprocessing.PCA;
 
 public class Profile {
 	
@@ -13,6 +14,9 @@ public class Profile {
 	private final double[][] data;
 	private final double[][] features;
 	private final double[][] mean;
+	private final double[] originalMeans;
+	private final double originalMean;
+	private final double binSize;
 
 	public Profile(
 			String[] classes, 
@@ -23,7 +27,10 @@ public class Profile {
 			String[] filenames, 
 			double[][] data, 
 			double[][] features, 
-			double[][] mean) {
+			double[][] mean,
+			double[] originalMeans,
+			double originalMean,
+			double binSize) {
 		this.classes = classes;
 		this.datetime = datetime;
 		this.device = device;
@@ -33,6 +40,9 @@ public class Profile {
 		this.data = data;
 		this.features = features;
 		this.mean = mean;
+		this.originalMeans = originalMeans;
+		this.originalMean = originalMean;
+		this.binSize = binSize;
 	}
 
 	public String[] getClasses() {
@@ -69,6 +79,18 @@ public class Profile {
 
 	public double[][] getMean() {
 		return mean;
+	}
+	
+	public double[] getOriginalMeans() {
+		return originalMeans;
+	}
+
+	public double getOriginalMean() {
+		return originalMean;
+	}
+
+	public double getBinSize() {
+		return binSize;
 	}
 
 	@Override
@@ -109,5 +131,28 @@ public class Profile {
 		}
 		
 		return res;
+	}
+
+	public ClassificationResult mahalanobisDistance(Spectrum spectrum){
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+	
+	public ClassificationResult euclideanDistance(Spectrum spectrum){
+		// check if same length
+		if(spectrum.getLength()!=originalMeans.length){
+			throw new IllegalArgumentException("Spectrum and Data in the profile do not have the same M/Z range. "
+			+ "Please adjust the device.");
+		}
+		// normalize and center the spectrum
+		spectrum.normalizationDivideByMean(originalMean);
+		spectrum.center(originalMeans);
+		// transform the spectrum into PCA space
+		double[] pca_spectrum = PCA.transformSpectrum(spectrum, features);
+		// loop through all classes to pick the same row in the mean array
+		for(int i=0; i<classes.length; i++){
+			
+			
+		}
+		throw new UnsupportedOperationException("Not supported yet.");
 	}
 }

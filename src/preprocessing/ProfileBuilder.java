@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class ProfileBuilder {
 	
-	public static void build(PCADataSet data, String device, String inputPath, String path) throws FileNotFoundException, UnsupportedEncodingException, ParseException{
+	public static void build(PCADataSet data, SpectraMatrix originalData, String device, String inputPath, String path) throws FileNotFoundException, UnsupportedEncodingException, ParseException{
 		double[][] dataValues = data.getData();
 		PrintWriter writer = new PrintWriter(path, "UTF-8");
 		
@@ -47,6 +47,21 @@ public class ProfileBuilder {
 		for(int i=0; i<sampleFiles.length; i++){
 			writer.println(sampleFiles[i]);
 		}
+		writer.println("//#");
+		// print the mean values of the original untransformed data for normalization
+		writer.println("original-means:");
+		double[] originalMeans = originalData.getDimensionsMean();
+		for(int i=0; i<originalMeans.length; i++){
+			writer.println(originalMeans[i]);
+		}
+		writer.println("//#");
+		// print the mean of the untransformed spectraMatrix for normalization
+		writer.println("original-mean:\t" + originalData.getMean());
+		writer.println("//#");
+		// print the bin size
+		double[] bins = originalData.getMz();
+		double binSize = bins[1] - bins[0];
+		writer.println("bin:\t" + binSize);
 		writer.println("//#");
 		// print transformed data matrix
 		writer.println("data:");

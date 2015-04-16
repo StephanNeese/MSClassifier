@@ -1,6 +1,7 @@
 package preprocessing;
 
 import Spectrum.SpectraMatrix;
+import Spectrum.Spectrum;
 import java.util.Arrays;
 import weka.core.Matrix;
 
@@ -143,8 +144,7 @@ public class PCA {
 		}
 		
 		// multiply the matrices
-		double[][] finalData = new double[featuresTransposed.length][originalData[0].length];
-		finalData = multiply(featuresTransposed, originalDataTransposed);
+		double[][] finalData = multiply(featuresTransposed, originalDataTransposed);
 		
 		PCADataSet res = new PCADataSet(
 				finalData, 
@@ -160,13 +160,9 @@ public class PCA {
 	 * @param b matrix on the right
 	 * @return new matrix as 2d double array
 	 */
-	public static double[][] multiply(double[][] a, double[][] b){
+	private static double[][] multiply(double[][] a, double[][] b){
 		double[][] res = new double[a.length][b[0].length];
-//		
-//		System.out.println("A rows: " + a.length + " cols: " + a[0].length);
-//		System.out.println("B rows: " + b.length + " cols: " + b[0].length);
-//		System.out.println("C rows: " + res.length + " cols: " + res[0].length);
-		
+
 		for(int rows=0; rows<a.length; rows++){
 			for(int cols=0; cols<b[0].length; cols++){
 				// multiplication of a cell takes place here
@@ -195,5 +191,22 @@ public class PCA {
 		}
 		
 		return res;
+	}
+	
+	/** transformes a given spectrum into PCA space using a feature matrix
+	 * 
+	 * @param spectrum the spectrum to be transformed
+	 * @param features the feature matrix to be used
+	 * @return the transformed spectrum
+	 */
+	public static double[] transformSpectrum(Spectrum spectrum, double[][] features){
+		double[][] data = new double[1][spectrum.getLength()];
+		data[0] = spectrum.getVoltage();
+		double[][] dataTransposed = transpose(data);
+		
+		// transform using the feature matrix
+		double[][] finalData = multiply(features, dataTransposed);
+		
+		return finalData[0];
 	}
 }
