@@ -91,7 +91,7 @@ public class Spectrum {
 			}
 		}
 		
-		/** parse from hashmap to arrays **/
+		/** parse from ArrayList to arrays **/
 		mz = new double[mzTmp2.size()];
 		voltage = new double[voltageTmp2.size()];
 		for(int i=0; i<mzTmp2.size(); i++){

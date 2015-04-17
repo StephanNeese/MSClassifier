@@ -31,13 +31,14 @@ public class SpectraMatrix {
 		}
 		
 		mean = calculateMean();
+		this.normalizationDivideByMean();
 		dimensionsMean = calculateDimensionMeans();
 	}
 	
 	/** Normalizes the data by division of each value
 	 * by the mean over the whole matrix
 	 */
-	public void normalizationDivideByMean(){
+	private void normalizationDivideByMean(){
 		// divide all values by mean
 		for(int i=0; i<voltage.length; i++){
 			for(int j=0; j<voltage[0].length; j++){
@@ -98,9 +99,8 @@ public class SpectraMatrix {
 	public void center(){
 		// substract dimension-mean value from all dimensions
 		for(int dim=0; dim<voltage[0].length; dim++){
-			double mean = calculateMean(dim);			// mean of dimension j
 			for(int sampl=0; sampl<voltage.length; sampl++){
-				voltage[sampl][dim] = voltage[sampl][dim]-mean;
+				voltage[sampl][dim] = voltage[sampl][dim] - dimensionsMean[dim];
 			}
 		}
 	}

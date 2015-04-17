@@ -205,8 +205,13 @@ public class PCA {
 		double[][] dataTransposed = transpose(data);
 		
 		// transform using the feature matrix
-		double[][] finalData = multiply(features, dataTransposed);
+		double[][] tmp = multiply(features, dataTransposed);
+		double[] finalData = new double[tmp.length];
 		
-		return finalData[0];
+		for(int i=0; i<tmp.length; i++){
+			finalData[i] = tmp[i][0];
+		}
+		
+		return finalData;
 	}
 }

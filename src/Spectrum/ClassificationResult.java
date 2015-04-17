@@ -23,4 +23,9 @@ public class ClassificationResult {
 	public double getScore() {
 		return score;
 	}
+
+	@Override
+	public String toString() {
+		return "ClassificationResult{" + "assignedClass=" + assignedClass + ", distance=" + distance + ", score=" + score + '}';
+	}
 }

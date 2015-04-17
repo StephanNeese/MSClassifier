@@ -13,7 +13,7 @@ public class Profile {
 	private final String[] filenames;
 	private final double[][] data;
 	private final double[][] features;
-	private final double[][] mean;
+	private final double[][] mean;			// [class][dimension]
 	private final double[] originalMeans;
 	private final double originalMean;
 	private final double binSize;
@@ -149,10 +149,29 @@ public class Profile {
 		// transform the spectrum into PCA space
 		double[] pca_spectrum = PCA.transformSpectrum(spectrum, features);
 		// loop through all classes to pick the same row in the mean array
+		double[] distances = new double[classes.length];
 		for(int i=0; i<classes.length; i++){
-			
-			
+			double sum = 0;
+			for(int j=0; j<mean[i].length; j++){
+				sum += (mean[i][j] - pca_spectrum[j])*(mean[i][j] - pca_spectrum[j]);
+			}
+			distances[i] = Math.sqrt(sum);
 		}
-		throw new UnsupportedOperationException("Not supported yet.");
+		// lookup the smallest distance
+		double smallest = distances[0];
+		int index = 0;
+		for(int i=1; i<distances.length; i++){
+			if(distances[i]<smallest){
+				smallest = distances[i];
+				index = i;
+			}
+		}
+		// calculate score
+		double sum = 0;
+		for(int i=0; i<distances.length; i++){
+			sum += distances[i];
+		}
+		
+		return new ClassificationResult(classes[index], distances[index], (1 - (distances[index]/sum)));
 	}
 }

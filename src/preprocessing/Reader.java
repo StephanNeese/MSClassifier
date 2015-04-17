@@ -150,6 +150,7 @@ public class Reader {
 			}else if(tmp.startsWith("mean:")){
 				String[] row = segment[i].split("\n");
 				mean = new double[row.length-1][row[1].split("\t").length];
+				// each row = one class mean vector
 				for(int j=1; j<row.length; j++){
 					String[] column = row[j].split("\t");
 					for(int k=0; k<column.length; k++){
