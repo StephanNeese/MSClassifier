@@ -62,6 +62,14 @@ public class Reader {
 		return res;
 	}
 	
+	/**
+	 * 
+	 * @param path
+	 * @return
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws ParseException 
+	 */
 	public static Profile readProfile(String path) throws FileNotFoundException, IOException, ParseException{
 		File profile = new File(path);
 		BufferedReader buff = new BufferedReader(new FileReader(profile));

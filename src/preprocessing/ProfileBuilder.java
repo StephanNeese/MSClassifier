@@ -14,7 +14,31 @@ import java.util.Map;
 
 public class ProfileBuilder {
 	
-	public static void build(PCADataSet data, SpectraMatrix originalData, String device, String inputPath, String path) throws FileNotFoundException, UnsupportedEncodingException, ParseException{
+	/**
+	 * 
+	 * @param data
+	 * @param originalData
+	 * @param device
+	 * @param inputPath
+	 * @param path
+	 * @param adjustment
+	 * @throws FileNotFoundException
+	 * @throws UnsupportedEncodingException
+	 * @throws ParseException 
+	 */
+	public static void build(
+			PCADataSet data, 
+			SpectraMatrix originalData, 
+			String device, 
+			String inputPath, 
+			String path,
+			double adjustment) throws FileNotFoundException, UnsupportedEncodingException, ParseException{
+		if(adjustment>1.0 || adjustment<0){
+			throw new IllegalArgumentException("You cannot use more than 100 % "
+					+ "of the samples to calculate the groups center."
+					+ " Please use a number between 0 and 1.0.");
+		}
+		
 		double[][] dataValues = data.getData();
 		PrintWriter writer = new PrintWriter(path, "UTF-8");
 		
@@ -87,19 +111,38 @@ public class ProfileBuilder {
 		writer.println("mean:");
 		// calculate and print means of dimensions
 		// loop through the classes
-		for(Map.Entry<String, Integer> e : classes.entrySet()){
-			String cls = e.getKey();
-			double[] mean = calcMeans(dataValues, sampleFiles, cls);
-			writer.print(mean[0]);
-			for(int i=1; i<mean.length; i++){
-				writer.print("\t" + mean[i]);
+		if(adjustment==1.0){
+			for(Map.Entry<String, Integer> e : classes.entrySet()){
+				String cls = e.getKey();
+				double[] mean = calcMeans(dataValues, sampleFiles, cls);
+				writer.print(mean[0]);
+				for(int i=1; i<mean.length; i++){
+					writer.print("\t" + mean[i]);
+				}
+				writer.println();
 			}
-			writer.println();
+		}else{
+			for(Map.Entry<String, Integer> e : classes.entrySet()){
+				String cls = e.getKey();
+				double[] mean = calcMeans(dataValues, sampleFiles, cls, adjustment);
+				writer.print(mean[0]);
+				for(int i=1; i<mean.length; i++){
+					writer.print("\t" + mean[i]);
+				}
+				writer.println();
+			}
 		}
 		
 		writer.close();
 	}
 	
+	/**
+	 * 
+	 * @param dataValues
+	 * @param sampleFiles
+	 * @param cls
+	 * @return 
+	 */
 	private static double[] calcMeans(double[][] dataValues, String[] sampleFiles, String cls){
 		ArrayList<double[]> picked = new ArrayList<>();
 		// loop through the samples of the data array (columns)
@@ -115,6 +158,78 @@ public class ProfileBuilder {
 				picked.add(sample);
 			}
 		}
+		// calculate mean for dimensions
+		double[] mean = new double[dataValues.length];
+		for(int i=0; i<mean.length; i++){
+			double sum = 0;
+			double meanVal = 0;
+			for(int j=0; j<picked.size(); j++){
+				sum += picked.get(j)[i];
+			}
+			mean[i] = sum/picked.size();
+		}
+		
+		return mean;
+	}
+	
+	/**
+	 * 
+	 * @param dataValues
+	 * @param sampleFiles
+	 * @param cls
+	 * @param partition
+	 * @return 
+	 */
+	private static double[] calcMeans(double[][] dataValues, String[] sampleFiles, String cls, double partition){
+		ArrayList<double[]> picked = new ArrayList<>();
+		// loop through the samples of the data array (columns)
+		for(int i=0; i<dataValues[0].length; i++){
+			// new array for the sample
+			double[] sample = new double[dataValues.length];
+			// check if the name of the csv starts with our class name
+			// filenames and samples in data array are in same order
+			if(sampleFiles[i].startsWith(cls)){
+				for(int dim=0; dim<dataValues.length; dim++){
+					sample[dim] = dataValues[dim][i];
+				}
+				picked.add(sample);
+			}
+		}
+		
+		// calc how much of the worst samples will be dismissed and loop as many times
+		int eject = (int)(picked.size() - (picked.size() * partition));
+		for(int k=0; k<eject; k++){
+			// calculate mean for dimensions
+			double[] mean = new double[dataValues.length];
+			for(int i=0; i<mean.length; i++){
+				double sum = 0;
+				double meanVal = 0;
+				for(int j=0; j<picked.size(); j++){
+					sum += picked.get(j)[i];
+				}
+				mean[i] = sum/picked.size();
+			}
+			// calculate distance from center (mean) point from every sample
+			double[] distances = new double[picked.size()];
+			for(int i=0; i<picked.size(); i++){
+				double sum = 0;
+				for(int j=0; j<mean.length; j++){
+					sum += (mean[j] - picked.get(i)[j])*(mean[j] - picked.get(i)[j]);
+				}
+				distances[i] = Math.sqrt(sum);
+			}
+			// find index of biggest distance and discard from list
+			double biggest = distances[0];
+			int index = 0;
+			for(int i=1; i<distances.length; i++){
+				if(distances[i]>biggest){
+					biggest = distances[i];
+					index = i;
+				}
+			}
+			picked.remove(index);
+		}
+		
 		// calculate mean for dimensions
 		double[] mean = new double[dataValues.length];
 		for(int i=0; i<mean.length; i++){

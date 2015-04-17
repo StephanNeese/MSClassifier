@@ -177,10 +177,18 @@ public class SpectraMatrix {
 		return voltage;
 	}
 
+	/**
+	 * 
+	 * @return 
+	 */
 	public double getMean() {
 		return mean;
 	}
 
+	/**
+	 * 
+	 * @return 
+	 */
 	public double[] getDimensionsMean() {
 		return dimensionsMean;
 	}

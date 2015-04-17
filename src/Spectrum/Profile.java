@@ -18,6 +18,21 @@ public class Profile {
 	private final double originalMean;
 	private final double binSize;
 
+	/**
+	 * 
+	 * @param classes
+	 * @param datetime
+	 * @param device
+	 * @param path
+	 * @param variance
+	 * @param filenames
+	 * @param data
+	 * @param features
+	 * @param mean
+	 * @param originalMeans
+	 * @param originalMean
+	 * @param binSize 
+	 */
 	public Profile(
 			String[] classes, 
 			Date datetime, 
@@ -45,50 +60,98 @@ public class Profile {
 		this.binSize = binSize;
 	}
 
+	/**
+	 * 
+	 * @return 
+	 */
 	public String[] getClasses() {
 		return classes;
 	}
 
+	/**
+	 * 
+	 * @return 
+	 */
 	public Date getDatetime() {
 		return datetime;
 	}
 
+	/**
+	 * 
+	 * @return 
+	 */
 	public String getDevice() {
 		return device;
 	}
 
+	/**
+	 * 
+	 * @return 
+	 */
 	public String getPath() {
 		return path;
 	}
 
+	/**
+	 * 
+	 * @return 
+	 */
 	public double getVariance() {
 		return variance;
 	}
 
+	/**
+	 * 
+	 * @return 
+	 */
 	public String[] getFilenames() {
 		return filenames;
 	}
 
+	/**
+	 * 
+	 * @return 
+	 */
 	public double[][] getData() {
 		return data;
 	}
 
+	/**
+	 * 
+	 * @return 
+	 */
 	public double[][] getFeatures() {
 		return features;
 	}
 
+	/**
+	 * 
+	 * @return 
+	 */
 	public double[][] getMean() {
 		return mean;
 	}
 	
+	/**
+	 * 
+	 * @return 
+	 */
 	public double[] getOriginalMeans() {
 		return originalMeans;
 	}
 
+	/**
+	 * 
+	 * @return 
+	 */
 	public double getOriginalMean() {
 		return originalMean;
 	}
 
+	/**
+	 * 
+	 * @return 
+	 */
 	public double getBinSize() {
 		return binSize;
 	}
@@ -133,10 +196,20 @@ public class Profile {
 		return res;
 	}
 
+	/**
+	 * 
+	 * @param spectrum
+	 * @return 
+	 */
 	public ClassificationResult mahalanobisDistance(Spectrum spectrum){
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 	
+	/**
+	 * 
+	 * @param spectrum
+	 * @return 
+	 */
 	public ClassificationResult euclideanDistance(Spectrum spectrum){
 		// check if same length
 		if(spectrum.getLength()!=originalMeans.length){
