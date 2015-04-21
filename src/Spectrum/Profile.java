@@ -2,6 +2,7 @@ package Spectrum;
 
 import java.util.Date;
 import preprocessing.PCA;
+import weka.core.matrix.Matrix;
 
 public class Profile {
 	
