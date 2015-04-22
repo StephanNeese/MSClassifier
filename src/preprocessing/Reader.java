@@ -13,6 +13,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 /** This class contains the static method readData(String path, int binSize)
  * which creates a SpectraMatrix object from csv files in a directory.
@@ -94,6 +95,7 @@ public class Reader {
 		double binSize = 0;
 		double[][] data = null;
 		double[][] features = null;
+		HashMap<String, double[][]> invertedCovarianceMatrices = null;
 		double[][] mean = null;
 		
 		for(int i=0; i<segment.length; i++){
@@ -155,6 +157,8 @@ public class Reader {
 						features[j-1][k] = Double.parseDouble(column[k]);
 					}
 				}
+			}else if(tmp.startsWith("covariances:")){
+				invertedCovarianceMatrices = obtainCovarianceMatrices(segment[i]);
 			}else if(tmp.startsWith("mean:")){
 				String[] row = segment[i].split("\n");
 				mean = new double[row.length-1][row[1].split("\t").length];
@@ -177,9 +181,59 @@ public class Reader {
 				filenames, 
 				data, 
 				features, 
+				invertedCovarianceMatrices,
 				mean, 
 				originalMeans, 
 				originalMean, 
 				binSize);
+	}
+	
+	/**
+	 * 
+	 * @param block
+	 * @return 
+	 */
+	private static HashMap<String, double[][]> obtainCovarianceMatrices(String block){
+		HashMap<String, double[][]> res = new HashMap<>();
+		
+		String[] tmp = block.split("\n");
+		ArrayList<String> matrix = new ArrayList<>();
+		for(int i=2; i<tmp.length; i++){
+			matrix.add(tmp[i-1]);
+			String[] columnLast = tmp[i-1].split("\t");
+			String[] columnCurrent = tmp[i].split("\t");
+			if(!(columnLast[0].equals(columnCurrent[0])) && i<tmp.length-1){
+				res.put(columnLast[0], readMatrix(matrix));
+				matrix = new ArrayList<>();
+			}else if(!(columnLast[0].equals(columnCurrent[0])) && i==tmp.length-1){
+				res.put(columnLast[0], readMatrix(matrix));
+				ArrayList<String> x = new ArrayList<>();
+				x.add(tmp[i]);
+				res.put(columnCurrent[0], readMatrix(x));
+			}else if(columnLast[0].equals(columnCurrent[0]) && i==tmp.length-1){
+				matrix.add(tmp[i]);
+				res.put(columnCurrent[0], readMatrix(matrix));
+			}
+		}
+		
+		return res;
+	}
+	
+	/**
+	 * 
+	 * @param block
+	 * @return 
+	 */
+	private static double[][] readMatrix(ArrayList<String> block){
+		double[][] res = new double[block.size()][block.get(0).split("\t").length-1];
+		
+		for(int i=0; i<block.size(); i++){
+			String[] tmp = block.get(i).split("\t");
+			for(int j=1; j<tmp.length; j++){
+				res[i][j] = Double.parseDouble(tmp[j]);
+			}
+		}
+		
+		return res;
 	}
 }

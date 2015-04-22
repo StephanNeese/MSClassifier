@@ -1,8 +1,8 @@
 package Spectrum;
 
 import java.util.Date;
+import java.util.HashMap;
 import preprocessing.PCA;
-import weka.core.matrix.Matrix;
 
 public class Profile {
 	
@@ -14,6 +14,7 @@ public class Profile {
 	private final String[] filenames;
 	private final double[][] data;
 	private final double[][] features;
+	private HashMap<String, double[][]> invertedCovarianceMatrices;
 	private final double[][] mean;			// [class][dimension]
 	private final double[] originalMeans;
 	private final double originalMean;
@@ -29,6 +30,7 @@ public class Profile {
 	 * @param filenames
 	 * @param data
 	 * @param features
+	 * @param invertedCovarianceMatrices
 	 * @param mean
 	 * @param originalMeans
 	 * @param originalMean
@@ -42,7 +44,8 @@ public class Profile {
 			double variance, 
 			String[] filenames, 
 			double[][] data, 
-			double[][] features, 
+			double[][] features,
+			HashMap<String, double[][]> invertedCovarianceMatrices,
 			double[][] mean,
 			double[] originalMeans,
 			double originalMean,
@@ -55,6 +58,7 @@ public class Profile {
 		this.filenames = filenames;
 		this.data = data;
 		this.features = features;
+		this.invertedCovarianceMatrices = invertedCovarianceMatrices;
 		this.mean = mean;
 		this.originalMeans = originalMeans;
 		this.originalMean = originalMean;
@@ -123,6 +127,23 @@ public class Profile {
 	 */
 	public double[][] getFeatures() {
 		return features;
+	}
+	
+	/**
+	 * 
+	 * @return 
+	 */
+	public HashMap<String, double[][]> getInvertedCovarianceMatrices(){
+		return invertedCovarianceMatrices;
+	}
+	
+	/**
+	 * 
+	 * @param cls
+	 * @return 
+	 */
+	public double[][] getInvertedCovarianceMatrix(String cls){
+		return invertedCovarianceMatrices.get(cls);
 	}
 
 	/**

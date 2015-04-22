@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import weka.core.matrix.Matrix;
 
 public class ProfileBuilder {
 	
@@ -44,16 +45,24 @@ public class ProfileBuilder {
 		
 		// obtain the classes from the samples filenames
 		String[] sampleFiles = data.getClasses();
-		HashMap<String, Integer> classes = new HashMap<>();
+		HashMap<String, Integer> classesTmp = new HashMap<>();
 		for(int i=0; i<sampleFiles.length; i++){
 			String[] tmp = sampleFiles[i].split("_");
-			classes.put(tmp[0], 1);
+			classesTmp.put(tmp[0], 1);
+		}
+		
+		// load classnames into array to ensure the same order everytime
+		String[] classes = new String[classesTmp.size()];
+		int cnt = 0;
+		for(Map.Entry<String, Integer> e : classesTmp.entrySet()){
+			classes[cnt] = e.getKey();
+			cnt++;
 		}
 		
 		// print classes to file
 		writer.print("classes:");
-		for(Map.Entry<String, Integer> e : classes.entrySet()){
-			writer.print("\t" + e.getKey());
+		for(String s : classes){
+			writer.print("\t" + s);
 		}
 		writer.println("\n//#");
 		// print datetime
@@ -108,13 +117,28 @@ public class ProfileBuilder {
 			writer.println();
 		}
 		writer.println("//#");
-		writer.println("mean:");
+		// print the inverse covariance matrices for each group
+		writer.println("covariances:");
+		for(String s : classes){
+			double[][] cov = calcCovarianceMatrix(dataValues, sampleFiles, s);
+			Matrix covarianceMatrix = new Matrix(cov);
+			Matrix inverseCovarianceMatrix = covarianceMatrix.inverse();
+			double[][] invCov = inverseCovarianceMatrix.getArray();
+			for(int i=0; i<invCov.length; i++){
+				writer.print(s);
+				for(int j=0; j<invCov[i].length; j++){
+					writer.print("\t" + invCov[i][j]);
+				}
+				writer.println();
+			}
+		}
+		writer.println("//#");
 		// calculate and print means of dimensions
+		writer.println("mean:");
 		// loop through the classes
 		if(adjustment==1.0){
-			for(Map.Entry<String, Integer> e : classes.entrySet()){
-				String cls = e.getKey();
-				double[] mean = calcMeans(dataValues, sampleFiles, cls);
+			for(String s : classes){
+				double[] mean = calcMeans(dataValues, sampleFiles, s);
 				writer.print(mean[0]);
 				for(int i=1; i<mean.length; i++){
 					writer.print("\t" + mean[i]);
@@ -122,9 +146,8 @@ public class ProfileBuilder {
 				writer.println();
 			}
 		}else{
-			for(Map.Entry<String, Integer> e : classes.entrySet()){
-				String cls = e.getKey();
-				double[] mean = calcMeans(dataValues, sampleFiles, cls, adjustment);
+			for(String s : classes){
+				double[] mean = calcMeans(dataValues, sampleFiles, s, adjustment);
 				writer.print(mean[0]);
 				for(int i=1; i<mean.length; i++){
 					writer.print("\t" + mean[i]);
@@ -242,5 +265,59 @@ public class ProfileBuilder {
 		}
 		
 		return mean;
+	}
+	
+	private static double[][] calcCovarianceMatrix(double[][] dataValues, String[] sampleFiles, String cls){
+		double[][] covariance = new double[dataValues.length][dataValues.length];
+		
+		/*
+		find all samples for the class
+		loop through the samples of the data array (columns)
+		*/
+		ArrayList<double[]> picked = new ArrayList<>();
+		for(int i=0; i<dataValues[0].length; i++){
+			// new array for the sample
+			double[] sample = new double[dataValues.length];
+			// check if the name of the csv starts with our class name
+			// filenames and samples in data array are in same order
+			if(sampleFiles[i].startsWith(cls)){
+				for(int dim=0; dim<dataValues.length; dim++){
+					sample[dim] = dataValues[dim][i];
+				}
+				picked.add(sample);
+			}
+		}
+		
+		// calculate covariance matrix for the found samples
+		for(int i=0; i<covariance.length; i++){
+			double[] x = new double[picked.size()];
+			double xMean = 0;
+			double xSum = 0;
+			
+			for(int k=0; k<picked.size(); k++){
+				x[k] = picked.get(k)[i];
+				xSum += x[k];
+			}
+			xMean = xSum/x.length;
+			for(int j=0; j<covariance.length; j++){
+				double[] y = new double[picked.size()];
+				double yMean = 0;
+				double ySum = 0;
+				
+				for(int k=0; k<picked.size(); k++){
+					y[k] = picked.get(k)[j];
+					ySum += y[k];
+				}
+				yMean = ySum/y.length;
+				// calculate covariance for x and y
+				double num = 0;
+				for(int k=0; k<x.length; k++){
+					num += (x[k] - xMean)*(y[k] - yMean);
+				}
+				covariance[i][j] = num/(x.length-1);
+			}
+		}
+		
+		return covariance;
 	}
 }
