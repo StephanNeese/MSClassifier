@@ -3,6 +3,7 @@ package Spectrum;
 import java.util.Date;
 import java.util.HashMap;
 import preprocessing.PCA;
+import weka.core.matrix.Matrix;
 
 public class Profile {
 	
@@ -224,7 +225,57 @@ public class Profile {
 	 * @return 
 	 */
 	public ClassificationResult mahalanobisDistance(Spectrum spectrum){
-		throw new UnsupportedOperationException("Not supported yet.");
+		// check if same length
+		if(spectrum.getLength()!=originalMeans.length){
+			throw new IllegalArgumentException("Spectrum and Data in the profile do not have the same M/Z range. "
+			+ "Please adjust the device.");
+		}
+		// normalize and center the spectrum
+		spectrum.normalizationDivideByMean(originalMean);
+		spectrum.center(originalMeans);
+		// transform the spectrum into PCA space
+		double[] pca_spectrum = PCA.transformSpectrum(spectrum, features);
+		
+		double[] distances = new double[classes.length];
+		
+		// loop through all classes to pick the same row in the mean array
+		for(int i=0; i<classes.length; i++){
+			// differences between the dimensions
+			double[] differences = new double[pca_spectrum.length];
+			for(int j=0; j<differences.length; j++){
+				differences[j] = mean[i][j] - pca_spectrum[j];
+			}
+			// transform into matrix and its inverse
+			double[][] tmp = new double[1][differences.length];
+			tmp[0] = differences;
+			Matrix U = new Matrix(tmp);
+			Matrix UTransposed = U.transpose();
+			
+			// multiply U with covariance matrix
+			Matrix covarianceMatrix = new Matrix(invertedCovarianceMatrices.get(classes[i]));
+			Matrix left = U.times(covarianceMatrix);
+			// multiply left with transposed U
+			Matrix res = left.times(UTransposed);
+			
+			distances[i] = Math.sqrt(res.get(0, 0));
+		}
+		
+		// lookup the smallest distance
+		double smallest = distances[0];
+		int index = 0;
+		for(int i=1; i<distances.length; i++){
+			if(distances[i]<smallest){
+				smallest = distances[i];
+				index = i;
+			}
+		}
+		// calculate score
+		double sum = 0;
+		for(int i=0; i<distances.length; i++){
+			sum += distances[i];
+		}
+		
+		return new ClassificationResult(classes[index], distances[index], (1 - (distances[index]/sum)));
 	}
 	
 	/**

@@ -1,24 +1,37 @@
 package gui;
 
-import java.awt.Color;
+import Spectrum.ClassificationResult;
+import Spectrum.Profile;
+import Spectrum.Spectrum;
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import preprocessing.Reader;
 
 public class classificationWindow extends JFrame {
 	
@@ -26,13 +39,14 @@ public class classificationWindow extends JFrame {
 	JLabel folderLabel;
 	JTextField folder;
 	JButton folderSearch;
-	JLabel databaseLabel;
-	JPanel innerDatabasePanel;
-	JScrollPane databasePane;
-	JCheckBox[] database;
-	JLabel classificationLabel;
-	JCheckBox algA;
-	JCheckBox algB;
+	JLabel profileLabel;
+	JTextField profile;
+	JButton profileSearch;
+	JLabel distanceLabel;
+	JComboBox distance;
+	JLabel saveLabel;
+	JTextField save;
+	JButton saveSearch;
 	JButton cancel;
 	JButton classify;
 	JButton help;
@@ -54,19 +68,19 @@ public class classificationWindow extends JFrame {
 		setLayout(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		setSize(640, 480);
+		setSize(640, 240);
 		setVisible(true);
 		setResizable(false);
 		// positon on screen
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		int x = (dim.width-640)/2;
-		int y = (dim.height-480)/2;
+		int y = (dim.height-240)/2;
 		this.setLocation(x, y);
 		
 		main = new JPanel();
 		main.setVisible(true);
 		main.setLayout(null); 
-		main.setBounds(0, 0, 640, 480);
+		main.setBounds(0, 0, 640, 240);
 		
 		folderLabel = new JLabel("folder with CSV files");
 		folder = new JTextField();
@@ -78,42 +92,45 @@ public class classificationWindow extends JFrame {
 		main.add(folder);
 		main.add(folderSearch);
 		
-		databaseLabel = new JLabel("choose databases");
-		databaseLabel.setBounds(10, 80, 200, 15);
-		innerDatabasePanel = new JPanel();
-		innerDatabasePanel.setLayout(new GridLayout(40,0));
-		database = new JCheckBox[40];
-		for(int i=0; i<database.length; i++){
-			database[i] = new JCheckBox("Databasesubstance " + i);
-			innerDatabasePanel.add(database[i]);
-		}
-		databasePane = new JScrollPane(innerDatabasePanel, 
-				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, 
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		databasePane.setBounds(10, 100, 400, 200);
-		main.add(databaseLabel);
-		main.add(databasePane);
+		profileLabel = new JLabel("path to the profile file");
+		profile = new JTextField();
+		profileSearch = new JButton("search");
+		profileLabel.setBounds(330, 10, 200, 15);
+		profile.setBounds(330, 30, 200, 30);
+		profileSearch.setBounds(540, 30, 90, 30);
+		main.add(profileLabel);
+		main.add(profile);
+		main.add(profileSearch);
 		
-		classificationLabel = new JLabel("classification Algorithm");
-		algA = new JCheckBox("Algorithm A");
-		algB = new JCheckBox("Algorithm B");
-		classificationLabel.setBounds(10, 320, 200, 15);
-		algA.setBounds(10, 350, 150, 20);
-		algB.setBounds(170, 350, 150, 20);
-		main.add(classificationLabel);
-		main.add(algA);
-		main.add(algB);
+		distanceLabel = new JLabel("distance measure");
+		distance = new JComboBox();
+		distance.addItem("euclidean distance");
+		distance.addItem("mahalanobis distance");
+		distanceLabel.setBounds(10, 80, 200, 15);
+		distance.setBounds(10, 100, 299, 25);
+		main.add(distanceLabel);
+		main.add(distance);
+		
+		saveLabel = new JLabel("where to save the results");
+		save = new JTextField();
+		saveSearch = new JButton("search");
+		saveLabel.setBounds(330, 80, 200, 15);
+		save.setBounds(330, 100, 200, 30);
+		saveSearch.setBounds(540, 100, 90, 30);
+		main.add(saveLabel);
+		main.add(save);
+		main.add(saveSearch);
 		
 		cancel = new JButton("cancel");
-		cancel.setBounds(420, 410, 100, 30);
+		cancel.setBounds(420, 175, 100, 30);
 		main.add(cancel);
 		
 		classify = new JButton("classify");
-		classify.setBounds(530, 410, 100, 30);
+		classify.setBounds(530, 175, 100, 30);
 		main.add(classify);
 		
 		help = new JButton("help");
-		help.setBounds(10, 410, 100, 30);
+		help.setBounds(10, 175, 100, 30);
 		main.add(help);
 		
 		add(main);
@@ -148,6 +165,61 @@ public class classificationWindow extends JFrame {
 				}
 		);
 		
+		profileSearch.addActionListener(
+				new ActionListener(){
+					
+					/** Display a JFileChooser when pressing the "search" button
+					 * 
+					 * @param e ActionEvent that occurs when you press the button
+					 */
+					public void actionPerformed(ActionEvent e){
+						JFileChooser fileChooser = new JFileChooser();
+						// set only directories and disable "all files" option
+						FileNameExtensionFilter xmlfilter = new FileNameExtensionFilter(
+								"profile files (*.profile)", 
+								"profile");
+						fileChooser.setFileFilter(xmlfilter);
+						fileChooser.setDialogTitle("Open profile file");
+						
+						JFrame frame = new JFrame();
+						int result = fileChooser.showOpenDialog(frame);
+						
+						// if file is selected 
+						if (result == JFileChooser.APPROVE_OPTION){
+							profile.setText(fileChooser.getSelectedFile().getAbsolutePath());
+							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+						}else if(result != JFileChooser.APPROVE_OPTION){
+							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+						}
+					}
+				}
+		);
+		
+		saveSearch.addActionListener(
+				new ActionListener(){
+					
+					/** Display a JFileChooser when pressing the "search" button
+					 * 
+					 * @param e ActionEvent that occurs when you press the button
+					 */
+					public void actionPerformed(ActionEvent e){
+						JFileChooser fileChooser = new JFileChooser();
+						// set only directories and disable "all files" option
+						
+						JFrame frame = new JFrame();
+						int result = fileChooser.showOpenDialog(frame);
+						
+						// if file is selected 
+						if (result == JFileChooser.APPROVE_OPTION){
+							save.setText(fileChooser.getSelectedFile().getAbsolutePath());
+							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+						}else if(result != JFileChooser.APPROVE_OPTION){
+							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+						}
+					}
+				}
+		);
+		
 		help.addActionListener(
 				new ActionListener(){
 					
@@ -169,17 +241,83 @@ public class classificationWindow extends JFrame {
 		classify.addActionListener(
 				new ActionListener(){
 					
-					/** Display a JFileChooser when pressing the "search" button
+					/** calculate the distances and show results in a table + save them to file
 					 * 
 					 * @param e ActionEvent that occurs when you press the button
 					 */
 					public void actionPerformed(ActionEvent e){
-						JFrame frame = new JFrame();
+						// get data from the fields
+						String folderPath = folder.getText();
+						String profilePath = profile.getText();
+						String savePath = save.getText();
+						String distanceMeasure = (String)distance.getSelectedItem();
 						
-						JOptionPane.showMessageDialog(frame, 
-									"Classification in process!", 
-									"Classification", 
-									JOptionPane.INFORMATION_MESSAGE);
+						// obtain all csv files from the folder
+						String[] csv = Reader.readFolder(folderPath);
+						
+						// calculate distances
+						Object[][] rowData = new Object[csv.length][4];
+						if(distanceMeasure.equals("euclidean distance")){
+							for(int i=0; i<csv.length; i++){
+								try {
+									Profile profile = Reader.readProfile(profilePath);
+									Spectrum spectrum = new Spectrum(csv[i], (int)profile.getBinSize());
+									ClassificationResult res = profile.euclideanDistance(spectrum);
+									rowData[i][0] = csv[i];
+									rowData[i][1] = res.getAssignedClass();
+									rowData[i][2] = res.getDistance();
+									rowData[i][3] = res.getScore();
+								} catch (IOException ex) {
+									Logger.getLogger(classificationWindow.class.getName()).log(Level.SEVERE, null, ex);
+								} catch (ParseException ex) {
+									Logger.getLogger(classificationWindow.class.getName()).log(Level.SEVERE, null, ex);
+								}
+							}
+						}else{
+							for(int i=0; i<csv.length; i++){
+								try {
+									Profile profile = Reader.readProfile(profilePath);
+									Spectrum spectrum = new Spectrum(csv[i], (int)profile.getBinSize());
+									ClassificationResult res = profile.mahalanobisDistance(spectrum);
+									rowData[i][0] = csv[i];
+									rowData[i][1] = res.getAssignedClass();
+									rowData[i][2] = res.getDistance();
+									rowData[i][3] = res.getScore();
+								} catch (IOException ex) {
+									Logger.getLogger(classificationWindow.class.getName()).log(Level.SEVERE, null, ex);
+								} catch (ParseException ex) {
+									Logger.getLogger(classificationWindow.class.getName()).log(Level.SEVERE, null, ex);
+								}
+							}
+						}
+						
+						// save results to file
+						try{
+							PrintWriter writer = new PrintWriter(savePath, "UTF-8");
+							writer.println("Filename\tassigned class\tdistance\tscore");
+							for(int i=0; i<rowData.length; i++){
+								writer.println(rowData[i][0] + "\t" + rowData[i][1] + "\t" + rowData[i][2] + "\t" + rowData[i][3]);
+							}
+							writer.close();
+						}catch(IOException ex){
+							ex.printStackTrace();
+						}
+						
+						JFrame frame = new JFrame("Results");
+						frame.setSize(640, 480);
+						frame.setVisible(true);
+						frame.setResizable(false);
+						// positon on screen
+						Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+						int x = (dim.width-640)/2;
+						int y = (dim.height-480)/2;
+						frame.setLocation(x, y);
+						// create table with results
+						Object columnNames[] = { "Filename", "assigned class", "distance", "score" };
+						JTable table = new JTable(rowData, columnNames);
+
+						JScrollPane scrollPane = new JScrollPane(table);
+						frame.add(scrollPane, BorderLayout.CENTER);
 					}
 				}
 		);

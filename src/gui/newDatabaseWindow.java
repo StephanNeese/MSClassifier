@@ -1,10 +1,15 @@
 package gui;
 
+import Spectrum.SpectraMatrix;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -16,6 +21,10 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import preprocessing.PCA;
+import preprocessing.PCADataSet;
+import preprocessing.ProfileBuilder;
+import preprocessing.Reader;
 
 public class newDatabaseWindow extends JFrame {
 	
@@ -29,6 +38,8 @@ public class newDatabaseWindow extends JFrame {
 	JButton folderSearch;
 	JLabel binLabel;
 	JTextField bin;
+	JLabel varianceLabel;
+	JTextField variance;
 	JButton cancel;
 	JButton create;
 	JButton help;
@@ -96,6 +107,13 @@ public class newDatabaseWindow extends JFrame {
 		bin.setBounds(330, 100, 300, 30);
 		main.add(binLabel);
 		main.add(bin);
+		
+		varianceLabel = new JLabel("variance covered");
+		variance = new JTextField();
+		varianceLabel.setBounds(10, 150, 200, 15);
+		variance.setBounds(10, 170, 300, 30);
+		main.add(varianceLabel);
+		main.add(variance);
 		
 		cancel = new JButton("cancel");
 		cancel.setBounds(420, 250, 100, 30);
@@ -165,13 +183,47 @@ public class newDatabaseWindow extends JFrame {
 					 * 
 					 * @param e ActionEvent that occurs when you press the button
 					 */
+					@Override
 					public void actionPerformed(ActionEvent e){
-						JFrame frame = new JFrame();
+						// get data from text fields
+						String folderPath = folder.getText();
+						String machineName = (String)machine.getSelectedItem();
+						String profileName = name.getText();
+						double binTmp = Double.parseDouble(bin.getText());
+						int binSize = (int)binTmp;
+						double varianceCovered = Double.parseDouble(variance.getText());
 						
-						JOptionPane.showMessageDialog(frame, 
-									"Creation of Database in progress!", 
-									"creating", 
+						try{
+							SpectraMatrix data = Reader.readData(folderPath, binSize);
+							PCADataSet pca_data = PCA.performPCA(data, varianceCovered);
+							// make profile directory
+							File dir = new File(folderPath+File.separator+"profile");
+							if(!dir.exists()){
+								try{
+									dir.mkdir();
+								}catch(Exception ex){
+									ex.printStackTrace();
+								}
+							}
+							// create profile
+							ProfileBuilder.build(
+									pca_data, 
+									data, 
+									machineName, 
+									folderPath, 
+									folderPath+File.separator+"profile"+File.separator+profileName+".profile", 
+									1.0);
+							
+							// show success message
+							JFrame frame = new JFrame();						
+							JOptionPane.showMessageDialog(frame, 
+									"Profile has been created.", 
+									"Done", 
 									JOptionPane.INFORMATION_MESSAGE);
+						}catch (Exception ex) {
+							Logger.getLogger(newDatabaseWindow.class.getName()).log(Level.SEVERE, null, ex);
+						}
+						
 					}
 				}
 		);

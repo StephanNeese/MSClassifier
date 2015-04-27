@@ -45,7 +45,7 @@ public class Reader {
 	 * @param path the path to the folder
 	 * @return a String array containing complete paths to all csv files in the folder
 	 */
-	private static String[] readFolder(String path){
+	public static String[] readFolder(String path){
 		ArrayList<String> tmp = new ArrayList<>();
 		File folder = new File(path);
 		
@@ -230,7 +230,7 @@ public class Reader {
 		for(int i=0; i<block.size(); i++){
 			String[] tmp = block.get(i).split("\t");
 			for(int j=1; j<tmp.length; j++){
-				res[i][j] = Double.parseDouble(tmp[j]);
+				res[i][j-1] = Double.parseDouble(tmp[j]);
 			}
 		}
 		

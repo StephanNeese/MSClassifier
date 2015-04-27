@@ -22,17 +22,19 @@ public class Main {
 //		System.out.println("AFTER NORMALIZATION:");
 //		System.out.println(x.toString());
 		
-//		SpectraMatrix data = Reader.readData("/home/wens/mini", 2);
-//		data.toCSV("/home/wens/samples_wine2u.csv");
+//		SpectraMatrix data = Reader.readData("/home/wens/milch_daten", 2);
+//		data.toCSV("/home/wens/samples_milk2u.csv");
 		
 //		
 //		 read data from a folder
-		SpectraMatrix data = Reader.readData("/home/wens/MINI_samples", 1);
-		PCADataSet pca_data = PCA.performPCA(data, 0.6);
-		ProfileBuilder.build(pca_data, data, "MINI11", "/home/wens/MINI_samples", "/home/wens/testprofile2", 1.0);
+//		SpectraMatrix data = Reader.readData("/home/wens/MINI_samples", 1);
+//		PCADataSet pca_data = PCA.performPCA(data, 0.6);
+//		ProfileBuilder.build(pca_data, data, "MINI11", "/home/wens/MINI_samples", "/home/wens/testprofile2", 1.0);
 		Profile profile = Reader.readProfile("/home/wens/testprofile2");
-		Spectrum spectrum = new Spectrum("/home/wens/MINI_samples/Dakapo_Accent_25AVG5.csv", 1);
+		Spectrum spectrum = new Spectrum("/home/wens/MINI_samples/Dakapo_Accent_5AVG5.csv", 1);
 		ClassificationResult res = profile.euclideanDistance(spectrum);
+		System.out.println(res);
+		res = profile.mahalanobisDistance(spectrum);
 		System.out.println(res);
 		
 //		 transform data via PCA
