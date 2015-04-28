@@ -177,17 +177,17 @@ public class SpectraMatrix {
 		return voltage;
 	}
 
-	/**
+	/** returns the mean value for the data
 	 * 
-	 * @return 
+	 * @return the mean value
 	 */
 	public double getMean() {
 		return mean;
 	}
 
-	/**
+	/** returns the mean values for the dimensions
 	 * 
-	 * @return 
+	 * @return the mean values as array
 	 */
 	public double[] getDimensionsMean() {
 		return dimensionsMean;

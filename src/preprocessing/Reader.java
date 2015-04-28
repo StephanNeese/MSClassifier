@@ -63,10 +63,11 @@ public class Reader {
 		return res;
 	}
 	
-	/**
+	/** reads a profile file and returns
+	 * a Profile Object
 	 * 
-	 * @param path
-	 * @return
+	 * @param path path to the profile file
+	 * @return a Profile Object constructed from the file
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 * @throws ParseException 
@@ -188,16 +189,20 @@ public class Reader {
 				binSize);
 	}
 	
-	/**
+	/** reads a String containing the covariance matrix information from the profile file
+	 * and constructs the covariance matrices for the classes
 	 * 
-	 * @param block
-	 * @return 
+	 * @param block the block from the profile file containing information 
+	 * about the covariance matrices
+	 * @return a HasMap with class (String) => matrix (double[][])
 	 */
 	private static HashMap<String, double[][]> obtainCovarianceMatrices(String block){
 		HashMap<String, double[][]> res = new HashMap<>();
 		
+		// split by lines
 		String[] tmp = block.split("\n");
 		ArrayList<String> matrix = new ArrayList<>();
+		// check each line with previous line (without header)
 		for(int i=2; i<tmp.length; i++){
 			matrix.add(tmp[i-1]);
 			String[] columnLast = tmp[i-1].split("\t");
@@ -219,10 +224,10 @@ public class Reader {
 		return res;
 	}
 	
-	/**
+	/** takes a list of Strings and returns a 2d double array
 	 * 
-	 * @param block
-	 * @return 
+	 * @param block the list of Strings (lines)
+	 * @return a 2d double array
 	 */
 	private static double[][] readMatrix(ArrayList<String> block){
 		double[][] res = new double[block.size()][block.get(0).split("\t").length-1];

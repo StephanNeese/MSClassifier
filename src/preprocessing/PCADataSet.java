@@ -10,9 +10,9 @@ public class PCADataSet {
 	/** constructs a PCADataSet from given parameters
 	 * 
 	 * @param data the PCA transformed data 
-	 * @param classes 
+	 * @param classes the names of the classes
 	 * @param transformedFeatureMatrix the feature matrix used for transformation
-	 * @param variance
+	 * @param variance the variance covered by this dataset
 	 */
 	public PCADataSet(
 			double[][] data,

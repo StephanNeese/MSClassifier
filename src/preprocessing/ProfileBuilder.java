@@ -4,7 +4,6 @@ import Spectrum.SpectraMatrix;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -15,14 +14,16 @@ import weka.core.matrix.Matrix;
 
 public class ProfileBuilder {
 	
-	/**
+	/** prints a profile file from the given information
 	 * 
-	 * @param data
-	 * @param originalData
-	 * @param device
-	 * @param inputPath
-	 * @param path
-	 * @param adjustment
+	 * @param data the result of the PCA transformation
+	 * @param originalData the original dataset before PCA
+	 * @param device the name of the MS device
+	 * @param inputPath path to the original csv files of the spectras
+	 * @param path output path for the profile
+	 * @param adjustment variable that determines 
+	 * amount of PCA transformed datapoints 
+	 * to take into calculation of the mean of the groups
 	 * @throws FileNotFoundException
 	 * @throws UnsupportedEncodingException
 	 * @throws ParseException 
@@ -159,12 +160,15 @@ public class ProfileBuilder {
 		writer.close();
 	}
 	
-	/**
+	/** takes a set of data values (2d array with dimensions along the rows),
+	 * filters all the samples belonging to a given class 
+	 * and calculates the means for all dimensions of these samples
 	 * 
-	 * @param dataValues
-	 * @param sampleFiles
-	 * @param cls
-	 * @return 
+	 * @param dataValues the data array
+	 * @param sampleFiles the list with the file names 
+	 * (must be same order as samples/columns in data array)
+	 * @param cls the class
+	 * @return an array with mean values
 	 */
 	private static double[] calcMeans(double[][] dataValues, String[] sampleFiles, String cls){
 		ArrayList<double[]> picked = new ArrayList<>();
@@ -195,13 +199,16 @@ public class ProfileBuilder {
 		return mean;
 	}
 	
-	/**
+	/** takes a set of data values (2d array with dimensions along the rows),
+	 * filters a partition the best samples belonging to a given class (ex. 90 % of one class)
+	 * and calculates the means for all dimensions of these samples
 	 * 
-	 * @param dataValues
-	 * @param sampleFiles
-	 * @param cls
-	 * @param partition
-	 * @return 
+	 * @param dataValues the data array
+	 * @param sampleFiles the list with the file names 
+	 * (must be same order as samples/columns in data array)
+	 * @param cls the class
+	 * @param partition what fraction of the classes best samples should be used
+	 * @return an array with mean values
 	 */
 	private static double[] calcMeans(double[][] dataValues, String[] sampleFiles, String cls, double partition){
 		ArrayList<double[]> picked = new ArrayList<>();
@@ -267,6 +274,16 @@ public class ProfileBuilder {
 		return mean;
 	}
 	
+	/** takes a set of data values (2d array with dimensions along the rows),
+	 * filters all the samples belonging to a given class 
+	 * and calculates the covariance matrix for this class
+	 * 
+	 * @param dataValues the data array
+	 * @param sampleFiles the list with the file names 
+	 * (must be same order as samples/columns in data array)
+	 * @param cls the class
+	 * @return an array containing the covariance matrix
+	 */
 	private static double[][] calcCovarianceMatrix(double[][] dataValues, String[] sampleFiles, String cls){
 		double[][] covariance = new double[dataValues.length][dataValues.length];
 		

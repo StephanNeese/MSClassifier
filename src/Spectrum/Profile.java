@@ -21,21 +21,21 @@ public class Profile {
 	private final double originalMean;
 	private final double binSize;
 
-	/**
+	/** constructs a Profile Object
 	 * 
-	 * @param classes
-	 * @param datetime
-	 * @param device
-	 * @param path
-	 * @param variance
-	 * @param filenames
-	 * @param data
-	 * @param features
-	 * @param invertedCovarianceMatrices
-	 * @param mean
-	 * @param originalMeans
-	 * @param originalMean
-	 * @param binSize 
+	 * @param classes the names of the classes
+	 * @param datetime the date and time
+	 * @param device the name of the device
+	 * @param path the path to the csv files the profile has been constructed from
+	 * @param variance the amount of covered variance by the PCA
+	 * @param filenames the filenames of the csv files
+	 * @param data pca transformed data
+	 * @param features the feature matrix
+	 * @param invertedCovarianceMatrices the inverted covariance matrices of the pca data classes
+	 * @param mean the mean values (centroids) of the pca data
+	 * @param originalMeans mean values of the dimensions of the original data
+	 * @param originalMean mean value of the mean dataset (all dimensions)
+	 * @param binSize size of a bin in u
 	 */
 	public Profile(
 			String[] classes, 
@@ -66,114 +66,116 @@ public class Profile {
 		this.binSize = binSize;
 	}
 
-	/**
+	/** returns the classes
 	 * 
-	 * @return 
+	 * @return the classes as String array
 	 */
 	public String[] getClasses() {
 		return classes;
 	}
 
-	/**
+	/** returns the Date and time
 	 * 
-	 * @return 
+	 * @return datetime object
 	 */
 	public Date getDatetime() {
 		return datetime;
 	}
 
-	/**
+	/** returns teh device name
 	 * 
-	 * @return 
+	 * @return device name
 	 */
 	public String getDevice() {
 		return device;
 	}
 
-	/**
+	/** returns the path of the csv files the profile has been constructed from
 	 * 
-	 * @return 
+	 * @return the path
 	 */
 	public String getPath() {
 		return path;
 	}
 
-	/**
+	/** returns the covered variance
 	 * 
-	 * @return 
+	 * @return the variance as double
 	 */
 	public double getVariance() {
 		return variance;
 	}
 
-	/**
+	/** returns all the filenames of the original csv files
 	 * 
-	 * @return 
+	 * @return the csv file names as array
 	 */
 	public String[] getFilenames() {
 		return filenames;
 	}
 
-	/**
+	/** returns the pca transformed data matrix. 
+	 * The columns are in the same order as the elements of the filename array
 	 * 
-	 * @return 
+	 * @return data matrix as double array [dimensions][samples]
 	 */
 	public double[][] getData() {
 		return data;
 	}
 
-	/**
+	/** returns the feature matrix. 
 	 * 
-	 * @return 
+	 * @return the feature matrix as 2d array
 	 */
 	public double[][] getFeatures() {
 		return features;
 	}
 	
-	/**
+	/** returns the Hash containing the covariance matrices for the classes
 	 * 
-	 * @return 
+	 * @return a hash with class(string) => inv-covariancematrix(double[][])
 	 */
 	public HashMap<String, double[][]> getInvertedCovarianceMatrices(){
 		return invertedCovarianceMatrices;
 	}
 	
-	/**
+	/** returns the inverted covariance matrix for the given class
 	 * 
-	 * @param cls
-	 * @return 
+	 * @param cls the class name
+	 * @return the inv. covariance matrix
 	 */
 	public double[][] getInvertedCovarianceMatrix(String cls){
 		return invertedCovarianceMatrices.get(cls);
 	}
 
-	/**
+	/** returns the mean values (centroids) for the pca data
 	 * 
-	 * @return 
+	 * @return the mean values in the form [class][dimension]
 	 */
 	public double[][] getMean() {
 		return mean;
 	}
 	
-	/**
+	/** returns the mean values for the dimensions 
+	 * of the original (untransformed) data
 	 * 
-	 * @return 
+	 * @return the mean values of the original data
 	 */
 	public double[] getOriginalMeans() {
 		return originalMeans;
 	}
 
-	/**
+	/** returns the mean value for the original data
 	 * 
-	 * @return 
+	 * @return mean value
 	 */
 	public double getOriginalMean() {
 		return originalMean;
 	}
 
-	/**
+	/** returns the bin size
 	 * 
-	 * @return 
+	 * @return the bin size
 	 */
 	public double getBinSize() {
 		return binSize;
@@ -219,10 +221,10 @@ public class Profile {
 		return res;
 	}
 
-	/**
+	/** calculates the mahalanobis distance between the profiles classes and a given spectrum
 	 * 
-	 * @param spectrum
-	 * @return 
+	 * @param spectrum the spectrum to calculate the distance for
+	 * @return a ClassificationResult object
 	 */
 	public ClassificationResult mahalanobisDistance(Spectrum spectrum){
 		// check if same length
@@ -278,10 +280,10 @@ public class Profile {
 		return new ClassificationResult(classes[index], distances[index], (1 - (distances[index]/sum)));
 	}
 	
-	/**
+	/** calculates the euclidian distance between the profiles classes and a given spectrum
 	 * 
-	 * @param spectrum
-	 * @return 
+	 * @param spectrum the spectrum to calculate the distance for
+	 * @return a ClassificationResult object
 	 */
 	public ClassificationResult euclideanDistance(Spectrum spectrum){
 		// check if same length

@@ -6,11 +6,11 @@ public class ClassificationResult {
 	private final double distance;
 	private final double score;
 
-	/**
+	/** constructs a ClassificationResult object
 	 * 
-	 * @param assignedClass
-	 * @param distance
-	 * @param score 
+	 * @param assignedClass class that was assigned after classification
+	 * @param distance the distance from the class
+	 * @param score the score for the calculation
 	 */
 	public ClassificationResult(String assignedClass, double distance, double score) {
 		this.assignedClass = assignedClass;
@@ -18,25 +18,25 @@ public class ClassificationResult {
 		this.score = score;
 	}
 
-	/**
+	/** returns the assigned class
 	 * 
-	 * @return 
+	 * @return the assigned class
 	 */
 	public String getAssignedClass() {
 		return assignedClass;
 	}
 
-	/**
+	/** returns the calculated distance from the assigned class
 	 * 
-	 * @return 
+	 * @return the distance
 	 */
 	public double getDistance() {
 		return distance;
 	}
 
-	/**
+	/** returns the score of the calculation
 	 * 
-	 * @return 
+	 * @return the score (a number between 0 and 1)
 	 */
 	public double getScore() {
 		return score;
