@@ -28,7 +28,7 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import preprocessing.Reader;
+import io.Reader;
 
 public class classificationWindow extends JFrame {
 	

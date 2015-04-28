@@ -1,4 +1,4 @@
-package preprocessing;
+package io;
 
 import Spectrum.Profile;
 import Spectrum.SpectraMatrix;

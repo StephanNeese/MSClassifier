@@ -22,8 +22,8 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import preprocessing.PCA;
 import preprocessing.PCADataSet;
-import preprocessing.ProfileBuilder;
-import preprocessing.Reader;
+import io.ProfileBuilder;
+import io.Reader;
 
 public class newDatabaseWindow extends JFrame {
 	
