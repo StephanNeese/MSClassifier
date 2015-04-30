@@ -1,11 +1,15 @@
 package gui;
 
+import io.DirWatch;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
@@ -21,6 +25,7 @@ import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class liveClassificationWindow extends JFrame {
 	
@@ -28,19 +33,25 @@ public class liveClassificationWindow extends JFrame {
 	JLabel folderLabel;
 	JTextField folder;
 	JButton folderSearch;
-	JLabel machineLabel;
-	JComboBox machine;
-	JLabel databaseLabel;
-	JPanel innerDatabasePanel;
-	JScrollPane databasePane;
-	JCheckBox[] database;
-	JLabel classificationLabel;
-	JCheckBox algA;
-	JCheckBox algB;
+	JLabel profileLabel;
+	JTextField profile;
+	JButton profileSearch;
+	JLabel distanceLabel;
+	JComboBox distance;
+	JLabel saveLabel;
+	JTextField save;
+	JButton saveSearch;
 	JButton cancel;
 	JButton classify;
 	JButton help;
 
+	/** constructs a classificationWindow
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws UnsupportedLookAndFeelException 
+	 */
 	public liveClassificationWindow() 
 			throws ClassNotFoundException, 
 			InstantiationException, 
@@ -50,7 +61,13 @@ public class liveClassificationWindow extends JFrame {
 		initGui();
 	}
 	
-	
+	/** initializes and places all the GUI elements
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws UnsupportedLookAndFeelException 
+	 */
 	private void initGui() 
 			throws ClassNotFoundException, 
 			InstantiationException, 
@@ -59,19 +76,19 @@ public class liveClassificationWindow extends JFrame {
 		setLayout(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		setSize(640, 480);
+		setSize(640, 240);
 		setVisible(true);
 		setResizable(false);
 		// positon on screen
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		int x = (dim.width-640)/2;
-		int y = (dim.height-480)/2;
+		int y = (dim.height-240)/2;
 		this.setLocation(x, y);
 		
 		main = new JPanel();
 		main.setVisible(true);
 		main.setLayout(null); 
-		main.setBounds(0, 0, 640, 480);
+		main.setBounds(0, 0, 640, 240);
 		
 		folderLabel = new JLabel("folder with CSV files");
 		folder = new JTextField();
@@ -83,51 +100,45 @@ public class liveClassificationWindow extends JFrame {
 		main.add(folder);
 		main.add(folderSearch);
 		
-		machineLabel = new JLabel("Type of machine");
-		machine = new JComboBox();
-		machine.addItem("Mini 11");
-		machine.addItem("Exactive");
-		machineLabel.setBounds(330, 10, 200, 15);
-		machine.setBounds(330, 30, 300, 30);
-		main.add(machineLabel);
-		main.add(machine);
+		profileLabel = new JLabel("path to the profile file");
+		profile = new JTextField();
+		profileSearch = new JButton("search");
+		profileLabel.setBounds(330, 10, 200, 15);
+		profile.setBounds(330, 30, 200, 30);
+		profileSearch.setBounds(540, 30, 90, 30);
+		main.add(profileLabel);
+		main.add(profile);
+		main.add(profileSearch);
 		
-		databaseLabel = new JLabel("choose databases");
-		databaseLabel.setBounds(10, 80, 200, 15);
-		innerDatabasePanel = new JPanel();
-		innerDatabasePanel.setLayout(new GridLayout(40,0));
-		database = new JCheckBox[40];
-		for(int i=0; i<database.length; i++){
-			database[i] = new JCheckBox("Databasesubstance " + i);
-			innerDatabasePanel.add(database[i]);
-		}
-		databasePane = new JScrollPane(innerDatabasePanel, 
-				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, 
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		databasePane.setBounds(10, 100, 400, 200);
-		main.add(databaseLabel);
-		main.add(databasePane);
+		distanceLabel = new JLabel("distance measure");
+		distance = new JComboBox();
+		distance.addItem("euclidean distance");
+		distance.addItem("mahalanobis distance");
+		distanceLabel.setBounds(10, 80, 200, 15);
+		distance.setBounds(10, 100, 299, 25);
+		main.add(distanceLabel);
+		main.add(distance);
 		
-		classificationLabel = new JLabel("classification Algorithm");
-		algA = new JCheckBox("Algorithm A");
-		algB = new JCheckBox("Algorithm B");
-		classificationLabel.setBounds(10, 320, 200, 15);
-		algA.setBounds(10, 350, 150, 20);
-		algB.setBounds(170, 350, 150, 20);
-		main.add(classificationLabel);
-		main.add(algA);
-		main.add(algB);
+		saveLabel = new JLabel("where to save the results");
+		save = new JTextField();
+		saveSearch = new JButton("search");
+		saveLabel.setBounds(330, 80, 200, 15);
+		save.setBounds(330, 100, 200, 30);
+		saveSearch.setBounds(540, 100, 90, 30);
+		main.add(saveLabel);
+		main.add(save);
+		main.add(saveSearch);
 		
 		cancel = new JButton("cancel");
-		cancel.setBounds(420, 410, 100, 30);
+		cancel.setBounds(420, 175, 100, 30);
 		main.add(cancel);
 		
 		classify = new JButton("classify");
-		classify.setBounds(530, 410, 100, 30);
+		classify.setBounds(530, 175, 100, 30);
 		main.add(classify);
 		
 		help = new JButton("help");
-		help.setBounds(10, 410, 100, 30);
+		help.setBounds(10, 175, 100, 30);
 		main.add(help);
 		
 		add(main);
@@ -162,6 +173,61 @@ public class liveClassificationWindow extends JFrame {
 				}
 		);
 		
+		profileSearch.addActionListener(
+				new ActionListener(){
+					
+					/** Display a JFileChooser when pressing the "search" button
+					 * 
+					 * @param e ActionEvent that occurs when you press the button
+					 */
+					public void actionPerformed(ActionEvent e){
+						JFileChooser fileChooser = new JFileChooser();
+						// set only directories and disable "all files" option
+						FileNameExtensionFilter xmlfilter = new FileNameExtensionFilter(
+								"profile files (*.profile)", 
+								"profile");
+						fileChooser.setFileFilter(xmlfilter);
+						fileChooser.setDialogTitle("Open profile file");
+						
+						JFrame frame = new JFrame();
+						int result = fileChooser.showOpenDialog(frame);
+						
+						// if file is selected 
+						if (result == JFileChooser.APPROVE_OPTION){
+							profile.setText(fileChooser.getSelectedFile().getAbsolutePath());
+							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+						}else if(result != JFileChooser.APPROVE_OPTION){
+							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+						}
+					}
+				}
+		);
+		
+		saveSearch.addActionListener(
+				new ActionListener(){
+					
+					/** Display a JFileChooser when pressing the "search" button
+					 * 
+					 * @param e ActionEvent that occurs when you press the button
+					 */
+					public void actionPerformed(ActionEvent e){
+						JFileChooser fileChooser = new JFileChooser();
+						// set only directories and disable "all files" option
+						
+						JFrame frame = new JFrame();
+						int result = fileChooser.showOpenDialog(frame);
+						
+						// if file is selected 
+						if (result == JFileChooser.APPROVE_OPTION){
+							save.setText(fileChooser.getSelectedFile().getAbsolutePath());
+							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+						}else if(result != JFileChooser.APPROVE_OPTION){
+							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+						}
+					}
+				}
+		);
+		
 		help.addActionListener(
 				new ActionListener(){
 					
@@ -188,19 +254,60 @@ public class liveClassificationWindow extends JFrame {
 					 * @param e ActionEvent that occurs when you press the button
 					 */
 					public void actionPerformed(ActionEvent e){
-						try {
-							liveWindow x = new liveWindow();
-							setVisible(false);
-							x.runProgram();
-						} catch (ClassNotFoundException ex) {
-							Logger.getLogger(liveClassificationWindow.class.getName()).log(Level.SEVERE, null, ex);
-						} catch (InstantiationException ex) {
-							Logger.getLogger(liveClassificationWindow.class.getName()).log(Level.SEVERE, null, ex);
-						} catch (IllegalAccessException ex) {
-							Logger.getLogger(liveClassificationWindow.class.getName()).log(Level.SEVERE, null, ex);
-						} catch (UnsupportedLookAndFeelException ex) {
-							Logger.getLogger(liveClassificationWindow.class.getName()).log(Level.SEVERE, null, ex);
+						
+							// get data from the fields
+							String folderPath = folder.getText();
+							String profilePath = profile.getText();
+							String savePath = save.getText();
+							String distanceMeasure = (String)distance.getSelectedItem();
+						
+							// check if given parameters are valid
+							if(!("".equals(checkParams(folderPath, profilePath, savePath)))){
+								JFrame frame = new JFrame();						
+								JOptionPane.showMessageDialog(frame, 
+										checkParams(folderPath, profilePath, savePath),
+										"Invalid Input", 
+										JOptionPane.ERROR_MESSAGE);
+							}else{
+								setVisible(false);
+								DirWatch watch = new DirWatch("live", folderPath, profilePath, savePath, distanceMeasure);
+								watch.start();
+							}
+							
+						
+					}
+					
+					/** check the parameters if they are valid
+					 * 
+					 * @param folder the folder to the csv files
+					 * @param profile the path and name of the profile file
+					 * @param save the path and name of the results file
+					 * @return an empty string if all parameters are valid, 
+					 * a string with error messages otherwise
+					 */
+					private String checkParams(String folder, String profile, String save){
+						String res = "";
+						
+						File x = new File(folder);
+						if("".equals(folder)){
+							res += "Error: The path to the folder containing the csv files is empty\n";
+						}else if(!(x.exists())){
+							res += "Error: The path to the folder containing the csv files does not exist\n";
 						}
+						x = new File(profile);
+						if("".equals(profile)){
+							res += "Error: The path to the profile file is empty\n";
+						}else if(!(x.exists())){
+							res += "Error: The profile file does not exist\n";
+						}
+						x = new File(save);
+						if("".equals(save)){
+							res += "Error: The path to save the results to is empty\n";
+						}else if(x.exists()){
+							res += "Error: A file with the same name and path as the results file already exists\n";
+						}
+						
+						return res;
 					}
 				}
 		);

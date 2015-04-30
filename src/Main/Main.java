@@ -16,11 +16,12 @@ import io.ProfileBuilder;
 import java.io.File;
 
 public class Main {
-	private static Object MainWatch;
 	
 	public static void main(String[] args) throws IOException, Exception {
 		File dir = new File("/home/wens/test");
-        DirWatch.watchDirectoryPath(dir);
+		DirWatch watch = new DirWatch("live", "/home/wens/test", "/home/wens/pflaume-traube.profile", "/home/wens/test", "euclidean distance");
+		//watch.watchDirectoryPath();
+        //DirWatch.watchDirectoryPath(dir, "/home/wens/pflaume-traube.profile");
 		
 //		Spectrum x = new Spectrum("/home/wens/Pflaume_32AVG5.csv", 1);
 //		System.out.println(x.toString());
