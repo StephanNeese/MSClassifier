@@ -11,6 +11,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
@@ -18,7 +20,12 @@ import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -26,35 +33,87 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-public class liveWindow extends JFrame {
+/** This class initializes a small window on the lower right site of the screen
+ * and performs a live classification of spectras (during the MS run).
+ *
+ * @author Stephan Neese
+ */
+public class liveWindow extends Thread {
 	
+	// threading
+	private Thread t;
+	private String threadName;
+	// classification info
+	String dir;
+	String profilePath;
+	String output;
+	String distanceMeasure;
+	// GUI
+	JFrame frame;
 	JPanel main;
 	public JLabel substance;
 	public JLabel probability;
 	public JLabel distance;
 	public JLabel filename;
 	JButton close;
-	
-	public liveWindow() 
+	// log
+	PrintWriter writer;
+
+	/** constructs a liveWindow from given parameters
+	 * 
+	 * @param threadName name of the thread to start
+	 * @param dir folder where the csv files will be written
+	 * @param profilePath path to the profile file
+	 * @param output path and name of the output log file
+	 * @param distanceMeasure string for type of distance measurement
+	 * @throws java.lang.ClassNotFoundException 
+	 * @throws java.lang.InstantiationException 
+	 * @throws java.lang.IllegalAccessException 
+	 * @throws javax.swing.UnsupportedLookAndFeelException 
+	 * @throws java.io.FileNotFoundException 
+	 * @throws java.io.UnsupportedEncodingException 
+	 */
+	public liveWindow(
+			String threadName, 
+			String dir, 
+			String profilePath, 
+			String output, 
+			String distanceMeasure) 
 			throws ClassNotFoundException, 
 			InstantiationException, 
 			IllegalAccessException, 
-			UnsupportedLookAndFeelException{
-		super("classification");
+			UnsupportedLookAndFeelException,
+			FileNotFoundException,
+			UnsupportedEncodingException {
+		this.threadName = threadName;
+		this.dir = dir;
+		this.profilePath = profilePath;
+		this.output = output;
+		this.distanceMeasure = distanceMeasure;
+		frame = new JFrame();
+		writer = new PrintWriter(output, "UTF-8");
 		initGui();
 	}
 	
+	/** initializes the GUI elements of the liveWindow
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws UnsupportedLookAndFeelException 
+	 */
 	private void initGui() 
 			throws ClassNotFoundException, 
 			InstantiationException, 
 			IllegalAccessException, 
 			UnsupportedLookAndFeelException{
-		setLayout(null);
+		frame.setLayout(null);
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		setSize(160, 100);
-		setUndecorated(true);
-		setVisible(true);
-		setResizable(false);
+		frame.setTitle("live");
+		frame.setSize(160, 100);
+		frame.setUndecorated(true);
+		frame.setVisible(true);
+		frame.setResizable(false);
 		
 		main = new JPanel();
 		main.setVisible(true);
@@ -64,7 +123,7 @@ public class liveWindow extends JFrame {
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		int width = dim.width;
 		int height = dim.height;
-		this.setLocation(width-160, height-100);
+		frame.setLocation(width-160, height-100);
 		
 		filename = new JLabel("Filename");
 		filename.setFont(filename.getFont().deriveFont(10.0f));
@@ -86,10 +145,8 @@ public class liveWindow extends JFrame {
 		close.setBounds(10, 75, 80, 20);
 		main.add(close);
 		
-		add(main);
-	}
-	
-	public void runProgram(){
+		frame.add(main);
+		
 		close.addActionListener(
 				new ActionListener(){
 					
@@ -98,9 +155,125 @@ public class liveWindow extends JFrame {
 					 * @param e ActionEvent that occurs when you press the button
 					 */
 					public void actionPerformed(ActionEvent e){
+						writer.close();
 						System.exit(0);
 					}
 				}
 		);
+	}
+	
+	/** Overwritten method of class Thread.
+	 * This method runs the windows classification and output process.
+	 * 
+	 */
+	public void run(){
+        try{
+			// write logfile header
+			DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+			Date date = new Date();
+			writer.println("created: " + df.format(date));
+			writer.println("csv files from: " + dir);
+			writer.println("profile used: " + profilePath);
+			writer.println("distance measure: " + distanceMeasure);
+			writer.println("Filename\tassigned class\tdistance\tscore");
+			
+			Path path = new File(dir).toPath();
+			FileSystem fs = path.getFileSystem();
+			Profile profile = Reader.readProfile(profilePath);
+			
+			WatchService service = fs.newWatchService();
+			// we only watch directory for new files
+            path.register(service, ENTRY_CREATE);
+            WatchKey key = null;
+			// infinite loop
+            while(true){
+                key = service.take();
+                WatchEvent.Kind<?> kind = null;
+                for(WatchEvent<?> watchEvent : key.pollEvents()){
+                    kind = watchEvent.kind();
+					// check for kin of event
+                    if(OVERFLOW == kind){
+						// events occuring faster than can be polled
+                        continue;
+                    }else if(ENTRY_CREATE == kind){
+                        // new file created
+                        Path file = ((WatchEvent<Path>)watchEvent).context();
+                        // check for csv ending
+						if(checkCSV(file.toString())){
+							// sleep so file can be written completely by the filesystem
+							Thread.sleep(100);
+							
+							Spectrum spectrum = new Spectrum(
+									path.toString() + File.separator + file.toString(), 
+									(int)profile.getBinSize());
+							if(distanceMeasure.equals("euclidean distance")){
+								ClassificationResult res = profile.euclideanDistance(spectrum);
+								filename.setText(file.toString());
+								substance.setText(res.getAssignedClass());
+								probability.setText("P=" + res.getScore());
+								distance.setText("d=" + res.getDistance());
+								// write log
+								writer.println(
+										file.toString() 
+												+ "\t" 
+												+ res.getAssignedClass() 
+												+ "\t" 
+												+ res.getScore() 
+												+ "\t" 
+												+ res.getDistance());
+							}else{
+								ClassificationResult res = profile.mahalanobisDistance(spectrum);
+								filename.setText(file.toString());
+								substance.setText(res.getAssignedClass());
+								probability.setText("P=" + res.getScore());
+								distance.setText("d=" + res.getDistance());
+								// write log
+								writer.println(
+										file.toString() 
+												+ "\t" 
+												+ res.getAssignedClass() 
+												+ "\t" 
+												+ res.getScore() 
+												+ "\t" 
+												+ res.getDistance());
+							}
+						}
+                    }
+                }
+				// reset key to re-enter the loop
+                if(!key.reset()){
+                    break;
+                }
+            }
+        } catch(IOException | InterruptedException ioe){
+            ioe.printStackTrace();
+        } catch (ParseException ex) {
+			Logger.getLogger(liveWindow.class.getName()).log(Level.SEVERE, null, ex);
+		}
+    }
+	
+	/** Overwritten method from class Thread. 
+	 * This method starts the thread
+	 * 
+	 */
+	public void start(){
+		if(t==null){
+			t = new Thread(this, threadName);
+			t.start();
+		}
+	}
+	
+	/** This method checks if a file is a CSV file
+	 * by checking the fileending.
+	 * 
+	 * @param filepath the filepath
+	 * @return true if file is a csv file, false otherwise
+	 */
+	private static boolean checkCSV(String filepath){
+		if(filepath.endsWith(".csv") || filepath.endsWith(".CSV")){
+			return true;
+		}else{
+			return false;
+		}
 	}
 }

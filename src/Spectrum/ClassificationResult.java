@@ -1,5 +1,10 @@
 package Spectrum;
 
+/** This class provides all nessessary information of a classification process
+ * such as the assigned class from the profile used, distance and the score value.
+ * 
+ * @author Stephan Neese
+ */
 public class ClassificationResult {
 	
 	private final String assignedClass;

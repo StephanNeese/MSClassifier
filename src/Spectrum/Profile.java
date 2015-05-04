@@ -5,6 +5,11 @@ import java.util.HashMap;
 import preprocessing.PCA;
 import weka.core.matrix.Matrix;
 
+/** 
+ * 
+ * @author Stephan Neese
+ */
+
 public class Profile {
 	
 	private final String[] classes;

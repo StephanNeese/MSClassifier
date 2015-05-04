@@ -1,28 +1,23 @@
 package gui;
 
-import io.DirWatch;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.IOException;
-import java.text.ParseException;
+import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -254,27 +249,29 @@ public class liveClassificationWindow extends JFrame {
 					 * @param e ActionEvent that occurs when you press the button
 					 */
 					public void actionPerformed(ActionEvent e){
+						// get data from the fields
+						String folderPath = folder.getText();
+						String profilePath = profile.getText();
+						String savePath = save.getText();
+						String distanceMeasure = (String)distance.getSelectedItem();
 						
-							// get data from the fields
-							String folderPath = folder.getText();
-							String profilePath = profile.getText();
-							String savePath = save.getText();
-							String distanceMeasure = (String)distance.getSelectedItem();
-						
-							// check if given parameters are valid
-							if(!("".equals(checkParams(folderPath, profilePath, savePath)))){
-								JFrame frame = new JFrame();						
-								JOptionPane.showMessageDialog(frame, 
-										checkParams(folderPath, profilePath, savePath),
-										"Invalid Input", 
-										JOptionPane.ERROR_MESSAGE);
-							}else{
-								setVisible(false);
-								DirWatch watch = new DirWatch("live", folderPath, profilePath, savePath, distanceMeasure);
+						// check if given parameters are valid
+						if(!("".equals(checkParams(folderPath, profilePath, savePath)))){
+							JFrame frame = new JFrame();						
+							JOptionPane.showMessageDialog(frame, 
+									checkParams(folderPath, profilePath, savePath),
+									"Invalid Input", 
+									JOptionPane.ERROR_MESSAGE);
+						}else{
+							setVisible(false);
+							liveWindow watch;
+							try {
+								watch = new liveWindow("live", folderPath, profilePath, savePath, distanceMeasure);
 								watch.start();
+							} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException | FileNotFoundException | UnsupportedEncodingException ex) {
+								Logger.getLogger(liveClassificationWindow.class.getName()).log(Level.SEVERE, null, ex);
 							}
-							
-						
+						}
 					}
 					
 					/** check the parameters if they are valid

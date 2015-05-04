@@ -29,6 +29,9 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import io.Reader;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class classificationWindow extends JFrame {
 	
@@ -315,6 +318,12 @@ public class classificationWindow extends JFrame {
 							// save results to file
 							try{
 								PrintWriter writer = new PrintWriter(savePath, "UTF-8");
+								DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+								Date date = new Date();
+								writer.println("created: " + df.format(date));
+								writer.println("csv files from: " + folderPath);
+								writer.println("profile used: " + profilePath);
+								writer.println("distance measure: " + distanceMeasure);
 								writer.println("Filename\tassigned class\tdistance\tscore");
 								for(int i=0; i<rowData.length; i++){
 									writer.println(rowData[i][0] + "\t" + rowData[i][1] + "\t" + rowData[i][2] + "\t" + rowData[i][3]);
