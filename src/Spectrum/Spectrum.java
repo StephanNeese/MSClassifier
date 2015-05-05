@@ -99,8 +99,14 @@ public class Spectrum {
 			voltage[i] = voltageTmp2.get(i);
 		}
 		
-		String[] pathTmp = path.split(File.separator);
-		filename = pathTmp[pathTmp.length-1];
+		if(System.getProperty("os.name").startsWith("Windows")){
+			String[] pathTmp = path.split("\\\\");
+		    filename = pathTmp[pathTmp.length-1];
+		}else{
+			String[] pathTmp = path.split("/");
+		    filename = pathTmp[pathTmp.length-1];
+		}
+		
 		
 		length = mzTmp2.size();
 	}
