@@ -4,15 +4,21 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
+/** This class provides a datastructure for an array of
+ * spectras. During construction of the object the spectras
+ * are binned. 
+ * 
+ * @author Stephan Neese
+ */
 public class SpectraMatrix {
 	
-	private double[] mz;
-	private String[] samples;
-	private double[][] voltage;		// [spectrum][mz]
-	private final int numSpectra;
-	private final int numDimensions;
-	private double mean;
-	private double[] dimensionsMean;
+	private double[] mz;				// mz values (dimensions)
+	private String[] samples;			// filenames of spectras
+	private double[][] voltage;			// [spectrum][mz]
+	private final int numSpectra;		// no of spectras
+	private final int numDimensions;	// no of dimensions (mz bins)
+	private double mean;				// mean of all values in the matrix
+	private double[] dimensionsMean;	// mean for each dimension
 	
 	/** constructs a SpectraMatrix from a Spectrum array
 	 * 

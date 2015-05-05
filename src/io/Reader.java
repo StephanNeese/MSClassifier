@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-/** This class contains the static method readData(String path, int binSize)
- * which creates a SpectraMatrix object from csv files in a directory.
+/** This class contains static methods to read in from the file system 
+ * and create a SpectraMatrix or a profile. 
  * 
  * @author Stephan Neese
  */

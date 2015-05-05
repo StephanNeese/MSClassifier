@@ -22,6 +22,11 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+/** This class is the parameter input window
+ * for live classification.
+ * 
+ * @author Stephan Neese
+ */
 public class liveClassificationWindow extends JFrame {
 	
 	JPanel main;

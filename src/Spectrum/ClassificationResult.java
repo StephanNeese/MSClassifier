@@ -1,6 +1,7 @@
 package Spectrum;
 
 /** This class provides all nessessary information of a classification process
+ * of a Spectrum with a profile,
  * such as the assigned class from the profile used, distance and the score value.
  * 
  * @author Stephan Neese

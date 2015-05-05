@@ -33,6 +33,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/** This class is the window for
+ * non live classification.
+ * 
+ * @author Stephan Neese
+ */
 public class classificationWindow extends JFrame {
 	
 	JPanel main;

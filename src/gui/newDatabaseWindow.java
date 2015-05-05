@@ -25,6 +25,11 @@ import preprocessing.PCADataSet;
 import io.ProfileBuilder;
 import io.Reader;
 
+/** This class inits the window
+ * to create a new Profile.
+ * 
+ * @author Stephan Neese
+ */
 public class newDatabaseWindow extends JFrame {
 	
 	JPanel main;

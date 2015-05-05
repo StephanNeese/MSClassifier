@@ -13,6 +13,12 @@ import java.util.Map;
 import preprocessing.PCADataSet;
 import weka.core.matrix.Matrix;
 
+/** This class contains the static method build() 
+ * that builds a profile from given parameters 
+ * and writes a pofile file to a specified path on the file system.
+ * 
+ * @author Stephan Neese
+ */
 public class ProfileBuilder {
 	
 	/** prints a profile file from the given information

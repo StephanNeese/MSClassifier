@@ -1,8 +1,13 @@
 package preprocessing;
 
+/** This class provides a data structure
+ * for an eigen vector.
+ * 
+ * @author Stephan Neese
+ */
 public class EigenVector implements Comparable<EigenVector> {
 	
-	private final double[] data;
+	private final double[] data;		// dimensions of vector
 	private double eigenValue;
 	
 	/** consructs a EigenVector from a data array and an eigenvalue

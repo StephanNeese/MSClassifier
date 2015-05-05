@@ -5,6 +5,10 @@ import Spectrum.Spectrum;
 import java.util.Arrays;
 import weka.core.Matrix;
 
+/** This class provides static methods for pca.
+ * 
+ * @author Stephan Neese
+ */
 public class PCA {
 	
 	/** performs a principal component analysis on a SpectraMatrix

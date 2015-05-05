@@ -5,26 +5,30 @@ import java.util.HashMap;
 import preprocessing.PCA;
 import weka.core.matrix.Matrix;
 
-/** 
+/** This class provides a data structure for
+ * the saved data from pca transformation and
+ * some of the raw data as well as basic information
+ * on the creation of this dataset.
  * 
  * @author Stephan Neese
  */
 
 public class Profile {
 	
-	private final String[] classes;
-	private final Date datetime;
-	private final String device;
-	private final String path;
-	private final double variance;
-	private final String[] filenames;
-	private final double[][] data;
-	private final double[][] features;
+	private final String[] classes;			// names of the classes
+	private final Date datetime;			// date the profile was created
+	private final String device;			// MS device
+	private final String path;				// path to profile (original path)
+	private final double variance;			// covered variance by profile
+	private final String[] filenames;		// filenames of original csv files 
+	private final double[][] data;			// pca transformed data [dimensions][samples]
+	private final double[][] features;		// feature vector (used for transformation)
+	// inv. cov. matrices of classes
 	private HashMap<String, double[][]> invertedCovarianceMatrices;
 	private final double[][] mean;			// [class][dimension]
-	private final double[] originalMeans;
-	private final double originalMean;
-	private final double binSize;
+	private final double[] originalMeans;	// mean of dimensions of untransformed dataset
+	private final double originalMean;		// mean of all spectras and dimensions of untransformed
+	private final double binSize;			// size of a bin
 
 	/** constructs a Profile Object
 	 * 

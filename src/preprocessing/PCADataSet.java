@@ -1,11 +1,16 @@
 package preprocessing;
 
+/** This class provides a data structure for
+ * pca transformed data like feature matrix, classnames etc.
+ * 
+ * @author Stephan Neese
+ */
 public class PCADataSet {
 	
 	private double[][] data;						// data[dimensions][samples]
 	private String[] classes;						// classes of the samples
 	private double[][] transformedFeatureMatrix;	// [vectors][dimensions]
-	private final double variance;
+	private final double variance;					// covered variance by pca
 
 	/** constructs a PCADataSet from given parameters
 	 * 

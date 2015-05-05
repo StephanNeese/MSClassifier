@@ -12,6 +12,11 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+/** Main class of the GUI. 
+ * This frame is the first to pop up when executing the program.
+ * 
+ * @author Stephan Neese
+ */
 public class Main extends JFrame {
 	
 	JPanel main;
@@ -19,6 +24,13 @@ public class Main extends JFrame {
 	JButton classification;
 	JButton liveClassification;
 	
+	/** constructs the GUI elements of the main window
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws UnsupportedLookAndFeelException 
+	 */
 	public Main() 
 			throws ClassNotFoundException, 
 			InstantiationException, 
@@ -28,6 +40,14 @@ public class Main extends JFrame {
 		initGui();
 	}
 	
+	/** called by the constructor to init the 
+	 * GUI elements.
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws UnsupportedLookAndFeelException 
+	 */
 	private void initGui() 
 			throws ClassNotFoundException, 
 			InstantiationException, 
@@ -66,6 +86,10 @@ public class Main extends JFrame {
 		add(main);
 	}
 	
+	/** This method makes the program usable. 
+	 * It adds all the actionListeners to the buttons.
+	 * 
+	 */
 	public void runProgram(){
 		newDB.addActionListener(
 				new ActionListener(){
@@ -135,6 +159,14 @@ public class Main extends JFrame {
 		);
 	}
 	
+	/** main method of program.
+	 * 
+	 * @param args command line arguments
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws UnsupportedLookAndFeelException 
+	 */
 	public static void main(String[] args) 
 			throws ClassNotFoundException, 
 			InstantiationException, 

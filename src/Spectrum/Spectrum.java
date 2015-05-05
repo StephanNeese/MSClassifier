@@ -6,15 +6,17 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
-
+/** This class provides a data structure for a spectrum.
+ * 
+ * @author Stephan Neese
+ */
 public class Spectrum {
 	
-	private double[] mz;
-	private double[] voltage;
-	private String filename;
-	private int length;
+	private double[] mz;			// mz values
+	private double[] voltage;		// voltage values
+	private String filename;		// filename of csv
+	private int length;				// num dimensions
 	
 	/** constructs a spectrum from given values
 	 * 
