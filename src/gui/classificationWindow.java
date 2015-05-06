@@ -286,37 +286,40 @@ public class classificationWindow extends JFrame {
 						
 							// calculate distances
 							Object[][] rowData = new Object[csv.length][4];
+							double worstScore = 0.0;
 							if(distanceMeasure.equals("euclidean distance")){
-								for(int i=0; i<csv.length; i++){
-									try {
-										Profile profile = Reader.readProfile(profilePath);
+								try {
+									Profile profile = Reader.readProfile(profilePath);
+									// get worst possible score from first result
+									worstScore = 1.0 - (1.0/(double)(profile.getClasses().length));
+									System.out.println(profile.getClasses().length);
+									for(int i=0; i<csv.length; i++){
 										Spectrum spectrum = new Spectrum(csv[i], (int)profile.getBinSize());
 										ClassificationResult res = profile.euclideanDistance(spectrum);
-										rowData[i][0] = csv[i];
+										rowData[i][0] = spectrum.getFilename();
 										rowData[i][1] = res.getAssignedClass();
 										rowData[i][2] = res.getDistance();
 										rowData[i][3] = res.getScore();
-									} catch (IOException ex) {
-										Logger.getLogger(classificationWindow.class.getName()).log(Level.SEVERE, null, ex);
-									} catch (ParseException ex) {
-										Logger.getLogger(classificationWindow.class.getName()).log(Level.SEVERE, null, ex);
 									}
+								} catch (IOException | ParseException ex) {
+									Logger.getLogger(classificationWindow.class.getName()).log(Level.SEVERE, null, ex);
 								}
 							}else{
-								for(int i=0; i<csv.length; i++){
-									try {
-										Profile profile = Reader.readProfile(profilePath);
+								try {
+									Profile profile = Reader.readProfile(profilePath);
+									// get worst possible score from first result
+									worstScore = 1.0 - (1.0/(double)(profile.getClasses().length));
+									System.out.println(profile.getClasses().length);
+									for(int i=0; i<csv.length; i++){
 										Spectrum spectrum = new Spectrum(csv[i], (int)profile.getBinSize());
 										ClassificationResult res = profile.mahalanobisDistance(spectrum);
-										rowData[i][0] = csv[i];
+										rowData[i][0] = spectrum.getFilename();
 										rowData[i][1] = res.getAssignedClass();
 										rowData[i][2] = res.getDistance();
 										rowData[i][3] = res.getScore();
-									} catch (IOException ex) {
-										Logger.getLogger(classificationWindow.class.getName()).log(Level.SEVERE, null, ex);
-									} catch (ParseException ex) {
-										Logger.getLogger(classificationWindow.class.getName()).log(Level.SEVERE, null, ex);
 									}
+								} catch (IOException | ParseException ex) {
+									Logger.getLogger(classificationWindow.class.getName()).log(Level.SEVERE, null, ex);
 								}
 							}
 						
@@ -329,6 +332,7 @@ public class classificationWindow extends JFrame {
 								writer.println("csv files from: " + folderPath);
 								writer.println("profile used: " + profilePath);
 								writer.println("distance measure: " + distanceMeasure);
+								writer.println("worst score possible: " + worstScore);
 								writer.println("Filename\tassigned class\tdistance\tscore");
 								for(int i=0; i<rowData.length; i++){
 									writer.println(rowData[i][0] + "\t" + rowData[i][1] + "\t" + rowData[i][2] + "\t" + rowData[i][3]);

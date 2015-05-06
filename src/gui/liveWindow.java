@@ -114,6 +114,7 @@ public class liveWindow extends Thread {
 		frame.setUndecorated(true);
 		frame.setVisible(true);
 		frame.setResizable(false);
+		frame.setAlwaysOnTop(true);
 		
 		main = new JPanel();
 		main.setVisible(true);
@@ -123,7 +124,7 @@ public class liveWindow extends Thread {
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		int width = dim.width;
 		int height = dim.height;
-		frame.setLocation(width-160, height-100);
+		frame.setLocation(width-160, height-130);
 		
 		filename = new JLabel("Filename");
 		filename.setFont(filename.getFont().deriveFont(10.0f));
@@ -168,6 +169,10 @@ public class liveWindow extends Thread {
 	 */
 	public void run(){
         try{
+			Path path = new File(dir).toPath();
+			FileSystem fs = path.getFileSystem();
+			Profile profile = Reader.readProfile(profilePath);
+			
 			// write logfile header
 			DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 			Date date = new Date();
@@ -175,11 +180,8 @@ public class liveWindow extends Thread {
 			writer.println("csv files from: " + dir);
 			writer.println("profile used: " + profilePath);
 			writer.println("distance measure: " + distanceMeasure);
+			writer.println("worst possible score: " + (1.0 - (1.0/(double)(profile.getClasses().length))));
 			writer.println("Filename\tassigned class\tdistance\tscore");
-			
-			Path path = new File(dir).toPath();
-			FileSystem fs = path.getFileSystem();
-			Profile profile = Reader.readProfile(profilePath);
 			
 			WatchService service = fs.newWatchService();
 			// we only watch directory for new files
@@ -201,7 +203,7 @@ public class liveWindow extends Thread {
                         // check for csv ending
 						if(checkCSV(file.toString())){
 							// sleep so file can be written completely by the filesystem
-							Thread.sleep(100);
+							Thread.sleep(1000);
 							
 							Spectrum spectrum = new Spectrum(
 									path.toString() + File.separator + file.toString(), 
@@ -218,9 +220,9 @@ public class liveWindow extends Thread {
 												+ "\t" 
 												+ res.getAssignedClass() 
 												+ "\t" 
-												+ res.getScore() 
+												+ res.getDistance() 
 												+ "\t" 
-												+ res.getDistance());
+												+ res.getScore());
 							}else{
 								ClassificationResult res = profile.mahalanobisDistance(spectrum);
 								filename.setText(file.toString());
@@ -233,9 +235,9 @@ public class liveWindow extends Thread {
 												+ "\t" 
 												+ res.getAssignedClass() 
 												+ "\t" 
-												+ res.getScore() 
+												+ res.getDistance() 
 												+ "\t" 
-												+ res.getDistance());
+												+ res.getScore());
 							}
 						}
                     }

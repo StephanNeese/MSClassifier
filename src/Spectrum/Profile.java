@@ -286,7 +286,10 @@ public class Profile {
 			sum += distances[i];
 		}
 		
-		return new ClassificationResult(classes[index], distances[index], (1 - (distances[index]/sum)));
+		return new ClassificationResult(
+				classes[index], 
+				distances[index], 
+				(1 - (distances[index]/sum)));
 	}
 	
 	/** calculates the euclidian distance between the profiles classes and a given spectrum
@@ -329,6 +332,9 @@ public class Profile {
 			sum += distances[i];
 		}
 		
-		return new ClassificationResult(classes[index], distances[index], (1 - (distances[index]/sum)));
+		return new ClassificationResult(
+				classes[index], 
+				distances[index], 
+				(1 - (distances[index]/sum)));
 	}
 }
