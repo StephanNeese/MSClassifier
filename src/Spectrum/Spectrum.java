@@ -38,7 +38,7 @@ public class Spectrum {
 	 * @throws FileNotFoundException
 	 * @throws IOException 
 	 */
-	public Spectrum(String path, int bin) throws FileNotFoundException, IOException{
+	public Spectrum(String path, int bin){
 		readCSV(path, bin);
 	}
 	
@@ -49,8 +49,11 @@ public class Spectrum {
 	 * @throws FileNotFoundException
 	 * @throws IOException 
 	 */
-	private void readCSV(String path, int bin) throws FileNotFoundException, IOException{
+	private void readCSV(String path, int bin){
 		File csv = new File(path);
+		boolean check = false;
+		while(!check){
+		try{
 		BufferedReader buff = new BufferedReader(new FileReader(csv));
 		
 		/** read in **/
@@ -109,8 +112,12 @@ public class Spectrum {
 		    filename = pathTmp[pathTmp.length-1];
 		}
 		
-		
 		length = mzTmp2.size();
+		check = true;
+		}catch(Exception ex){
+			continue;
+		}
+		}
 	}
 
 	/** returns the mz values

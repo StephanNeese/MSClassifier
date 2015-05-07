@@ -202,9 +202,6 @@ public class liveWindow extends Thread {
                         Path file = ((WatchEvent<Path>)watchEvent).context();
                         // check for csv ending
 						if(checkCSV(file.toString())){
-							// sleep so file can be written completely by the filesystem
-							Thread.sleep(1000);
-							
 							Spectrum spectrum = new Spectrum(
 									path.toString() + File.separator + file.toString(), 
 									(int)profile.getBinSize());
