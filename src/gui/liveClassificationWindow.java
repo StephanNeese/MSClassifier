@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -29,21 +30,23 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class liveClassificationWindow extends JFrame {
 	
-	JPanel main;
-	JLabel folderLabel;
-	JTextField folder;
-	JButton folderSearch;
-	JLabel profileLabel;
-	JTextField profile;
-	JButton profileSearch;
-	JLabel distanceLabel;
-	JComboBox distance;
-	JLabel saveLabel;
-	JTextField save;
-	JButton saveSearch;
-	JButton cancel;
-	JButton classify;
-	JButton help;
+	private JPanel main;
+	private JLabel folderLabel;
+	private JTextField folder;
+	private JButton folderSearch;
+	private JLabel profileLabel;
+	private JTextField profile;
+	private JButton profileSearch;
+	private JLabel distanceLabel;
+	private JComboBox distance;
+	private JLabel saveLabel;
+	private JTextField save;
+	private JButton saveSearch;
+	private JLabel cutoffLabel;
+	private JTextField cutoff;
+	private JButton cancel;
+	private JButton classify;
+	private JButton help;
 
 	/** constructs a classificationWindow
 	 * 
@@ -76,19 +79,16 @@ public class liveClassificationWindow extends JFrame {
 		setLayout(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		setSize(640, 240);
+		setSize(640, 310);
 		setVisible(true);
 		setResizable(false);
 		// positon on screen
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		int x = (dim.width-640)/2;
-		int y = (dim.height-240)/2;
+		int y = (dim.height-310)/2;
 		this.setLocation(x, y);
 		
 		main = new JPanel();
-		main.setVisible(true);
-		main.setLayout(null); 
-		main.setBounds(0, 0, 640, 240);
 		
 		folderLabel = new JLabel("folder with CSV files");
 		folder = new JTextField();
@@ -129,19 +129,29 @@ public class liveClassificationWindow extends JFrame {
 		main.add(save);
 		main.add(saveSearch);
 		
+		cutoffLabel = new JLabel("minimal score for results to classify");
+		cutoff = new JTextField();
+		cutoffLabel.setBounds(10, 145, 200, 15);
+		cutoff.setBounds(10, 165, 299, 30);
+		main.add(cutoffLabel);
+		main.add(cutoff);
+		
 		cancel = new JButton("cancel");
-		cancel.setBounds(420, 175, 100, 30);
+		cancel.setBounds(420, 240, 100, 30);
 		main.add(cancel);
 		
 		classify = new JButton("classify");
-		classify.setBounds(530, 175, 100, 30);
+		classify.setBounds(530, 240, 100, 30);
 		main.add(classify);
 		
 		help = new JButton("help");
-		help.setBounds(10, 175, 100, 30);
+		help.setBounds(10, 240, 100, 30);
 		main.add(help);
 		
 		add(main);
+		main.setVisible(true);
+		main.setLayout(null); 
+		main.setBounds(0, 0, 640, 310);
 	}
 	
 	
@@ -259,19 +269,22 @@ public class liveClassificationWindow extends JFrame {
 						String profilePath = profile.getText();
 						String savePath = save.getText();
 						String distanceMeasure = (String)distance.getSelectedItem();
+						String cutoffTmp = cutoff.getText();
 						
 						// check if given parameters are valid
-						if(!("".equals(checkParams(folderPath, profilePath, savePath)))){
+						if(!("".equals(checkParams(folderPath, profilePath, savePath, cutoffTmp)))){
+							// if not valid output an ERROR MSG
 							JFrame frame = new JFrame();						
 							JOptionPane.showMessageDialog(frame, 
-									checkParams(folderPath, profilePath, savePath),
+									checkParams(folderPath, profilePath, savePath, cutoffTmp),
 									"Invalid Input", 
 									JOptionPane.ERROR_MESSAGE);
 						}else{
 							setVisible(false);
 							liveWindow watch;
+							double cutoffValue = Double.parseDouble(cutoffTmp);
 							try {
-								watch = new liveWindow("live", folderPath, profilePath, savePath, distanceMeasure);
+								watch = new liveWindow("live", folderPath, profilePath, savePath, distanceMeasure, cutoffValue);
 								watch.start();
 							} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException | FileNotFoundException | UnsupportedEncodingException ex) {
 								Logger.getLogger(liveClassificationWindow.class.getName()).log(Level.SEVERE, null, ex);
@@ -287,7 +300,7 @@ public class liveClassificationWindow extends JFrame {
 					 * @return an empty string if all parameters are valid, 
 					 * a string with error messages otherwise
 					 */
-					private String checkParams(String folder, String profile, String save){
+					private String checkParams(String folder, String profile, String save, String cutoffValue){
 						String res = "";
 						
 						File x = new File(folder);
@@ -308,8 +321,68 @@ public class liveClassificationWindow extends JFrame {
 						}else if(x.exists()){
 							res += "Error: A file with the same name and path as the results file already exists\n";
 						}
+						if(!(parseDouble(cutoffValue))){
+							res += "Error: The value for the minimum score is not a valid number\n";
+						}else{
+							double tmp = Double.parseDouble(cutoffValue);
+							if(tmp<0 || tmp>1.0){
+								res += "Error: The value for the minimum score must be between 0 and 1.0\n";
+							}
+						}
 						
 						return res;
+					}
+					
+					/** checks if a String can be parsed to double
+					 * 
+					 * @param x the String containing a number (or something else)
+					 * @return true if string can  parsed to double false otherwise
+					 */
+					private boolean parseDouble(String x){
+						final String Digits     = "(\\p{Digit}+)";
+						final String HexDigits  = "(\\p{XDigit}+)";
+						// an exponent is 'e' or 'E' followed by an optionally
+						// signed decimal integer.
+						final String Exp        = "[eE][+-]?"+Digits;
+						final String fpRegex    =
+								("[\\x00-\\x20]*"+  // Optional leading "whitespace"
+									"[+-]?(" + // Optional sign character
+									"NaN|" +           // "NaN" string
+									"Infinity|" +      // "Infinity" string
+
+									// A decimal floating-point string representing a finite positive
+									// number without a leading sign has at most five basic pieces:
+									// Digits . Digits ExponentPart FloatTypeSuffix
+									//
+									// Since this method allows integer-only strings as input
+									// in addition to strings of floating-point literals, the
+									// two sub-patterns below are simplifications of the grammar
+									// productions from section 3.10.2 of
+									// The Java™ Language Specification.
+
+									// Digits ._opt Digits_opt ExponentPart_opt FloatTypeSuffix_opt
+									"((("+Digits+"(\\.)?("+Digits+"?)("+Exp+")?)|"+
+
+									// . Digits ExponentPart_opt FloatTypeSuffix_opt
+									"(\\.("+Digits+")("+Exp+")?)|"+
+
+									// Hexadecimal strings
+									"((" +
+									// 0[xX] HexDigits ._opt BinaryExponent FloatTypeSuffix_opt
+									"(0[xX]" + HexDigits + "(\\.)?)|" +
+
+									// 0[xX] HexDigits_opt . HexDigits BinaryExponent FloatTypeSuffix_opt
+									"(0[xX]" + HexDigits + "?(\\.)" + HexDigits + ")" +
+
+									")[pP][+-]?" + Digits + "))" +
+									"[fFdD]?))" +
+									"[\\x00-\\x20]*");// Optional trailing "whitespace"
+
+						if (Pattern.matches(fpRegex, x))
+							return true;
+						else {
+							return false;
+						}
 					}
 				}
 		);

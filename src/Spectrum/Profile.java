@@ -254,7 +254,7 @@ public class Profile {
 			// differences between the dimensions
 			double[] differences = new double[pca_spectrum.length];
 			for(int j=0; j<differences.length; j++){
-				differences[j] = mean[i][j] - pca_spectrum[j];
+				differences[j] = pca_spectrum[j] - mean[i][j];
 			}
 			// transform into matrix and its inverse
 			double[][] tmp = new double[1][differences.length];
@@ -285,11 +285,14 @@ public class Profile {
 		for(int i=0; i<distances.length; i++){
 			sum += distances[i];
 		}
+		double best = (1.0 - (distances[index]/sum));
+		double worst = (1.0 - (1.0/distances.length));
+		double score = (best - worst)/(1 - worst);
 		
 		return new ClassificationResult(
 				classes[index], 
 				distances[index], 
-				(1 - (distances[index]/sum)));
+				score);
 	}
 	
 	/** calculates the euclidian distance between the profiles classes and a given spectrum
@@ -331,10 +334,13 @@ public class Profile {
 		for(int i=0; i<distances.length; i++){
 			sum += distances[i];
 		}
+		double best = (1.0 - (distances[index]/sum));
+		double worst = (1.0 - (1.0/distances.length));
+		double score = (best - worst)/(1 - worst);
 		
 		return new ClassificationResult(
 				classes[index], 
 				distances[index], 
-				(1 - (distances[index]/sum)));
+				score);
 	}
 }

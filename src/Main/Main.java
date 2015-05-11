@@ -19,7 +19,7 @@ public class Main {
 	
 	public static void main(String[] args) throws IOException, Exception {
 		File dir = new File("/home/wens/test");
-		liveWindow watch = new liveWindow("live", "/home/wens/test", "/home/wens/pflaume-traube.profile", "/home/wens/test", "euclidean distance");
+		//liveWindow watch = new liveWindow("live", "/home/wens/test", "/home/wens/pflaume-traube.profile", "/home/wens/test", "euclidean distance");
 		//watch.watchDirectoryPath();
         //DirWatch.watchDirectoryPath(dir, "/home/wens/pflaume-traube.profile");
 		

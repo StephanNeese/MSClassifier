@@ -44,20 +44,21 @@ public class liveWindow extends Thread {
 	private Thread t;
 	private String threadName;
 	// classification info
-	String dir;
-	String profilePath;
-	String output;
-	String distanceMeasure;
+	private String dir;
+	private String profilePath;
+	private String output;
+	private String distanceMeasure;
+	private double cutoff;
 	// GUI
-	JFrame frame;
-	JPanel main;
-	public JLabel substance;
-	public JLabel probability;
-	public JLabel distance;
-	public JLabel filename;
-	JButton close;
+	private JFrame frame;
+	private JPanel main;
+	private JLabel substance;
+	private JLabel probability;
+	private JLabel distance;
+	private JLabel filename;
+	private JButton close;
 	// log
-	PrintWriter writer;
+	private PrintWriter writer;
 
 	/** constructs a liveWindow from given parameters
 	 * 
@@ -78,7 +79,8 @@ public class liveWindow extends Thread {
 			String dir, 
 			String profilePath, 
 			String output, 
-			String distanceMeasure) 
+			String distanceMeasure,
+			double cutoff) 
 			throws ClassNotFoundException, 
 			InstantiationException, 
 			IllegalAccessException, 
@@ -90,6 +92,7 @@ public class liveWindow extends Thread {
 		this.profilePath = profilePath;
 		this.output = output;
 		this.distanceMeasure = distanceMeasure;
+		this.cutoff = cutoff;
 		frame = new JFrame();
 		writer = new PrintWriter(output, "UTF-8");
 		initGui();
@@ -180,7 +183,7 @@ public class liveWindow extends Thread {
 			writer.println("csv files from: " + dir);
 			writer.println("profile used: " + profilePath);
 			writer.println("distance measure: " + distanceMeasure);
-			writer.println("worst possible score: " + (1.0 - (1.0/(double)(profile.getClasses().length))));
+			writer.println("minimum score: " + cutoff);
 			writer.println("Filename\tassigned class\tdistance\tscore");
 			
 			WatchService service = fs.newWatchService();
@@ -208,33 +211,64 @@ public class liveWindow extends Thread {
 							if(distanceMeasure.equals("euclidean distance")){
 								ClassificationResult res = profile.euclideanDistance(spectrum);
 								filename.setText(file.toString());
-								substance.setText(res.getAssignedClass());
-								probability.setText("P=" + res.getScore());
-								distance.setText("d=" + res.getDistance());
-								// write log
-								writer.println(
-										file.toString() 
-												+ "\t" 
-												+ res.getAssignedClass() 
-												+ "\t" 
-												+ res.getDistance() 
-												+ "\t" 
-												+ res.getScore());
+								if(res.getScore()<cutoff){
+									substance.setText("<html><font color='red'>NONE</font></html>");
+									probability.setText("P=NA");
+									distance.setText("d=NA");
+									// write log
+									writer.println(
+											file.toString() 
+													+ "\t" 
+													+ "NA"
+													+ "\t" 
+													+ "NA"
+													+ "\t" 
+													+ "NA");
+								}else{
+									substance.setText(res.getAssignedClass());
+									probability.setText("P=" + res.getScore());
+									distance.setText("d=" + res.getDistance());
+									// write log
+									writer.println(
+											file.toString() 
+													+ "\t" 
+													+ res.getAssignedClass() 
+													+ "\t" 
+													+ res.getDistance() 
+													+ "\t" 
+													+ res.getScore());
+								}
+								
 							}else{
 								ClassificationResult res = profile.mahalanobisDistance(spectrum);
 								filename.setText(file.toString());
-								substance.setText(res.getAssignedClass());
-								probability.setText("P=" + res.getScore());
-								distance.setText("d=" + res.getDistance());
-								// write log
-								writer.println(
-										file.toString() 
-												+ "\t" 
-												+ res.getAssignedClass() 
-												+ "\t" 
-												+ res.getDistance() 
-												+ "\t" 
-												+ res.getScore());
+								if(res.getScore()<cutoff){
+									substance.setText("<html><font color='red'>NONE</font></html>");
+									probability.setText("P=NA");
+									distance.setText("d=NA");
+									// write log
+									writer.println(
+											file.toString() 
+													+ "\t" 
+													+ "NA"
+													+ "\t" 
+													+ "NA"
+													+ "\t" 
+													+ "NA");
+								}else{
+									substance.setText(res.getAssignedClass());
+									probability.setText("P=" + res.getScore());
+									distance.setText("d=" + res.getDistance());
+									// write log
+									writer.println(
+											file.toString() 
+													+ "\t" 
+													+ res.getAssignedClass() 
+													+ "\t" 
+													+ res.getDistance() 
+													+ "\t" 
+													+ res.getScore());
+								}
 							}
 						}
                     }

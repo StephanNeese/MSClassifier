@@ -36,7 +36,7 @@ public class Main extends JFrame {
 			InstantiationException, 
 			IllegalAccessException, 
 			UnsupportedLookAndFeelException{
-		super("Mass-Spec image classification");
+		super("Mass-Spec classification");
 		initGui();
 	}
 	
@@ -67,9 +67,6 @@ public class Main extends JFrame {
 		this.setLocation(x, y);
 		
 		main = new JPanel();
-		main.setVisible(true);
-		main.setLayout(null); 
-		main.setBounds(0, 0, 400, 300);
 		
 		newDB = new JButton("create new profile");
 		newDB.setBounds(10, 30, 380, 50);
@@ -84,6 +81,9 @@ public class Main extends JFrame {
 		main.add(liveClassification);
 		
 		add(main);
+		main.setVisible(true);
+		main.setLayout(null); 
+		main.setBounds(0, 0, 400, 300);
 	}
 	
 	/** This method makes the program usable. 

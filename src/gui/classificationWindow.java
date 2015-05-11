@@ -32,6 +32,7 @@ import io.Reader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 /** This class is the window for
  * non live classification.
@@ -40,21 +41,23 @@ import java.util.Date;
  */
 public class classificationWindow extends JFrame {
 	
-	JPanel main;
-	JLabel folderLabel;
-	JTextField folder;
-	JButton folderSearch;
-	JLabel profileLabel;
-	JTextField profile;
-	JButton profileSearch;
-	JLabel distanceLabel;
-	JComboBox distance;
-	JLabel saveLabel;
-	JTextField save;
-	JButton saveSearch;
-	JButton cancel;
-	JButton classify;
-	JButton help;
+	private JPanel main;
+	private JLabel folderLabel;
+	private JTextField folder;
+	private JButton folderSearch;
+	private JLabel profileLabel;
+	private JTextField profile;
+	private JButton profileSearch;
+	private JLabel distanceLabel;
+	private JComboBox distance;
+	private JLabel saveLabel;
+	private JTextField save;
+	private JButton saveSearch;
+	private JLabel cutoffLabel;
+	private JTextField cutoff;
+	private JButton cancel;
+	private JButton classify;
+	private JButton help;
 
 	/** constructs a classificationWindow
 	 * 
@@ -87,19 +90,16 @@ public class classificationWindow extends JFrame {
 		setLayout(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		setSize(640, 240);
+		setSize(640, 310);
 		setVisible(true);
 		setResizable(false);
 		// positon on screen
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		int x = (dim.width-640)/2;
-		int y = (dim.height-240)/2;
+		int y = (dim.height-310)/2;
 		this.setLocation(x, y);
 		
 		main = new JPanel();
-		main.setVisible(true);
-		main.setLayout(null); 
-		main.setBounds(0, 0, 640, 240);
 		
 		folderLabel = new JLabel("folder with CSV files");
 		folder = new JTextField();
@@ -140,19 +140,29 @@ public class classificationWindow extends JFrame {
 		main.add(save);
 		main.add(saveSearch);
 		
+		cutoffLabel = new JLabel("minimal score for results to classify");
+		cutoff = new JTextField();
+		cutoffLabel.setBounds(10, 145, 200, 15);
+		cutoff.setBounds(10, 165, 299, 30);
+		main.add(cutoffLabel);
+		main.add(cutoff);
+		
 		cancel = new JButton("cancel");
-		cancel.setBounds(420, 175, 100, 30);
+		cancel.setBounds(420, 240, 100, 30);
 		main.add(cancel);
 		
 		classify = new JButton("classify");
-		classify.setBounds(530, 175, 100, 30);
+		classify.setBounds(530, 240, 100, 30);
 		main.add(classify);
 		
 		help = new JButton("help");
-		help.setBounds(10, 175, 100, 30);
+		help.setBounds(10, 240, 100, 30);
 		main.add(help);
 		
 		add(main);
+		main.setVisible(true);
+		main.setLayout(null); 
+		main.setBounds(0, 0, 640, 310);
 	}
 	
 	/** initializes all the ActionListeners 
@@ -272,34 +282,40 @@ public class classificationWindow extends JFrame {
 						String profilePath = profile.getText();
 						String savePath = save.getText();
 						String distanceMeasure = (String)distance.getSelectedItem();
+						String cutoffTmp = cutoff.getText();
 						
 						// check if given parameters are valid
-						if(!("".equals(checkParams(folderPath, profilePath, savePath)))){
+						if(!("".equals(checkParams(folderPath, profilePath, savePath, cutoffTmp)))){
+							// if not valid output an ERROR MSG
 							JFrame frame = new JFrame();						
 							JOptionPane.showMessageDialog(frame, 
-									checkParams(folderPath, profilePath, savePath),
+									checkParams(folderPath, profilePath, savePath, cutoffTmp),
 									"Invalid Input", 
 									JOptionPane.ERROR_MESSAGE);
 						}else{
 							// obtain all csv files from the folder
 							String[] csv = Reader.readFolder(folderPath);
+							double cutoffValue = Double.parseDouble(cutoffTmp);
 						
 							// calculate distances
 							Object[][] rowData = new Object[csv.length][4];
-							double worstScore = 0.0;
 							if(distanceMeasure.equals("euclidean distance")){
 								try {
 									Profile profile = Reader.readProfile(profilePath);
 									// get worst possible score from first result
-									worstScore = 1.0 - (1.0/(double)(profile.getClasses().length));
-									System.out.println(profile.getClasses().length);
 									for(int i=0; i<csv.length; i++){
 										Spectrum spectrum = new Spectrum(csv[i], (int)profile.getBinSize());
 										ClassificationResult res = profile.euclideanDistance(spectrum);
 										rowData[i][0] = spectrum.getFilename();
-										rowData[i][1] = res.getAssignedClass();
-										rowData[i][2] = res.getDistance();
-										rowData[i][3] = res.getScore();
+										if(res.getScore()<cutoffValue){
+											rowData[i][1] = "NA";
+											rowData[i][2] = "NA";
+											rowData[i][3] = "NA";
+										}else{
+											rowData[i][1] = res.getAssignedClass();
+											rowData[i][2] = res.getDistance();
+											rowData[i][3] = res.getScore();
+										}
 									}
 								} catch (IOException | ParseException ex) {
 									Logger.getLogger(classificationWindow.class.getName()).log(Level.SEVERE, null, ex);
@@ -308,15 +324,19 @@ public class classificationWindow extends JFrame {
 								try {
 									Profile profile = Reader.readProfile(profilePath);
 									// get worst possible score from first result
-									worstScore = 1.0 - (1.0/(double)(profile.getClasses().length));
-									System.out.println(profile.getClasses().length);
 									for(int i=0; i<csv.length; i++){
 										Spectrum spectrum = new Spectrum(csv[i], (int)profile.getBinSize());
 										ClassificationResult res = profile.mahalanobisDistance(spectrum);
 										rowData[i][0] = spectrum.getFilename();
-										rowData[i][1] = res.getAssignedClass();
-										rowData[i][2] = res.getDistance();
-										rowData[i][3] = res.getScore();
+										if(res.getScore()<cutoffValue){
+											rowData[i][1] = "NA";
+											rowData[i][2] = "NA";
+											rowData[i][3] = "NA";
+										}else{
+											rowData[i][1] = res.getAssignedClass();
+											rowData[i][2] = res.getDistance();
+											rowData[i][3] = res.getScore();
+										}
 									}
 								} catch (IOException | ParseException ex) {
 									Logger.getLogger(classificationWindow.class.getName()).log(Level.SEVERE, null, ex);
@@ -332,7 +352,7 @@ public class classificationWindow extends JFrame {
 								writer.println("csv files from: " + folderPath);
 								writer.println("profile used: " + profilePath);
 								writer.println("distance measure: " + distanceMeasure);
-								writer.println("worst score possible: " + worstScore);
+								writer.println("minimum score: " + cutoffValue);
 								writer.println("Filename\tassigned class\tdistance\tscore");
 								for(int i=0; i<rowData.length; i++){
 									writer.println(rowData[i][0] + "\t" + rowData[i][1] + "\t" + rowData[i][2] + "\t" + rowData[i][3]);
@@ -368,7 +388,7 @@ public class classificationWindow extends JFrame {
 					 * @return an empty string if all parameters are valid, 
 					 * a string with error messages otherwise
 					 */
-					private String checkParams(String folder, String profile, String save){
+					private String checkParams(String folder, String profile, String save, String cutoffValue){
 						String res = "";
 						
 						File x = new File(folder);
@@ -389,8 +409,68 @@ public class classificationWindow extends JFrame {
 						}else if(x.exists()){
 							res += "Error: A file with the same name and path as the results file already exists\n";
 						}
+						if(!(parseDouble(cutoffValue))){
+							res += "Error: The value for the minimum score is not a valid number\n";
+						}else{
+							double tmp = Double.parseDouble(cutoffValue);
+							if(tmp<0 || tmp>1.0){
+								res += "Error: The value for the minimum score must be between 0 and 1.0\n";
+							}
+						}
 						
 						return res;
+					}
+					
+					/** checks if a String can be parsed to double
+					 * 
+					 * @param x the String containing a number (or something else)
+					 * @return true if string can  parsed to double false otherwise
+					 */
+					private boolean parseDouble(String x){
+						final String Digits     = "(\\p{Digit}+)";
+						final String HexDigits  = "(\\p{XDigit}+)";
+						// an exponent is 'e' or 'E' followed by an optionally
+						// signed decimal integer.
+						final String Exp        = "[eE][+-]?"+Digits;
+						final String fpRegex    =
+								("[\\x00-\\x20]*"+  // Optional leading "whitespace"
+									"[+-]?(" + // Optional sign character
+									"NaN|" +           // "NaN" string
+									"Infinity|" +      // "Infinity" string
+
+									// A decimal floating-point string representing a finite positive
+									// number without a leading sign has at most five basic pieces:
+									// Digits . Digits ExponentPart FloatTypeSuffix
+									//
+									// Since this method allows integer-only strings as input
+									// in addition to strings of floating-point literals, the
+									// two sub-patterns below are simplifications of the grammar
+									// productions from section 3.10.2 of
+									// The Java™ Language Specification.
+
+									// Digits ._opt Digits_opt ExponentPart_opt FloatTypeSuffix_opt
+									"((("+Digits+"(\\.)?("+Digits+"?)("+Exp+")?)|"+
+
+									// . Digits ExponentPart_opt FloatTypeSuffix_opt
+									"(\\.("+Digits+")("+Exp+")?)|"+
+
+									// Hexadecimal strings
+									"((" +
+									// 0[xX] HexDigits ._opt BinaryExponent FloatTypeSuffix_opt
+									"(0[xX]" + HexDigits + "(\\.)?)|" +
+
+									// 0[xX] HexDigits_opt . HexDigits BinaryExponent FloatTypeSuffix_opt
+									"(0[xX]" + HexDigits + "?(\\.)" + HexDigits + ")" +
+
+									")[pP][+-]?" + Digits + "))" +
+									"[fFdD]?))" +
+									"[\\x00-\\x20]*");// Optional trailing "whitespace"
+
+						if (Pattern.matches(fpRegex, x))
+							return true;
+						else {
+							return false;
+						}
 					}
 				}
 		);
