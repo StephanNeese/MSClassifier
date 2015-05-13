@@ -24,6 +24,8 @@ import preprocessing.PCA;
 import preprocessing.PCADataSet;
 import io.ProfileBuilder;
 import io.Reader;
+import preprocessing.LDA;
+import preprocessing.LDADataSet;
 
 /** This class inits the window
  * to create a new Profile.
@@ -226,6 +228,7 @@ public class newDatabaseWindow extends JFrame {
 							try{
 								SpectraMatrix data = Reader.readData(folderPath, binSize);
 								PCADataSet pca_data = PCA.performPCA(data, varianceCovered);
+								LDADataSet lda_data = LDA.performLDA(pca_data, data);
 								// make profile directory
 								File dir = new File(folderPath+File.separator+"profile");
 								if(!dir.exists()){
@@ -238,6 +241,7 @@ public class newDatabaseWindow extends JFrame {
 								// create profile
 								ProfileBuilder.build(
 										pca_data, 
+										lda_data,
 										data, 
 										machineName, 
 										folderPath, 

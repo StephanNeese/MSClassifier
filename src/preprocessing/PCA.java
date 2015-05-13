@@ -3,6 +3,8 @@ package preprocessing;
 import Spectrum.SpectraMatrix;
 import Spectrum.Spectrum;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import weka.core.Matrix;
 
 /** This class provides static methods for pca.
@@ -149,10 +151,11 @@ public class PCA {
 		
 		// multiply the matrices
 		double[][] finalData = multiply(featuresTransposed, originalDataTransposed);
+		String[] classes = findClasses(data.getSamples());
 		
 		PCADataSet res = new PCADataSet(
 				finalData, 
-				data.getSamples(), 
+				classes, 
 				featuresTransposed, 
 				varianceCovered);
 		return res;
@@ -217,5 +220,24 @@ public class PCA {
 		}
 		
 		return finalData;
+	}
+	
+	private static String[] findClasses(String[] samples){
+		// obtain the classes from the samples filenames
+		HashMap<String, Integer> classesTmp = new HashMap<>();
+		for(int i=0; i<samples.length; i++){
+			String[] tmp = samples[i].split("_");
+			classesTmp.put(tmp[0], 1);
+		}
+		
+		// load classnames into array to ensure the same order everytime
+		String[] classes = new String[classesTmp.size()];
+		int cnt = 0;
+		for(Map.Entry<String, Integer> e : classesTmp.entrySet()){
+			classes[cnt] = e.getKey();
+			cnt++;
+		}
+		
+		return classes;
 	}
 }

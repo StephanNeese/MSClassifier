@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import preprocessing.LDADataSet;
 import preprocessing.PCADataSet;
 import weka.core.matrix.Matrix;
 
@@ -24,6 +25,7 @@ public class ProfileBuilder {
 	/** prints a profile file from the given information
 	 * 
 	 * @param data the result of the PCA transformation
+	 * @param lda the result of the LDA
 	 * @param originalData the original dataset before PCA
 	 * @param device the name of the MS device
 	 * @param inputPath path to the original csv files of the spectras
@@ -37,6 +39,7 @@ public class ProfileBuilder {
 	 */
 	public static void build(
 			PCADataSet data, 
+			LDADataSet lda,
 			SpectraMatrix originalData, 
 			String device, 
 			String inputPath, 
@@ -51,23 +54,8 @@ public class ProfileBuilder {
 		double[][] dataValues = data.getData();
 		PrintWriter writer = new PrintWriter(path, "UTF-8");
 		
-		// obtain the classes from the samples filenames
-		String[] sampleFiles = data.getClasses();
-		HashMap<String, Integer> classesTmp = new HashMap<>();
-		for(int i=0; i<sampleFiles.length; i++){
-			String[] tmp = sampleFiles[i].split("_");
-			classesTmp.put(tmp[0], 1);
-		}
-		
-		// load classnames into array to ensure the same order everytime
-		String[] classes = new String[classesTmp.size()];
-		int cnt = 0;
-		for(Map.Entry<String, Integer> e : classesTmp.entrySet()){
-			classes[cnt] = e.getKey();
-			cnt++;
-		}
-		
 		// print classes to file
+		String[] classes = data.getClasses();
 		writer.print("classes:");
 		for(String s : classes){
 			writer.print("\t" + s);
@@ -84,9 +72,10 @@ public class ProfileBuilder {
 		// print variance covered
 		writer.println("variance:\t" + data.getVariance() + "\n//#");
 		// print filenames in same order as data
+		String[] samples = originalData.getSamples();
 		writer.println("filenames:");
-		for(int i=0; i<sampleFiles.length; i++){
-			writer.println(sampleFiles[i]);
+		for(int i=0; i<samples.length; i++){
+			writer.println(samples[i]);
 		}
 		writer.println("//#");
 		// print the mean values of the original untransformed data for normalization
@@ -128,7 +117,7 @@ public class ProfileBuilder {
 		// print the inverse covariance matrices for each group
 		writer.println("covariances:");
 		for(String s : classes){
-			double[][] cov = calcCovarianceMatrix(dataValues, sampleFiles, s);
+			double[][] cov = calcCovarianceMatrix(dataValues, samples, s);
 			Matrix covarianceMatrix = new Matrix(cov);
 			Matrix inverseCovarianceMatrix = covarianceMatrix.inverse();
 			double[][] invCov = inverseCovarianceMatrix.getArray();
@@ -146,7 +135,7 @@ public class ProfileBuilder {
 		// loop through the classes
 		if(adjustment==1.0){
 			for(String s : classes){
-				double[] mean = calcMeans(dataValues, sampleFiles, s);
+				double[] mean = calcMeans(dataValues, samples, s);
 				writer.print(mean[0]);
 				for(int i=1; i<mean.length; i++){
 					writer.print("\t" + mean[i]);
@@ -155,13 +144,31 @@ public class ProfileBuilder {
 			}
 		}else{
 			for(String s : classes){
-				double[] mean = calcMeans(dataValues, sampleFiles, s, adjustment);
+				double[] mean = calcMeans(dataValues, samples, s, adjustment);
 				writer.print(mean[0]);
 				for(int i=1; i<mean.length; i++){
 					writer.print("\t" + mean[i]);
 				}
 				writer.println();
 			}
+		}
+		writer.println("//#");
+		// print inverse covariance Matrix derived from LDA
+		writer.println("lda-covariance:");
+		double[][] lda_cov = lda.getInverseCovarianceMatrix();
+		for(int i=0; i<lda_cov.length; i++){
+			writer.print(lda_cov[i][0]);
+			for(int j=1; j<lda_cov[i].length; j++){
+				writer.print("\t" + lda_cov[i][j]);
+			}
+			writer.println();
+		}
+		writer.println("//#");
+		// print the fractions of the groups
+		writer.println("lda-fractions:");
+		double[] fractions = lda.getFractions();
+		for(int i=0; i<fractions.length; i++){
+			writer.println(fractions[i]);
 		}
 		
 		writer.close();
