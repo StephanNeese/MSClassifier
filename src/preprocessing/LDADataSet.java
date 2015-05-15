@@ -7,10 +7,12 @@ package preprocessing;
 public class LDADataSet {
 	
 	private double[][] inverseCovarianceMatrix;
+	private double[] globalMean;
 	private double[] fractions;
 	
-	public LDADataSet(double[][] inverseCovarianceMatrix, double[] fractions){
+	public LDADataSet(double[][] inverseCovarianceMatrix, double[] globalMean, double[] fractions){
 		this.inverseCovarianceMatrix = inverseCovarianceMatrix;
+		this.globalMean = globalMean;
 		this.fractions = fractions;
 	}
 
@@ -20,6 +22,14 @@ public class LDADataSet {
 
 	public void setInverseCovarianceMatrix(double[][] inverseCovarianceMatrix) {
 		this.inverseCovarianceMatrix = inverseCovarianceMatrix;
+	}
+
+	public double[] getGlobalMean() {
+		return globalMean;
+	}
+
+	public void setGlobalMean(double[] globalMean) {
+		this.globalMean = globalMean;
 	}
 
 	public double[] getFractions() {

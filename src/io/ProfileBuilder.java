@@ -153,6 +153,13 @@ public class ProfileBuilder {
 			}
 		}
 		writer.println("//#");
+		// print lda global mean
+		writer.println("lda-mean:");
+		double[] globalMean = lda.getGlobalMean();
+		for(int i=0; i<globalMean.length; i++){
+			writer.println(globalMean[i]);
+		}
+		writer.println("//#");
 		// print inverse covariance Matrix derived from LDA
 		writer.println("lda-covariance:");
 		double[][] lda_cov = lda.getInverseCovarianceMatrix();

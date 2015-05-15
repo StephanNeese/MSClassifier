@@ -2,6 +2,7 @@ package Spectrum;
 
 import java.util.Date;
 import java.util.HashMap;
+import preprocessing.LDA;
 import preprocessing.PCA;
 import weka.core.matrix.Matrix;
 
@@ -29,6 +30,10 @@ public class Profile {
 	private final double[] originalMeans;	// mean of dimensions of untransformed dataset
 	private final double originalMean;		// mean of all spectras and dimensions of untransformed
 	private final double binSize;			// size of a bin
+	// lda data
+	private final double[][] ldaCovarianceMatrix;
+	private final double[] globalMean;
+	private final double[] fractions;
 
 	/** constructs a Profile Object
 	 * 
@@ -45,6 +50,8 @@ public class Profile {
 	 * @param originalMeans mean values of the dimensions of the original data
 	 * @param originalMean mean value of the mean dataset (all dimensions)
 	 * @param binSize size of a bin in u
+	 * @param ldaCovarianceMatrix
+	 * @param fractions
 	 */
 	public Profile(
 			String[] classes, 
@@ -59,7 +66,10 @@ public class Profile {
 			double[][] mean,
 			double[] originalMeans,
 			double originalMean,
-			double binSize) {
+			double binSize,
+			double[][] ldaCovarianceMatrix,
+			double[] globalMean,
+			double[] fractions) {
 		this.classes = classes;
 		this.datetime = datetime;
 		this.device = device;
@@ -73,6 +83,9 @@ public class Profile {
 		this.originalMeans = originalMeans;
 		this.originalMean = originalMean;
 		this.binSize = binSize;
+		this.ldaCovarianceMatrix = ldaCovarianceMatrix;
+		this.globalMean = globalMean;
+		this.fractions = fractions;
 	}
 
 	/** returns the classes
@@ -188,6 +201,24 @@ public class Profile {
 	 */
 	public double getBinSize() {
 		return binSize;
+	}
+
+	/** returns the global covariance matrix created during the LDA
+	 * 
+	 * @return the inv. cov. matrix
+	 */
+	public double[][] getLdaCovarianceMatrix() {
+		return ldaCovarianceMatrix;
+	}
+
+	/** returns the fractions of the classes.
+	 * This is needed for the discriminant function
+	 * for LDA classification.
+	 * 
+	 * @return the fractions of the classes
+	 */
+	public double[] getFractions() {
+		return fractions;
 	}
 
 	@Override
@@ -342,5 +373,82 @@ public class Profile {
 				classes[index], 
 				distances[index], 
 				score);
+	}
+	
+	/** calculates the lda coefficient for the discriminant function.
+	 * 
+	 * @param spectrum the spectrum to calculate the coefficient for
+	 * @return a ClassificationResult object
+	 */
+	public ClassificationResult ldaCoefficient(Spectrum spectrum){
+		// check if same length
+		if(spectrum.getLength()!=originalMeans.length){
+			throw new IllegalArgumentException("Spectrum and Data in the profile do not have the same M/Z range. "
+			+ "Please adjust the device.");
+		}
+		// normalize and center the spectrum
+		spectrum.normalizationDivideByMean(originalMean);
+		spectrum.center(originalMeans);
+		// transform the spectrum into PCA space
+		double[] pca_spectrum = PCA.transformSpectrum(spectrum, features);
+		
+		double[] coefficients = new double[classes.length];
+		
+		// loop through all classes to pick the same row in the mean array
+		for(int i=0; i<classes.length; i++){
+			// transpose pca vector and convert to matrix
+			double[][] tmp = new double[1][pca_spectrum.length];
+			tmp[0] = pca_spectrum;
+			tmp = LDA.center(tmp, globalMean);
+			Matrix X = new Matrix(tmp);
+			Matrix XTransposed = X.transpose();
+			
+			// convert mean vector of class i to matrix
+			double[][] tmp2 = new double[1][mean[i].length];
+			tmp2[0] = mean[i];
+			Matrix u = new Matrix(tmp2);
+			
+			// calc first term of equation
+			Matrix covarianceMatrix = new Matrix(ldaCovarianceMatrix);
+			Matrix firstLeft = u.times(covarianceMatrix);
+			Matrix firstRight = firstLeft.times(XTransposed);
+			
+			// calc second term of equation
+			Matrix secondLeft = u.times(0.5);
+			Matrix secondMiddle = secondLeft.times(covarianceMatrix);
+			Matrix UTransposed = u.transpose();
+			Matrix secondRight = secondMiddle.times(UTransposed);
+			
+			// substract the terms and add the fraction of class i
+			coefficients[i] = firstRight.get(0, 0) - secondRight.get(0, 0) + fractions[i];
+		}
+		
+		// find biggest coefficient
+		double biggest = coefficients[0];
+		int index = 0;
+		for(int i=1; i<coefficients.length; i++){
+			if(coefficients[i]>biggest){
+				biggest = coefficients[i];
+				index = i;
+			}
+		}
+		// calculate score
+		double sum = 0;
+		for(int i=0; i<coefficients.length; i++){
+			sum += coefficients[i];
+		}
+		double best = (1.0 - (coefficients[index]/sum));
+		double worst = (1.0 - (1.0/coefficients.length));
+		double score = 1.0 - (best - worst)/(1 - worst);
+		
+		for(double d : coefficients){
+			System.out.println(d);
+		}
+		
+		return new ClassificationResult(
+				classes[index], 
+				coefficients[index], 
+				score
+		);
 	}
 }

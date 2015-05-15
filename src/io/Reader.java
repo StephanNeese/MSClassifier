@@ -98,6 +98,9 @@ public class Reader {
 		double[][] features = null;
 		HashMap<String, double[][]> invertedCovarianceMatrices = null;
 		double[][] mean = null;
+		double[][] ldaCovarianceMatrix = null;
+		double[] globalMean = null;
+		double[] fractions = null;
 		
 		for(int i=0; i<segment.length; i++){
 			String tmp = segment[i].toLowerCase();
@@ -170,6 +173,29 @@ public class Reader {
 						mean[j-1][k] = Double.parseDouble(column[k]);
 					}
 				}
+			}else if(tmp.startsWith("lda-covariance:")){
+				String[] row = segment[i].split("\n");
+				ldaCovarianceMatrix = new double[row.length-1][row.length-1];
+				for(int j=1; j<row.length; j++){
+					String[] column = row[j].split("\t");
+					for(int k=0; k<column.length; k++){
+						ldaCovarianceMatrix[j-1][k] = Double.parseDouble(column[k]);
+					}
+				}
+			}else if(tmp.startsWith("lda-mean:")){
+				String[] row = segment[i].split("\n");
+				globalMean = new double[row.length];
+				for(int j=1; j<row.length; j++){
+					String x = row[j].replaceAll("\n", "");
+					globalMean[j] = Double.parseDouble(x);
+				}
+			}else if(tmp.startsWith("lda-fractions:")){
+				String[] row = segment[i].split("\n");
+				fractions = new double[row.length];
+				for(int j=1; j<row.length; j++){
+					String x = row[j].replaceAll("\n", "");
+					fractions[j] = Double.parseDouble(x);
+				}
 			}
 		}
 		
@@ -186,7 +212,11 @@ public class Reader {
 				mean, 
 				originalMeans, 
 				originalMean, 
-				binSize);
+				binSize,
+				ldaCovarianceMatrix,
+				globalMean,
+				fractions
+		);
 	}
 	
 	/** reads a String containing the covariance matrix information from the profile file

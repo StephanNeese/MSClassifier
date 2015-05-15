@@ -31,11 +31,24 @@ public class Main {
 //		System.out.println("AFTER NORMALIZATION:");
 //		System.out.println(x.toString());
 		
-		SpectraMatrix data = Reader.readData("/home/wens/MINI_samples", 2);
-		// transform data via PCA
-		PCADataSet transformed = PCA.performPCA(data, 0.6);
-		LDADataSet lda = LDA.performLDA(transformed, data);
-		System.out.println(lda);
+//		SpectraMatrix data = Reader.readData("/home/wens/MINI_samples", 2);
+//		// transform data via PCA
+//		PCADataSet transformed = PCA.performPCA(data, 0.6);
+//		LDADataSet lda = LDA.performLDA(transformed, data);
+//		ProfileBuilder.build(
+//										transformed, 
+//										lda,
+//										data, 
+//										"mini", 
+//										"/home/wens/MINI_samples", 
+//										"/home/wens/lda-profile.profile", 
+//										1.0);
+		
+		Profile profile = Reader.readProfile("/home/wens/lda-profile.profile");
+		Spectrum test = new Spectrum("/home/wens/MINI_samples/Pflaume_49AVG5.csv", 2);
+		ClassificationResult x = profile.ldaCoefficient(test);
+		System.out.println(x);
+		
 		// build profile
 		//ProfileBuilder.build(transformed, data, "test", "test", "/home/wens/testprofile_LDA", 1.0);
 //		data.toCSV("/home/wens/samples_milk2u.csv");

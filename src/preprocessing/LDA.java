@@ -30,14 +30,15 @@ public class LDA {
 			means[i] = calcMeans(pca_data, samples, classes[i]);
 		}
 		// mean center data
-		double[][] centeredData = center(pca_data);
+		double[] globalMean = globalMean(pca_data);
+		double[][] centeredData = center(pca_data, globalMean);
 		// calc global covariance matrix of dataset
 		double[][] covarianceMatrix = calcCovarianceMatrix(centeredData, samples, classes);
 		Matrix tmp = new Matrix(covarianceMatrix);
 		Matrix inverseCovarianceMatrix = tmp.inverse();
 		double[] fractions = calcFractions(samples, classes);
 		
-		return new LDADataSet(inverseCovarianceMatrix.getArray(), fractions);
+		return new LDADataSet(inverseCovarianceMatrix.getArray(), globalMean, fractions);
 	}	
 	
 	/** transposes a matrix
@@ -52,6 +53,27 @@ public class LDA {
 			for(int j=0; j<matrix[0].length; j++){
 				res[j][i] = matrix[i][j];
 			}
+		}
+		
+		return res;
+	}
+	
+	/** calculates and returns the global mean
+	 * of a data set
+	 * 
+	 * @param data the data set
+	 * @return the global mean values for the dimensions
+	 */
+	private static double[] globalMean(double[][] data){
+		double[] res = new double[data[0].length];
+		
+		// calc global mean
+		for(int i=0; i<data[0].length; i++){
+			double sum = 0;
+			for(int j=0; j<data.length; j++){
+				sum += data[j][i];
+			}
+			res[i] = sum/(double)(data.length);
 		}
 		
 		return res;
@@ -100,18 +122,8 @@ public class LDA {
 	 * @param data
 	 * @return 
 	 */
-	private static double[][] center(double[][] data){
-		double[] mean = new double[data[0].length];
+	public static double[][] center(double[][] data, double[] mean){
 		double[][] res = new double[data.length][data[0].length];
-		
-		// calc global mean
-		for(int i=0; i<data[0].length; i++){
-			double sum = 0;
-			for(int j=0; j<data.length; j++){
-				sum += data[j][i];
-			}
-			mean[i] = sum/(double)(data.length);
-		}
 		
 		// substract global mean from data
 		for(int i=0; i<data.length; i++){
