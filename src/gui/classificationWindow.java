@@ -125,6 +125,7 @@ public class classificationWindow extends JFrame {
 		distance = new JComboBox();
 		distance.addItem("euclidean distance");
 		distance.addItem("mahalanobis distance");
+		distance.addItem("LDA coefficient");
 		distanceLabel.setBounds(10, 80, 200, 15);
 		distance.setBounds(10, 100, 299, 25);
 		main.add(distanceLabel);
@@ -320,13 +321,34 @@ public class classificationWindow extends JFrame {
 								} catch (IOException | ParseException ex) {
 									Logger.getLogger(classificationWindow.class.getName()).log(Level.SEVERE, null, ex);
 								}
-							}else{
+							}else if(distanceMeasure.equals("mahalanobis distance")){
 								try {
 									Profile profile = Reader.readProfile(profilePath);
 									// get worst possible score from first result
 									for(int i=0; i<csv.length; i++){
 										Spectrum spectrum = new Spectrum(csv[i], (int)profile.getBinSize());
 										ClassificationResult res = profile.mahalanobisDistance(spectrum);
+										rowData[i][0] = spectrum.getFilename();
+										if(res.getScore()<cutoffValue){
+											rowData[i][1] = "NA";
+											rowData[i][2] = "NA";
+											rowData[i][3] = "NA";
+										}else{
+											rowData[i][1] = res.getAssignedClass();
+											rowData[i][2] = res.getDistance();
+											rowData[i][3] = res.getScore();
+										}
+									}
+								} catch (IOException | ParseException ex) {
+									Logger.getLogger(classificationWindow.class.getName()).log(Level.SEVERE, null, ex);
+								}
+							}else{
+								try {
+									Profile profile = Reader.readProfile(profilePath);
+									// get worst possible score from first result
+									for(int i=0; i<csv.length; i++){
+										Spectrum spectrum = new Spectrum(csv[i], (int)profile.getBinSize());
+										ClassificationResult res = profile.ldaCoefficient(spectrum);
 										rowData[i][0] = spectrum.getFilename();
 										if(res.getScore()<cutoffValue){
 											rowData[i][1] = "NA";

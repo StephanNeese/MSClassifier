@@ -239,8 +239,38 @@ public class liveWindow extends Thread {
 													+ res.getScore());
 								}
 								
-							}else{
+							}else if(distanceMeasure.equals("mahalanobis distance")){
 								ClassificationResult res = profile.mahalanobisDistance(spectrum);
+								filename.setText(file.toString());
+								if(res.getScore()<cutoff){
+									substance.setText("<html><font color='red'>NONE</font></html>");
+									probability.setText("P=NA");
+									distance.setText("d=NA");
+									// write log
+									writer.println(
+											file.toString() 
+													+ "\t" 
+													+ "NA"
+													+ "\t" 
+													+ "NA"
+													+ "\t" 
+													+ "NA");
+								}else{
+									substance.setText(res.getAssignedClass());
+									probability.setText("P=" + res.getScore());
+									distance.setText("d=" + res.getDistance());
+									// write log
+									writer.println(
+											file.toString() 
+													+ "\t" 
+													+ res.getAssignedClass() 
+													+ "\t" 
+													+ res.getDistance() 
+													+ "\t" 
+													+ res.getScore());
+								}
+							}else{
+								ClassificationResult res = profile.ldaCoefficient(spectrum);
 								filename.setText(file.toString());
 								if(res.getScore()<cutoff){
 									substance.setText("<html><font color='red'>NONE</font></html>");

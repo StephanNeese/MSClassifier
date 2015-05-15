@@ -114,6 +114,7 @@ public class liveClassificationWindow extends JFrame {
 		distance = new JComboBox();
 		distance.addItem("euclidean distance");
 		distance.addItem("mahalanobis distance");
+		distance.addItem("LDA coefficient");
 		distanceLabel.setBounds(10, 80, 200, 15);
 		distance.setBounds(10, 100, 299, 25);
 		main.add(distanceLabel);
