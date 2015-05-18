@@ -375,7 +375,11 @@ public class classificationWindow extends JFrame {
 								writer.println("profile used: " + profilePath);
 								writer.println("distance measure: " + distanceMeasure);
 								writer.println("minimum score: " + cutoffValue);
-								writer.println("Filename\tassigned class\tdistance\tscore");
+								if(distanceMeasure.equals("LDA coefficient")){
+									writer.println("Filename\tassigned class\tcoefficient\tscore");
+								}else{
+									writer.println("Filename\tassigned class\tdistance\tscore");
+								}
 								for(int i=0; i<rowData.length; i++){
 									writer.println(rowData[i][0] + "\t" + rowData[i][1] + "\t" + rowData[i][2] + "\t" + rowData[i][3]);
 								}
@@ -394,11 +398,19 @@ public class classificationWindow extends JFrame {
 							int y = (dim.height-480)/2;
 							frame.setLocation(x, y);
 							// create table with results
-							Object columnNames[] = { "Filename", "assigned class", "distance", "score" };
-							JTable table = new JTable(rowData, columnNames);
-
-							JScrollPane scrollPane = new JScrollPane(table);
-							frame.add(scrollPane, BorderLayout.CENTER);
+							if(distanceMeasure.equals("LDA coefficient")){
+								Object columnNames[] = { "Filename", "assigned class", "coefficient", "score" };
+								JTable table = new JTable(rowData, columnNames);
+								JScrollPane scrollPane = new JScrollPane(table);
+								frame.add(scrollPane, BorderLayout.CENTER);
+							}else{
+								Object columnNames[] = { "Filename", "assigned class", "distance", "score" };
+								JTable table = new JTable(rowData, columnNames);
+								JScrollPane scrollPane = new JScrollPane(table);
+								frame.add(scrollPane, BorderLayout.CENTER);
+							}
+							
+							
 						}
 					}
 					

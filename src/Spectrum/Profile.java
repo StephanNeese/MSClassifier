@@ -317,7 +317,7 @@ public class Profile {
 			sum += distances[i];
 		}
 		double best = (1.0 - (distances[index]/sum));
-		double worst = (1.0 - (1.0/distances.length));
+		double worst = (1.0 - (1.0/(double)(distances.length)));
 		double score = (best - worst)/(1 - worst);
 		
 		return new ClassificationResult(
@@ -366,7 +366,7 @@ public class Profile {
 			sum += distances[i];
 		}
 		double best = (1.0 - (distances[index]/sum));
-		double worst = (1.0 - (1.0/distances.length));
+		double worst = (1.0 - (1.0/(double)(distances.length)));
 		double score = (best - worst)/(1 - worst);
 		
 		return new ClassificationResult(
@@ -423,27 +423,39 @@ public class Profile {
 			coefficients[i] = firstRight.get(0, 0) - secondRight.get(0, 0) + fractions[i];
 		}
 		
-		// find biggest coefficient
+		// find biggest and smallest coefficient
 		double biggest = coefficients[0];
+		double smallest = coefficients[0];
 		int index = 0;
+		int indexSmall = 0;
 		for(int i=1; i<coefficients.length; i++){
 			if(coefficients[i]>biggest){
 				biggest = coefficients[i];
 				index = i;
 			}
+			if(coefficients[i]<smallest){
+				smallest = coefficients[i];
+				indexSmall = i;
+			}
 		}
+		// scale everything up so that the smallest coefficient is at least +1
+		double[] coefficientsScore = new double[coefficients.length];
+		for(int i=0; i<coefficientsScore.length; i++){
+			double scale = 0.0;
+			if(coefficients[indexSmall]<1.0){
+				scale = 1.0 - coefficients[indexSmall];
+			}
+			coefficientsScore[i] = coefficients[i] + scale;
+		}
+		
 		// calculate score
 		double sum = 0;
-		for(int i=0; i<coefficients.length; i++){
-			sum += coefficients[i];
+		for(int i=0; i<coefficientsScore.length; i++){
+			sum += coefficientsScore[i];
 		}
-		double best = (1.0 - (coefficients[index]/sum));
-		double worst = (1.0 - (1.0/coefficients.length));
-		double score = 1.0 - (best - worst)/(1 - worst);
-		
-		for(double d : coefficients){
-			System.out.println(d);
-		}
+		double best = coefficientsScore[index]/sum;
+		double worst = (1.0/(double)(coefficientsScore.length));
+		double score = (best - worst)/(1 - worst);
 		
 		return new ClassificationResult(
 				classes[index], 
