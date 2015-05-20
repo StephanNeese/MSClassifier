@@ -16,6 +16,7 @@ import io.ProfileBuilder;
 import java.io.File;
 import preprocessing.LDA;
 import preprocessing.LDADataSet;
+import com.jidesoft.swing.CheckBoxTree;
 
 public class Main {
 	
@@ -44,10 +45,12 @@ public class Main {
 //										"/home/wens/lda-profile.profile", 
 //										1.0);
 		
-		Profile profile = Reader.readProfile("/home/wens/lda-profile.profile");
-		Spectrum test = new Spectrum("/home/wens/MINI_samples/Pflaume_49AVG5.csv", 2);
-		ClassificationResult x = profile.ldaCoefficient(test);
-		System.out.println(x);
+//		Profile profile = Reader.readProfile("/home/wens/lda-profile.profile");
+//		Spectrum test = new Spectrum("/home/wens/MINI_samples/Pflaume_49AVG5.csv", 2);
+//		ClassificationResult x = profile.ldaCoefficient(test);
+//		System.out.println(x);
+		
+		CheckBoxTree checkboxTree = new CheckBoxTree();
 		
 		// build profile
 		//ProfileBuilder.build(transformed, data, "test", "test", "/home/wens/testprofile_LDA", 1.0);

@@ -1,6 +1,7 @@
 package gui;
 
 import Spectrum.SpectraMatrix;
+import com.jidesoft.swing.CheckBoxTree;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -24,6 +25,9 @@ import preprocessing.PCA;
 import preprocessing.PCADataSet;
 import io.ProfileBuilder;
 import io.Reader;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.tree.DefaultMutableTreeNode;
 import preprocessing.LDA;
 import preprocessing.LDADataSet;
 
@@ -44,6 +48,11 @@ public class newDatabaseWindow extends JFrame {
 	JButton folderSearch;
 	JLabel binLabel;
 	JTextField bin;
+	JLabel databaseLabel;
+	DefaultMutableTreeNode root;
+	CheckBoxTree tree;
+	JScrollPane databasePane;
+	JButton databaseButton;
 	JLabel varianceLabel;
 	JTextField variance;
 	JButton cancel;
@@ -81,7 +90,7 @@ public class newDatabaseWindow extends JFrame {
 		setLayout(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		setSize(640, 320);
+		setSize(640, 400);
 		setVisible(true);
 		setResizable(false);
 		// positon on screen
@@ -93,7 +102,7 @@ public class newDatabaseWindow extends JFrame {
 		main = new JPanel();
 		main.setVisible(true);
 		main.setLayout(null); 
-		main.setBounds(0, 0, 640, 320);
+		main.setBounds(0, 0, 640, 400);
 		
 		nameLabel = new JLabel("Name of the profile");
 		name = new JTextField();
@@ -128,23 +137,49 @@ public class newDatabaseWindow extends JFrame {
 		main.add(binLabel);
 		main.add(bin);
 		
+		databaseLabel = new JLabel("chose the folders");
+		root = new DefaultMutableTreeNode("please choose folder");
+//		DefaultMutableTreeNode mercury = new DefaultMutableTreeNode("Mercury");
+//		root.add(mercury);
+//		DefaultMutableTreeNode venus = new DefaultMutableTreeNode("Venus");
+//		root.add(venus);
+//		DefaultMutableTreeNode mars = new DefaultMutableTreeNode("Mars");
+//		root.add(mars);
+//		DefaultMutableTreeNode uranus = new DefaultMutableTreeNode("uranus");
+//		root.add(uranus);
+//		DefaultMutableTreeNode jupiter = new DefaultMutableTreeNode("jupiter");
+//		root.add(jupiter);
+//		DefaultMutableTreeNode saturn = new DefaultMutableTreeNode("saturn");
+//		root.add(saturn);
+		tree = new CheckBoxTree(root);
+		databasePane = new JScrollPane(tree, 
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, 
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		databasePane.setBounds(10, 160, 300, 100);
+		databaseLabel.setBounds(10, 140, 200, 15);
+		databaseButton = new JButton("search root folder");
+		databaseButton.setBounds(10, 270, 150, 30);
+		main.add(databaseLabel);
+		main.add(databasePane);
+		main.add(databaseButton);
+		
 		varianceLabel = new JLabel("variance covered");
 		variance = new JTextField();
-		varianceLabel.setBounds(10, 150, 200, 15);
-		variance.setBounds(10, 170, 300, 30);
+		varianceLabel.setBounds(330, 150, 200, 15);
+		variance.setBounds(330, 170, 300, 30);
 		main.add(varianceLabel);
 		main.add(variance);
 		
 		cancel = new JButton("cancel");
-		cancel.setBounds(420, 250, 100, 30);
+		cancel.setBounds(420, 330, 100, 30);
 		main.add(cancel);
 		
 		create = new JButton("create");
-		create.setBounds(530, 250, 100, 30);
+		create.setBounds(530, 330, 100, 30);
 		main.add(create);
 		
 		help = new JButton("help");
-		help.setBounds(10, 250, 100, 30);
+		help.setBounds(10, 330, 100, 30);
 		main.add(help);
 		
 		add(main);
@@ -173,6 +208,47 @@ public class newDatabaseWindow extends JFrame {
 						// if file is selected 
 						if (result == JFileChooser.APPROVE_OPTION){
 							folder.setText(fileChooser.getSelectedFile().getAbsolutePath());
+							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+						}else if(result != JFileChooser.APPROVE_OPTION){
+							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+						}
+					}
+				}
+		);
+		
+		databaseButton.addActionListener(
+				new ActionListener(){
+					
+					/** Display a JFileChooser when pressing the "search" button
+					 * 
+					 * @param e ActionEvent that occurs when you press the button
+					 */
+					public void actionPerformed(ActionEvent e){
+						JFileChooser fileChooser = new JFileChooser();
+						// set only directories and disable "all files" option
+						fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+						fileChooser.setAcceptAllFileFilterUsed(false);
+						
+						JFrame frame = new JFrame();
+						int result = fileChooser.showOpenDialog(frame);
+						
+						// if file is selected 
+						if (result == JFileChooser.APPROVE_OPTION){
+							root.setUserObject("root");
+							DefaultMutableTreeNode mercury = new DefaultMutableTreeNode("Mercury");
+		root.add(mercury);
+		DefaultMutableTreeNode venus = new DefaultMutableTreeNode("Venus");
+		root.add(venus);
+		DefaultMutableTreeNode mars = new DefaultMutableTreeNode("Mars");
+		root.add(mars);
+		DefaultMutableTreeNode uranus = new DefaultMutableTreeNode("uranus");
+		root.add(uranus);
+		DefaultMutableTreeNode jupiter = new DefaultMutableTreeNode("jupiter");
+		root.add(jupiter);
+		DefaultMutableTreeNode saturn = new DefaultMutableTreeNode("saturn");
+		root.add(saturn);
+		tree.repaint();
+//							folder.setText(fileChooser.getSelectedFile().getAbsolutePath());
 							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 						}else if(result != JFileChooser.APPROVE_OPTION){
 							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
