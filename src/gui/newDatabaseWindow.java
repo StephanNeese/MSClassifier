@@ -25,6 +25,8 @@ import preprocessing.PCA;
 import preprocessing.PCADataSet;
 import io.ProfileBuilder;
 import io.Reader;
+import java.io.IOException;
+import java.util.ArrayList;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -137,27 +139,15 @@ public class newDatabaseWindow extends JFrame {
 		main.add(binLabel);
 		main.add(bin);
 		
-		databaseLabel = new JLabel("chose the folders");
+		databaseLabel = new JLabel("chose the folders containing the csv files");
 		root = new DefaultMutableTreeNode("please choose folder");
-//		DefaultMutableTreeNode mercury = new DefaultMutableTreeNode("Mercury");
-//		root.add(mercury);
-//		DefaultMutableTreeNode venus = new DefaultMutableTreeNode("Venus");
-//		root.add(venus);
-//		DefaultMutableTreeNode mars = new DefaultMutableTreeNode("Mars");
-//		root.add(mars);
-//		DefaultMutableTreeNode uranus = new DefaultMutableTreeNode("uranus");
-//		root.add(uranus);
-//		DefaultMutableTreeNode jupiter = new DefaultMutableTreeNode("jupiter");
-//		root.add(jupiter);
-//		DefaultMutableTreeNode saturn = new DefaultMutableTreeNode("saturn");
-//		root.add(saturn);
 		tree = new CheckBoxTree(root);
 		databasePane = new JScrollPane(tree, 
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, 
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		databasePane.setBounds(10, 160, 300, 100);
-		databaseLabel.setBounds(10, 140, 200, 15);
-		databaseButton = new JButton("search root folder");
+		databaseLabel.setBounds(10, 140, 280, 15);
+		databaseButton = new JButton("choose root folder");
 		databaseButton.setBounds(10, 270, 150, 30);
 		main.add(databaseLabel);
 		main.add(databasePane);
@@ -234,24 +224,31 @@ public class newDatabaseWindow extends JFrame {
 						
 						// if file is selected 
 						if (result == JFileChooser.APPROVE_OPTION){
-							root.setUserObject("root");
-							DefaultMutableTreeNode mercury = new DefaultMutableTreeNode("Mercury");
-		root.add(mercury);
-		DefaultMutableTreeNode venus = new DefaultMutableTreeNode("Venus");
-		root.add(venus);
-		DefaultMutableTreeNode mars = new DefaultMutableTreeNode("Mars");
-		root.add(mars);
-		DefaultMutableTreeNode uranus = new DefaultMutableTreeNode("uranus");
-		root.add(uranus);
-		DefaultMutableTreeNode jupiter = new DefaultMutableTreeNode("jupiter");
-		root.add(jupiter);
-		DefaultMutableTreeNode saturn = new DefaultMutableTreeNode("saturn");
-		root.add(saturn);
-		tree.repaint();
-//							folder.setText(fileChooser.getSelectedFile().getAbsolutePath());
+							
+							String rootPath = fileChooser.getSelectedFile().getAbsolutePath();
+							root.setUserObject(fileChooser.getSelectedFile().getName());
+							listFolders(rootPath, root);
+							tree.repaint();
 							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 						}else if(result != JFileChooser.APPROVE_OPTION){
 							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+						}
+					}
+					
+					/** adds folders as subnodes to a TreeNode
+					 * 
+					 * @param rootPath path of the folder
+					 * @param root node of the folder
+					 */
+					private void listFolders(String rootPath, DefaultMutableTreeNode root){
+						File rootFolder = new File(rootPath);
+						File[] files = rootFolder.listFiles();
+						for(File f : files){
+							if(f.isDirectory()){
+								DefaultMutableTreeNode folder = new DefaultMutableTreeNode(f.getName());
+								root.add(folder);
+								listFolders(f.getAbsolutePath(), folder);
+							}
 						}
 					}
 				}
