@@ -207,6 +207,7 @@ public class liveWindow extends Thread {
 						if(checkCSV(file.toString())){
 							Spectrum spectrum = new Spectrum(
 									path.toString() + File.separator + file.toString(), 
+									null,
 									(int)profile.getBinSize());
 							if(distanceMeasure.equals("euclidean distance")){
 								ClassificationResult res = profile.euclideanDistance(spectrum);

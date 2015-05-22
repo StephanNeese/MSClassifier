@@ -25,11 +25,15 @@ import preprocessing.PCA;
 import preprocessing.PCADataSet;
 import io.ProfileBuilder;
 import io.Reader;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 import preprocessing.LDA;
 import preprocessing.LDADataSet;
 
@@ -41,20 +45,20 @@ import preprocessing.LDADataSet;
 public class newDatabaseWindow extends JFrame {
 	
 	JPanel main;
-	JLabel nameLabel;
-	JTextField name;
-	JLabel machineLabel;
-	JComboBox machine;
-	JLabel folderLabel;
-	JTextField folder;
-	JButton folderSearch;
-	JLabel binLabel;
-	JTextField bin;
 	JLabel databaseLabel;
 	DefaultMutableTreeNode root;
+	String rootPath;
 	CheckBoxTree tree;
+	HashMap<String, Integer> selectionCounter = new HashMap<>();
 	JScrollPane databasePane;
 	JButton databaseButton;
+	JLabel profileLabel;
+	JTextField profile;
+	JButton profileSearch;
+	JLabel machineLabel;
+	JComboBox machine;
+	JLabel binLabel;
+	JTextField bin;
 	JLabel varianceLabel;
 	JTextField variance;
 	JButton cancel;
@@ -106,12 +110,19 @@ public class newDatabaseWindow extends JFrame {
 		main.setLayout(null); 
 		main.setBounds(0, 0, 640, 400);
 		
-		nameLabel = new JLabel("Name of the profile");
-		name = new JTextField();
-		nameLabel.setBounds(10, 10, 200, 15);
-		name.setBounds(10, 30, 300, 30);
-		main.add(nameLabel);
-		main.add(name);
+		databaseLabel = new JLabel("chose the folders containing the csv files");
+		root = new DefaultMutableTreeNode("please choose folder");
+		tree = new CheckBoxTree(root);
+		databasePane = new JScrollPane(tree, 
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, 
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		databasePane.setBounds(10, 30, 300, 240);
+		databaseLabel.setBounds(10, 10, 280, 15);
+		databaseButton = new JButton("choose root folder");
+		databaseButton.setBounds(10, 280, 150, 30);
+		main.add(databaseLabel);
+		main.add(databasePane);
+		main.add(databaseButton);
 		
 		machineLabel = new JLabel("Type of machine");
 		machine = new JComboBox();
@@ -122,16 +133,6 @@ public class newDatabaseWindow extends JFrame {
 		main.add(machineLabel);
 		main.add(machine);
 		
-		folderLabel = new JLabel("folder with CSV files");
-		folder = new JTextField();
-		folderSearch = new JButton("search");
-		folderLabel.setBounds(10, 80, 200, 15);
-		folder.setBounds(10, 100, 200, 30);
-		folderSearch.setBounds(220, 100, 90, 30);
-		main.add(folderLabel);
-		main.add(folder);
-		main.add(folderSearch);
-		
 		binLabel = new JLabel("Size of a bin");
 		bin = new JTextField();
 		binLabel.setBounds(330, 80, 200, 15);
@@ -139,26 +140,22 @@ public class newDatabaseWindow extends JFrame {
 		main.add(binLabel);
 		main.add(bin);
 		
-		databaseLabel = new JLabel("chose the folders containing the csv files");
-		root = new DefaultMutableTreeNode("please choose folder");
-		tree = new CheckBoxTree(root);
-		databasePane = new JScrollPane(tree, 
-				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, 
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		databasePane.setBounds(10, 160, 300, 100);
-		databaseLabel.setBounds(10, 140, 280, 15);
-		databaseButton = new JButton("choose root folder");
-		databaseButton.setBounds(10, 270, 150, 30);
-		main.add(databaseLabel);
-		main.add(databasePane);
-		main.add(databaseButton);
-		
 		varianceLabel = new JLabel("variance covered");
 		variance = new JTextField();
 		varianceLabel.setBounds(330, 150, 200, 15);
 		variance.setBounds(330, 170, 300, 30);
 		main.add(varianceLabel);
 		main.add(variance);
+		
+		profileLabel = new JLabel("Name and path of the profile");
+		profile = new JTextField();
+		profileSearch = new JButton("search");
+		profileLabel.setBounds(330, 220, 250, 15);
+		profile.setBounds(330, 240, 200, 30);
+		profileSearch.setBounds(540, 240, 90, 30);
+		main.add(profileLabel);
+		main.add(profile);
+		main.add(profileSearch);
 		
 		cancel = new JButton("cancel");
 		cancel.setBounds(420, 330, 100, 30);
@@ -179,33 +176,33 @@ public class newDatabaseWindow extends JFrame {
 	 * for the GUI elements
 	 */
 	public void runProgram(){
-		folderSearch.addActionListener(
-				new ActionListener(){
-					
-					/** Display a JFileChooser when pressing the "search" button
-					 * 
-					 * @param e ActionEvent that occurs when you press the button
-					 */
-					public void actionPerformed(ActionEvent e){
-						JFileChooser fileChooser = new JFileChooser();
-						// set only directories and disable "all files" option
-						fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-						fileChooser.setAcceptAllFileFilterUsed(false);
-						
-						JFrame frame = new JFrame();
-						int result = fileChooser.showOpenDialog(frame);
-						
-						// if file is selected 
-						if (result == JFileChooser.APPROVE_OPTION){
-							folder.setText(fileChooser.getSelectedFile().getAbsolutePath());
-							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
-						}else if(result != JFileChooser.APPROVE_OPTION){
-							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
-						}
+		
+		/** Listener for changes in the CheckBox Tree.
+		 * Writes new selections/deselections into Hash.
+		 * 
+		 */
+		tree.getCheckBoxTreeSelectionModel().addTreeSelectionListener(new TreeSelectionListener(){
+
+			@Override
+			public void valueChanged(TreeSelectionEvent e) {
+				TreePath[] x = e.getPaths();
+				for(TreePath p : x){
+					if(selectionCounter.get(p.toString())!=null){
+						// either selection of deselection
+						Integer val = selectionCounter.get(p.toString());
+						selectionCounter.put(p.toString(), val+1);
+					}else{
+						// new selection
+						selectionCounter.put(p.toString(), 1);
 					}
 				}
-		);
+			}
+		});
 		
+		/** adds a Listener to the button for searching
+		 * for the root folder to create a folder tree.
+		 * 
+		 */
 		databaseButton.addActionListener(
 				new ActionListener(){
 					
@@ -225,7 +222,7 @@ public class newDatabaseWindow extends JFrame {
 						// if file is selected 
 						if (result == JFileChooser.APPROVE_OPTION){
 							
-							String rootPath = fileChooser.getSelectedFile().getAbsolutePath();
+							rootPath = fileChooser.getSelectedFile().getAbsolutePath();
 							root.setUserObject(fileChooser.getSelectedFile().getName());
 							listFolders(rootPath, root);
 							tree.repaint();
@@ -253,6 +250,30 @@ public class newDatabaseWindow extends JFrame {
 					}
 				}
 		);
+		
+		profileSearch.addActionListener(
+				new ActionListener(){
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						JFileChooser fileChooser = new JFileChooser();
+						// set only directories and disable "all files" option
+						fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+						fileChooser.setAcceptAllFileFilterUsed(false);
+						
+						JFrame frame = new JFrame();
+						int result = fileChooser.showOpenDialog(frame);
+						
+						// if file is selected 
+						if (result == JFileChooser.APPROVE_OPTION){
+							profile.setText(fileChooser.getSelectedFile().getAbsolutePath() + ".profile");
+							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+						}else if(result != JFileChooser.APPROVE_OPTION){
+							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+						}
+					}
+					
+				});
 		
 		help.addActionListener(
 				new ActionListener(){
@@ -282,43 +303,34 @@ public class newDatabaseWindow extends JFrame {
 					@Override
 					public void actionPerformed(ActionEvent e){
 						// get data from text fields
-						String folderPath = folder.getText();
+						String[] profilePaths = getSelected();
 						String machineName = (String)machine.getSelectedItem();
-						String profileName = name.getText();
+						String profileName = profile.getText();
 						String binTmp = bin.getText();
 						String varianceTmp = variance.getText();
 						
 						// check parameters first
-						if(!("".equals(checkParams(folderPath, profileName, binTmp, varianceTmp)))){
+						if(!("".equals(checkParams(profilePaths, profileName, binTmp, varianceTmp)))){
 							JFrame frame = new JFrame();						
 							JOptionPane.showMessageDialog(frame, 
-									checkParams(folderPath, profileName, binTmp, varianceTmp),
+									checkParams(profilePaths, profileName, binTmp, varianceTmp),
 									"Invalid Input", 
 									JOptionPane.ERROR_MESSAGE);
 						}else{
 							int binSize = (int)Double.parseDouble(binTmp);
 							double varianceCovered = Double.parseDouble(varianceTmp);
 							try{
-								SpectraMatrix data = Reader.readData(folderPath, binSize);
+								SpectraMatrix data = Reader.readData(profilePaths, rootPath, binSize);
 								PCADataSet pca_data = PCA.performPCA(data, varianceCovered);
 								LDADataSet lda_data = LDA.performLDA(pca_data, data);
-								// make profile directory
-								File dir = new File(folderPath+File.separator+"profile");
-								if(!dir.exists()){
-									try{
-										dir.mkdir();
-									}catch(Exception ex){
-										ex.printStackTrace();
-									}
-								}
 								// create profile
 								ProfileBuilder.build(
 										pca_data, 
 										lda_data,
 										data, 
 										machineName, 
-										folderPath, 
-										folderPath+File.separator+"profile"+File.separator+profileName+".profile", 
+										rootPath, 
+										profileName, 
 										1.0);
 							
 								// show success message
@@ -342,19 +354,28 @@ public class newDatabaseWindow extends JFrame {
 					 * @return an empty string if all parameters are valid, 
 					 * a string with error messages otherwise
 					 */
-					private String checkParams(String path, String profile, String bin, String variance){
+					private String checkParams(String[] profilePaths, String profile, String bin, String variance){
 						String res = "";
 						
-						File x = new File(path);
-						if("".equals(path)){
-							res += "Error: The path to the folder containing the csv is empty\n";
-						}else if(!(x.exists()) && !(x.isDirectory())){
-							res += "Error: The foldername containing the csv files does not exist\n";
+						boolean check = true;
+						if(profilePaths.length==0){
+							check = false;
+						}
+						for(String path : profilePaths){
+							File x = new File(path);
+							if("".equals(path)){
+								check = false;
+							}else if(!(x.exists()) && !(x.isDirectory())){
+								check = false;
+							}
+						}
+						if(!check){
+							res += "Error: No folders have been chosen containing csv files\n"
+									+ "for creating profiles or the folders are invalid\n"
+									+ "or not readable. Please check folder permissions.\n";
 						}
 						if("".equals(profile)){
 							res += "Error: The name of the profile file is empty\n";
-						}else if(!x.exists()){
-							res += "Error: A file with the same name as the profile file already exists\n";
 						}
 						if(!(parseDouble(bin))){
 							res += "Error: The value for the bin size is not a valid number\n";
@@ -371,18 +392,18 @@ public class newDatabaseWindow extends JFrame {
 						return res;
 					}
 				
-				/** checks if a String can be parsed to double
-				 * 
-				 * @param x the String containing a number (or something else)
-				 * @return true if string can  parsed to double false otherwise
-				 */
-				private boolean parseDouble(String x){
-					final String Digits     = "(\\p{Digit}+)";
-					final String HexDigits  = "(\\p{XDigit}+)";
-					// an exponent is 'e' or 'E' followed by an optionally
-					// signed decimal integer.
-					final String Exp        = "[eE][+-]?"+Digits;
-					final String fpRegex    =
+					/** checks if a String can be parsed to double
+					 * 
+					 * @param x the String containing a number (or something else)
+					 * @return true if string can  parsed to double false otherwise
+					 */
+					private boolean parseDouble(String x){
+						final String Digits     = "(\\p{Digit}+)";
+						final String HexDigits  = "(\\p{XDigit}+)";
+						// an exponent is 'e' or 'E' followed by an optionally
+						// signed decimal integer.
+						final String Exp        = "[eE][+-]?"+Digits;
+						final String fpRegex    =
 							("[\\x00-\\x20]*"+  // Optional leading "whitespace"
 								"[+-]?(" + // Optional sign character
 								"NaN|" +           // "NaN" string
@@ -416,13 +437,56 @@ public class newDatabaseWindow extends JFrame {
 								"[fFdD]?))" +
 								"[\\x00-\\x20]*");// Optional trailing "whitespace"
 
-					if (Pattern.matches(fpRegex, x))
-						return true;
-					else {
-						return false;
+						if (Pattern.matches(fpRegex, x)){
+							return true;
+						}else {
+							return false;
+						}
+					}
+					
+					private String[] getSelected(){
+						ArrayList<String> tmp = new ArrayList<>();
+						
+						for(Map.Entry<String, Integer> e : selectionCounter.entrySet()){
+							if((e.getValue()%2)!=0){
+								// selected
+								String tmp2 = e.getKey().replaceAll("[\\[\\]]", "");
+								String tmp3 = tmp2.replace(", ", File.separator).replace((String)(root.getUserObject()), "");
+								String folder = rootPath + tmp3;
+								String folderFinal = followUnfinishedPath(folder);
+								tmp.add(folderFinal);
+							}
+						}
+						
+						String[] res = new String[tmp.size()];
+						for(int i=0; i<tmp.size(); i++){
+							res[i] = tmp.get(i);
+						}
+						
+						return res;
+					}
+					
+					private String followUnfinishedPath(String path){
+						String res = "";
+						File rootFolder = new File(path);
+						File[] files = rootFolder.listFiles();
+						ArrayList<String> dir = new ArrayList<>();
+						if(!(files==null)){
+							for(File f : files){
+								if(f.isDirectory()){
+									dir.add(f.getName());
+								}
+							}
+						}
+						if(dir.size()==1){
+							res += followUnfinishedPath(path + File.separator + dir.get(0));
+						}else{
+							res = path;
+						}
+						
+						return res;
 					}
 				}
-			}
 		);
 		
 		cancel.addActionListener(

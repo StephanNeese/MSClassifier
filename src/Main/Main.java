@@ -21,6 +21,34 @@ import com.jidesoft.swing.CheckBoxTree;
 public class Main {
 	
 	public static void main(String[] args) throws IOException, Exception {
+		String[] profilePath = new String[2];
+		profilePath[0] = "/home/wens/MINI_samples_2/dakapo";
+		profilePath[1] = "/home/wens/MINI_samples_2/pflaume";
+		
+		SpectraMatrix data = Reader.readData(profilePath, "/home/wens/MINI_samples_2", 2);
+		PCADataSet pca_data = PCA.performPCA(data, 0.6);
+		LDADataSet lda_data = LDA.performLDA(pca_data, data);
+		
+		// make profile directory
+								File dir = new File("/home/wens/MINI_samples_2"+File.separator+"profile");
+								if(!dir.exists()){
+									try{
+										dir.mkdir();
+									}catch(Exception ex){
+										ex.printStackTrace();
+									}
+								}
+		
+		// create profile
+								ProfileBuilder.build(
+										pca_data, 
+										lda_data,
+										data, 
+										"mini 11", 
+										"/home/wens/MINI_samples_2", 
+										"/home/wens/MINI_samples_2"+File.separator+"profile"+File.separator+"new-profile-multiple-folders.profile", 
+										1.0);
+		
 		//File dir = new File("/home/wens/test");
 		//liveWindow watch = new liveWindow("live", "/home/wens/test", "/home/wens/pflaume-traube.profile", "/home/wens/test", "euclidean distance");
 		//watch.watchDirectoryPath();
@@ -50,7 +78,7 @@ public class Main {
 //		ClassificationResult x = profile.ldaCoefficient(test);
 //		System.out.println(x);
 		
-		CheckBoxTree checkboxTree = new CheckBoxTree();
+//		CheckBoxTree checkboxTree = new CheckBoxTree();
 		
 		// build profile
 		//ProfileBuilder.build(transformed, data, "test", "test", "/home/wens/testprofile_LDA", 1.0);

@@ -22,21 +22,21 @@ public class LDA {
 		// transpose to have [samples][dimensions]
 		double[][] pca_data = transpose(data.getData());
 		String[] classes = data.getClasses();
-		String[] samples = original.getSamples();
+		String[] groups = original.getGroups();
 		
 		// calc means for groups
 		double[][] means = new double[classes.length][pca_data[0].length];
 		for(int i=0; i<classes.length; i++){
-			means[i] = calcMeans(pca_data, samples, classes[i]);
+			means[i] = calcMeans(pca_data, groups, classes[i]);
 		}
 		// mean center data
 		double[] globalMean = globalMean(pca_data);
 		double[][] centeredData = center(pca_data, globalMean);
 		// calc global covariance matrix of dataset
-		double[][] covarianceMatrix = calcCovarianceMatrix(centeredData, samples, classes);
+		double[][] covarianceMatrix = calcCovarianceMatrix(centeredData, groups, classes);
 		Matrix tmp = new Matrix(covarianceMatrix);
 		Matrix inverseCovarianceMatrix = tmp.inverse();
-		double[] fractions = calcFractions(samples, classes);
+		double[] fractions = calcFractions(groups, classes);
 		
 		return new LDADataSet(inverseCovarianceMatrix.getArray(), globalMean, fractions);
 	}	
@@ -97,7 +97,7 @@ public class LDA {
 			double[] sample = new double[dataValues[i].length];
 			// check if the name of the csv starts with our class name
 			// filenames and samples in data array are in same order
-			if(sampleFiles[i].startsWith(cls)){
+			if(sampleFiles[i].equals(cls)){
 				for(int dim=0; dim<dataValues[i].length; dim++){
 					sample[dim] = dataValues[i][dim];
 				}
@@ -142,14 +142,14 @@ public class LDA {
 	 * @param classes
 	 * @return 
 	 */
-	private static double[][] calcCovarianceMatrix(double[][] data, String[] samples, String[] classes){
+	private static double[][] calcCovarianceMatrix(double[][] data, String[] groups, String[] classes){
 		double[][] res = new double[data[0].length][data[0].length];
 		HashMap<String, double[][]> matrices = new HashMap<>();
 		HashMap<String, Double> fractions = new HashMap<>();
 		
 		// calc covariance matrices for groups
 		for(String cls : classes){
-			double[][] matrix = getGroupMatrix(data, samples, cls);
+			double[][] matrix = getGroupMatrix(data, groups, cls);
 			double[][] covMatrix = calcCovarianceMatrix(matrix);
 			matrices.put(cls, covMatrix);
 			fractions.put(cls, ((double)matrix.length)/((double)data.length));
@@ -175,7 +175,7 @@ public class LDA {
 	 * @param cls
 	 * @return 
 	 */
-	private static double[][] getGroupMatrix(double[][] dataValues, String[] sampleFiles, String cls){
+	private static double[][] getGroupMatrix(double[][] dataValues, String[] groups, String cls){
 		ArrayList<double[]> picked = new ArrayList<>();
 		
 		// loop through the samples of the data array (rows)
@@ -184,7 +184,7 @@ public class LDA {
 			double[] sample = new double[dataValues[i].length];
 			// check if the name of the csv starts with our class name
 			// filenames and samples in data array are in same order
-			if(sampleFiles[i].startsWith(cls)){
+			if(groups[i].equals(cls)){
 				for(int dim=0; dim<dataValues[i].length; dim++){
 					sample[dim] = dataValues[i][dim];
 				}
@@ -247,17 +247,17 @@ public class LDA {
 	 * @param classes
 	 * @return 
 	 */
-	private static double[] calcFractions(String[] samples, String[] classes){
+	private static double[] calcFractions(String[] groups, String[] classes){
 		double[] res = new double[classes.length];
 		
 		for(int i=0; i<classes.length; i++){
 			int cnt = 0;
-			for(int j=0; j<samples.length; j++){
-				if(samples[j].startsWith(classes[i])){
+			for(int j=0; j<groups.length; j++){
+				if(groups[j].equals(classes[i])){
 					cnt++;
 				}
 			}
-			res[i] = ((double)cnt)/((double)samples.length);
+			res[i] = ((double)cnt)/((double)groups.length);
 		}
 		
 		return res;

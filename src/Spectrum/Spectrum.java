@@ -16,6 +16,7 @@ public class Spectrum {
 	private double[] mz;			// mz values
 	private double[] voltage;		// voltage values
 	private String filename;		// filename of csv
+	private String group;			// the group of this sample
 	private int length;				// num dimensions
 	
 	/** constructs a spectrum from given values
@@ -23,23 +24,25 @@ public class Spectrum {
 	 * @param mz array with mz values
 	 * @param voltage array with voltage values
 	 * @param filename the filename as identifier
+	 * @param group ssigned group of this spectrum
 	 */
-	public Spectrum(double[] mz, double[] voltage, String filename){
+	public Spectrum(double[] mz, double[] voltage, String filename, String group){
 		this.mz = mz;
 		this.voltage = voltage;
 		this.filename = filename;
+		this.group = group;
 		length = mz.length;
 	}
 	
 	/** constructs a spectrum from a file
 	 * 
 	 * @param path path to the csv file containing the spectral data
+	 * @param group assigned group of this spectrum
 	 * @param bin size of a bin
-	 * @throws FileNotFoundException
-	 * @throws IOException 
 	 */
-	public Spectrum(String path, int bin){
+	public Spectrum(String path, String group, int bin){
 		readCSV(path, bin);
+		this.group = group;
 	}
 	
 	/** reads a csv file and initializes the spectrum object (called in constructor)
@@ -51,72 +54,76 @@ public class Spectrum {
 	 */
 	private void readCSV(String path, int bin){
 		File csv = new File(path);
+		
+		/* continuous loop until file can be opened
+		* files cant be read when an output stream 
+		* of another program is still open
+		*/
 		boolean check = false;
 		while(!check){
-		try{
-		BufferedReader buff = new BufferedReader(new FileReader(csv));
+			try{
+				BufferedReader buff = new BufferedReader(new FileReader(csv));
 		
-		/** read in **/
-		String text = null;
-		boolean headlineReached = false;
-		ArrayList<Double> mzTmp = new ArrayList<>();
-		ArrayList<Double> voltageTmp = new ArrayList<>();
-		while ((text = buff.readLine()) != null) {
-			// parse values to hashmap
-			if(headlineReached && !(text.isEmpty())){
-				String[] lineTmp = text.split(",");
-				mzTmp.add(Double.parseDouble(lineTmp[0])); 
-				voltageTmp.add(Double.parseDouble(lineTmp[1]));
-			}
-			// check if we reached the headline of the csv table
-			// check after parse => when headline reached only next line is parsed
-			if(text.matches("^(M/Z,Voltage).*")){
-				headlineReached = true;
-			}
+				/** read in **/
+				String text = null;
+				boolean headlineReached = false;
+				ArrayList<Double> mzTmp = new ArrayList<>();
+				ArrayList<Double> voltageTmp = new ArrayList<>();
+				while ((text = buff.readLine()) != null) {
+					// parse values to hashmap
+					if(headlineReached && !(text.isEmpty())){
+						String[] lineTmp = text.split(",");
+						mzTmp.add(Double.parseDouble(lineTmp[0])); 
+						voltageTmp.add(Double.parseDouble(lineTmp[1]));
+					}
+					// check if we reached the headline of the csv table
+					// check after parse => when headline reached only next line is parsed
+					if(text.matches("^(M/Z,Voltage).*")){
+						headlineReached = true;
+					}
+				}
 			
-		}
-		
-		/** binning **/
-		ArrayList<Integer> mzTmp2 = new ArrayList<>();
-		ArrayList<Double> voltageTmp2 = new ArrayList<>();
-		// add first element to list
-		int number = mzTmp.get(0).intValue();
-		mzTmp2.add(number);
-		voltageTmp2.add(voltageTmp.get(0));
-		for(int i=1; i<mzTmp.size(); i++){
-			// if we reach a higher mz value make new bin
-			if(number+bin<=mzTmp.get(i).intValue()){
-				number = mzTmp.get(i).intValue();
+				/** binning **/
+				ArrayList<Integer> mzTmp2 = new ArrayList<>();
+				ArrayList<Double> voltageTmp2 = new ArrayList<>();
+				// add first element to list
+				int number = mzTmp.get(0).intValue();
 				mzTmp2.add(number);
-				voltageTmp2.add(voltageTmp.get(i));
-			}else{
-				// add up the values in one bin
-				double tmp = voltageTmp2.get(mzTmp2.indexOf(number)) + voltageTmp.get(i);
-				voltageTmp2.set(mzTmp2.indexOf(number), tmp);
+				voltageTmp2.add(voltageTmp.get(0));
+				for(int i=1; i<mzTmp.size(); i++){
+					// if we reach a higher mz value make new bin
+					if(number+bin<=mzTmp.get(i).intValue()){
+						number = mzTmp.get(i).intValue();
+						mzTmp2.add(number);
+						voltageTmp2.add(voltageTmp.get(i));
+					}else{
+						// add up the values in one bin
+						double tmp = voltageTmp2.get(mzTmp2.indexOf(number)) + voltageTmp.get(i);
+						voltageTmp2.set(mzTmp2.indexOf(number), tmp);
+					}
+				}
+		
+				/** parse from ArrayList to arrays **/
+				mz = new double[mzTmp2.size()];
+				voltage = new double[voltageTmp2.size()];
+				for(int i=0; i<mzTmp2.size(); i++){
+					mz[i] = mzTmp2.get(i);
+					voltage[i] = voltageTmp2.get(i);
+				}
+		
+				if(System.getProperty("os.name").startsWith("Windows")){
+					String[] pathTmp = path.split("\\\\");
+					filename = pathTmp[pathTmp.length-1];
+				}else{
+					String[] pathTmp = path.split("/");
+				   filename = pathTmp[pathTmp.length-1];
+				}
+		
+				length = mzTmp2.size();
+				check = true;
+			}catch(Exception ex){
+				continue;
 			}
-		}
-		
-		/** parse from ArrayList to arrays **/
-		mz = new double[mzTmp2.size()];
-		voltage = new double[voltageTmp2.size()];
-		for(int i=0; i<mzTmp2.size(); i++){
-			mz[i] = mzTmp2.get(i);
-			voltage[i] = voltageTmp2.get(i);
-		}
-		
-		if(System.getProperty("os.name").startsWith("Windows")){
-			String[] pathTmp = path.split("\\\\");
-		    filename = pathTmp[pathTmp.length-1];
-		}else{
-			String[] pathTmp = path.split("/");
-		    filename = pathTmp[pathTmp.length-1];
-		}
-		
-		length = mzTmp2.size();
-		check = true;
-		}catch(Exception ex){
-			continue;
-		}
 		}
 	}
 
@@ -185,6 +192,10 @@ public class Spectrum {
 	 */
 	public String getFilename(){
 		return filename;
+	}
+	
+	public String getGroup(){
+		return group;
 	}
 	
 	/** returns the size of this object in bins

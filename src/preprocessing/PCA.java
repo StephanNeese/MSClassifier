@@ -151,7 +151,7 @@ public class PCA {
 		
 		// multiply the matrices
 		double[][] finalData = multiply(featuresTransposed, originalDataTransposed);
-		String[] classes = findClasses(data.getSamples());
+		String[] classes = findClasses(data.getGroups());
 		
 		PCADataSet res = new PCADataSet(
 				finalData, 
@@ -222,22 +222,21 @@ public class PCA {
 		return finalData;
 	}
 	
-	private static String[] findClasses(String[] samples){
-		// obtain the classes from the samples filenames
+	private static String[] findClasses(String[] classes){
+		// get a factor variable for all groups of all samples
 		HashMap<String, Integer> classesTmp = new HashMap<>();
-		for(int i=0; i<samples.length; i++){
-			String[] tmp = samples[i].split("_");
-			classesTmp.put(tmp[0], 1);
+		for(int i=0; i<classes.length; i++){
+			classesTmp.put(classes[i], 1);
 		}
 		
 		// load classnames into array to ensure the same order everytime
-		String[] classes = new String[classesTmp.size()];
+		String[] res = new String[classesTmp.size()];
 		int cnt = 0;
 		for(Map.Entry<String, Integer> e : classesTmp.entrySet()){
-			classes[cnt] = e.getKey();
+			res[cnt] = e.getKey();
 			cnt++;
 		}
 		
-		return classes;
+		return res;
 	}
 }

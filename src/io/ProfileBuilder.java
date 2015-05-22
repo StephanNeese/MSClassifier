@@ -72,10 +72,10 @@ public class ProfileBuilder {
 		// print variance covered
 		writer.println("variance:\t" + data.getVariance() + "\n//#");
 		// print filenames in same order as data
-		String[] samples = originalData.getSamples();
-		writer.println("filenames:");
-		for(int i=0; i<samples.length; i++){
-			writer.println(samples[i]);
+		String[] groups = originalData.getGroups();
+		writer.println("groups:");
+		for(int i=0; i<groups.length; i++){
+			writer.println(groups[i]);
 		}
 		writer.println("//#");
 		// print the mean values of the original untransformed data for normalization
@@ -117,7 +117,7 @@ public class ProfileBuilder {
 		// print the inverse covariance matrices for each group
 		writer.println("covariances:");
 		for(String s : classes){
-			double[][] cov = calcCovarianceMatrix(dataValues, samples, s);
+			double[][] cov = calcCovarianceMatrix(dataValues, groups, s);
 			Matrix covarianceMatrix = new Matrix(cov);
 			Matrix inverseCovarianceMatrix = covarianceMatrix.inverse();
 			double[][] invCov = inverseCovarianceMatrix.getArray();
@@ -135,7 +135,7 @@ public class ProfileBuilder {
 		// loop through the classes
 		if(adjustment==1.0){
 			for(String s : classes){
-				double[] mean = calcMeans(dataValues, samples, s);
+				double[] mean = calcMeans(dataValues, groups, s);
 				writer.print(mean[0]);
 				for(int i=1; i<mean.length; i++){
 					writer.print("\t" + mean[i]);
@@ -144,7 +144,7 @@ public class ProfileBuilder {
 			}
 		}else{
 			for(String s : classes){
-				double[] mean = calcMeans(dataValues, samples, s, adjustment);
+				double[] mean = calcMeans(dataValues, groups, s, adjustment);
 				writer.print(mean[0]);
 				for(int i=1; i<mean.length; i++){
 					writer.print("\t" + mean[i]);

@@ -13,7 +13,8 @@ import java.io.UnsupportedEncodingException;
 public class SpectraMatrix {
 	
 	private double[] mz;				// mz values (dimensions)
-	private String[] samples;			// filenames of spectras
+	//private String[] samples;			// filenames of spectras
+	private String[] groups;			// the groups of the samples
 	private double[][] voltage;			// [spectrum][mz]
 	private final int numSpectra;		// no of spectras
 	private final int numDimensions;	// no of dimensions (mz bins)
@@ -26,14 +27,16 @@ public class SpectraMatrix {
 	 */
 	public SpectraMatrix(Spectrum[] spectra){
 		this.mz = spectra[0].getMz();
-		this.samples = new String[spectra.length];
+		//this.samples = new String[spectra.length];
 		numSpectra = spectra.length;
 		numDimensions = mz.length;
 		voltage = new double[numSpectra][numDimensions];
+		groups = new String[numSpectra];
 		
 		for(int i=0; i<spectra.length; i++){
 			voltage[i] = spectra[i].getVoltage();
-			samples[i] = spectra[i].getFilename();
+			//samples[i] = spectra[i].getFilename();
+			groups[i] = spectra[i].getGroup();
 		}
 		
 		mean = calculateMean();
@@ -123,8 +126,16 @@ public class SpectraMatrix {
 	 * 
 	 * @return the sample names as string array
 	 */
-	public String[] getSamples(){
-		return samples;
+//	public String[] getSamples(){
+//		return samples;
+//	}
+	
+	/** returns the groups for each spectrum of the spectra matrix
+	 * 
+	 * @return the groups as string array
+	 */
+	public String[] getGroups(){
+		return groups;
 	}
 	
 	/** sets a spectrum at a given index
@@ -141,9 +152,9 @@ public class SpectraMatrix {
 	 * @param index the index in the spectraMatrix
 	 * @return the specified spectrum
 	 */
-	public Spectrum getSpectrum(int index){
-		return new Spectrum(mz, voltage[index], samples[index]);
-	}
+//	public Spectrum getSpectrum(int index){
+//		return new Spectrum(mz, voltage[index], samples[index], groups[index]);
+//	}
 	
 	/** returns a dimension given by an index
 	 * 
@@ -205,7 +216,7 @@ public class SpectraMatrix {
 		String res = "";
 		for(int spec=0; spec<voltage.length; spec++){
 			res += "Spectrum " + spec;
-			for(int mzVal=0; mzVal<voltage[0].length; mzVal++){
+			for(int mzVal=0; mzVal<voltage[spec].length; mzVal++){
 				res += "\t" + voltage[spec][mzVal];
 			}
 			res += "\n";
@@ -232,7 +243,7 @@ public class SpectraMatrix {
 		
 		// datatable
 		for(int spec=0; spec<voltage.length; spec++){
-			writer.print(samples[spec]);
+//			writer.print(samples[spec]);
 			for(int mzVal=0; mzVal<voltage[0].length; mzVal++){
 				writer.print("\t" + voltage[spec][mzVal]);
 			}

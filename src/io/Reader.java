@@ -25,17 +25,28 @@ public class Reader {
 	
 	/** reads in all the csv files in a directory and creates a SpectraMatrix
 	 * 
-	 * @param path path to the directory containing the csv files
+	 * @param group all chosen directories in the root directory
+	 * @param rootPath path to the directory containing the csv files
 	 * @param binSize size of a bin in u
 	 * @return a SpectraMatrix Object created from all the csv files in the directory
 	 * @throws IOException 
 	 */
-	public static SpectraMatrix readData(String path, int binSize) throws IOException{
-		String[] csv = readFolder(path);
-		Spectrum[] spectra = new Spectrum[csv.length];
-		for(int i=0; i<csv.length; i++){
-			spectra[i] = new Spectrum(csv[i], binSize);
+	public static SpectraMatrix readData(String[] group, String rootPath, int binSize) throws IOException{
+		ArrayList<Spectrum> tmp = new ArrayList<>();
+		
+		for(String path : group){
+			// group name
+			String groupName = path.replace(rootPath+File.separator, "").replaceAll("/", "-");
+			String[] csv = readFolder(path);
+			for(int i=0; i<csv.length; i++){
+				tmp.add(new Spectrum(csv[i], groupName, binSize));
+			}
 		}
+		
+		Spectrum[] spectra = new Spectrum[tmp.size()];
+		for(int i=0; i<tmp.size(); i++){
+			spectra[i] = tmp.get(i);
+		}		
 		return new SpectraMatrix(spectra);
 	} 
 	
