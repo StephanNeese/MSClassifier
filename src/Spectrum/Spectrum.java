@@ -40,8 +40,8 @@ public class Spectrum {
 	 * @param group assigned group of this spectrum
 	 * @param bin size of a bin
 	 */
-	public Spectrum(String path, String group, int bin){
-		readCSV(path, bin);
+	public Spectrum(String path, String group, double bin, String device){
+		readCSV(path, bin, device);
 		this.group = group;
 	}
 	
@@ -52,7 +52,7 @@ public class Spectrum {
 	 * @throws FileNotFoundException
 	 * @throws IOException 
 	 */
-	private void readCSV(String path, int bin){
+	private void readCSV(String path, double bin, String device){
 		File csv = new File(path);
 		
 		/* continuous loop until file can be opened
@@ -72,34 +72,52 @@ public class Spectrum {
 				while ((text = buff.readLine()) != null) {
 					// parse values to hashmap
 					if(headlineReached && !(text.isEmpty())){
-						String[] lineTmp = text.split(",");
+						String[] lineTmp = null;
+						// different separators for different machines
+						if(device.equals("Mini 11")){
+							lineTmp = text.split(",");
+						}else{
+							lineTmp = text.split("\t");
+						}
 						mzTmp.add(Double.parseDouble(lineTmp[0])); 
 						voltageTmp.add(Double.parseDouble(lineTmp[1]));
 					}
 					// check if we reached the headline of the csv table
 					// check after parse => when headline reached only next line is parsed
-					if(text.matches("^(M/Z,Voltage).*")){
+					if(text.matches("^(Masse).*") ^ text.matches("^(M/Z,Voltage).*")){
 						headlineReached = true;
 					}
 				}
 			
 				/** binning **/
-				ArrayList<Integer> mzTmp2 = new ArrayList<>();
+				ArrayList<Double> mzTmp2 = new ArrayList<>();
 				ArrayList<Double> voltageTmp2 = new ArrayList<>();
-				// add first element to list
-				int number = mzTmp.get(0).intValue();
-				mzTmp2.add(number);
-				voltageTmp2.add(voltageTmp.get(0));
-				for(int i=1; i<mzTmp.size(); i++){
-					// if we reach a higher mz value make new bin
-					if(number+bin<=mzTmp.get(i).intValue()){
-						number = mzTmp.get(i).intValue();
-						mzTmp2.add(number);
-						voltageTmp2.add(voltageTmp.get(i));
-					}else{
-						// add up the values in one bin
-						double tmp = voltageTmp2.get(mzTmp2.indexOf(number)) + voltageTmp.get(i);
-						voltageTmp2.set(mzTmp2.indexOf(number), tmp);
+				// first bin
+				double from = mzTmp.get(0).intValue();
+				double to = from + bin;
+				// init all bins until the end of our mz temp list
+				while(from<=mzTmp.get(mzTmp.size()-1)){
+					mzTmp2.add(from);
+					voltageTmp2.add(0.0);
+					from = to;
+					to = from + bin;
+				}
+				// loop through the created bins
+				int low = -1;
+				int cnt = -1;
+				for(int i=1; i<mzTmp2.size(); i++){
+					low = cnt+1;
+					// increase upper limit if value is still below bin border
+					while(mzTmp.get(cnt+1)<=mzTmp2.get(i)){
+						cnt++;
+					}
+					// sum up all values that lie in the mz range of the bin
+					if(cnt>-1){
+						double sum = 0.0;
+						for(int x=low; x<=cnt; x++){
+							sum += voltageTmp.get(x);
+					    }
+						voltageTmp2.set(i, sum);
 					}
 				}
 		
@@ -116,13 +134,13 @@ public class Spectrum {
 					filename = pathTmp[pathTmp.length-1];
 				}else{
 					String[] pathTmp = path.split("/");
-				   filename = pathTmp[pathTmp.length-1];
+					filename = pathTmp[pathTmp.length-1];
 				}
 		
 				length = mzTmp2.size();
 				check = true;
 			}catch(Exception ex){
-				continue;
+				ex.printStackTrace();
 			}
 		}
 	}

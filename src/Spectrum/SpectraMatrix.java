@@ -3,6 +3,7 @@ package Spectrum;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 
 /** This class provides a datastructure for an array of
  * spectras. During construction of the object the spectras
@@ -13,7 +14,6 @@ import java.io.UnsupportedEncodingException;
 public class SpectraMatrix {
 	
 	private double[] mz;				// mz values (dimensions)
-	//private String[] samples;			// filenames of spectras
 	private String[] groups;			// the groups of the samples
 	private double[][] voltage;			// [spectrum][mz]
 	private final int numSpectra;		// no of spectras
@@ -25,18 +25,60 @@ public class SpectraMatrix {
 	 * 
 	 * @param spectra the spectrum array
 	 */
-	public SpectraMatrix(Spectrum[] spectra){
-		this.mz = spectra[0].getMz();
-		//this.samples = new String[spectra.length];
+	public SpectraMatrix(Spectrum[] spectra, double bin){
 		numSpectra = spectra.length;
-		numDimensions = mz.length;
-		voltage = new double[numSpectra][numDimensions];
 		groups = new String[numSpectra];
 		
+		// obtain the smallest bin and the biggest bin from all spectra
+		double smallest = spectra[0].getMz()[0];
+		double biggest = spectra[0].getMz()[spectra[0].getLength()-1];
+		for(int i=1; i<spectra.length; i++){
+			if(smallest>spectra[i].getMz()[0]){
+				smallest = spectra[i].getMz()[0];
+			}
+			double[] tmp = spectra[i].getMz();
+			if(biggest<tmp[tmp.length-1]){
+				biggest = spectra[i].getMz()[spectra[0].getLength()-1];
+			}
+		}
+		// write mz bins
+		double currentBin = smallest;
+		ArrayList<Double> binTmp = new ArrayList<>();
+		while(currentBin<=biggest){
+			binTmp.add(currentBin);
+			currentBin += bin;
+		}
+		mz = new double[binTmp.size()];
+		for(int i=0; i<binTmp.size(); i++){
+			mz[i] = binTmp.get(i);
+		}
+		
+		// write number of dimensions
+		numDimensions = mz.length;
+		
+		// init the groups for each sample
 		for(int i=0; i<spectra.length; i++){
-			voltage[i] = spectra[i].getVoltage();
-			//samples[i] = spectra[i].getFilename();
 			groups[i] = spectra[i].getGroup();
+		}
+		
+		// init voltage array
+		voltage = new double[numSpectra][numDimensions];
+		for(int i=0; i<numSpectra; i++){
+			for(int j=0; j<numDimensions; j++){
+				voltage[i][j] = 0.0;
+			}
+		}
+		// write voltage values
+		for(int i=0; i<numSpectra; i++){
+			// calc the offset of the beginning of the spectrum
+			double[] volt = spectra[i].getVoltage();
+			double[] mass = spectra[i].getMz();
+			Double diffTmp = (mass[0] - mz[0])/bin;
+			// inserting the first element from spectrum at this index
+			int diff = (int)Math.round(diffTmp);
+			for(int j=0; j<volt.length; j++){
+				voltage[i][j+diff] = volt[j];
+			}
 		}
 		
 		mean = calculateMean();

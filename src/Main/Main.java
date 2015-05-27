@@ -9,137 +9,104 @@ import java.io.FileNotFoundException;
 import preprocessing.PCA;
 import io.Reader;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import preprocessing.PCADataSet;
 import io.ProfileBuilder;
 import java.io.File;
+import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import preprocessing.LDA;
 import preprocessing.LDADataSet;
-import com.jidesoft.swing.CheckBoxTree;
+import java.util.ArrayList;
+import java.util.Date;
 
 public class Main {
 	
 	public static void main(String[] args) throws IOException, Exception {
-		String[] profilePath = new String[2];
-		profilePath[0] = "/home/wens/MINI_samples_2/dakapo";
-		profilePath[1] = "/home/wens/MINI_samples_2/pflaume";
 		
-		SpectraMatrix data = Reader.readData(profilePath, "/home/wens/MINI_samples_2", 2);
-		PCADataSet pca_data = PCA.performPCA(data, 0.6);
+		/*
+		args[0] = root directory path
+		args[1] = binsize
+		args[2] = covered Variance
+		args[3] = profile output folder
+		args[4] = profile name
+		args[5] = folder containing csv files to classify
+		args[6] = output file for results
+		*/
+		
+		String[] profilePath = readProfilePaths(args[0]);
+		
+		SpectraMatrix data = Reader.readData(profilePath, args[0], Double.parseDouble(args[1]), "Mini 11");
+		PCADataSet pca_data = PCA.performPCA(data, Double.parseDouble(args[2]));
 		LDADataSet lda_data = LDA.performLDA(pca_data, data);
 		
-		// make profile directory
-								File dir = new File("/home/wens/MINI_samples_2"+File.separator+"profile");
-								if(!dir.exists()){
-									try{
-										dir.mkdir();
-									}catch(Exception ex){
-										ex.printStackTrace();
-									}
-								}
-		
 		// create profile
-								ProfileBuilder.build(
-										pca_data, 
-										lda_data,
-										data, 
-										"mini 11", 
-										"/home/wens/MINI_samples_2", 
-										"/home/wens/MINI_samples_2"+File.separator+"profile"+File.separator+"new-profile-multiple-folders.profile", 
-										1.0);
+		ProfileBuilder.build(
+				pca_data, 
+				lda_data,
+				data, 
+				"Mini 11", 
+				args[0], 
+				args[3]+"/"+args[4], 
+				1.0);
 		
-		//File dir = new File("/home/wens/test");
-		//liveWindow watch = new liveWindow("live", "/home/wens/test", "/home/wens/pflaume-traube.profile", "/home/wens/test", "euclidean distance");
-		//watch.watchDirectoryPath();
-        //DirWatch.watchDirectoryPath(dir, "/home/wens/pflaume-traube.profile");
+		// open profile
+		Profile profile = Reader.readProfile(args[3]+"/"+args[4]);
 		
-//		Spectrum x = new Spectrum("/home/wens/Pflaume_32AVG5.csv", 1);
-//		System.out.println(x.toString());
-//		x.normalizationMeanSubstraction();
-//		System.out.println("AFTER NORMALIZATION:");
-//		System.out.println(x.toString());
+		// open folder with csv files to classify
+		String[] csv = Reader.readFolder(args[5]);
 		
-//		SpectraMatrix data = Reader.readData("/home/wens/MINI_samples", 2);
-//		// transform data via PCA
-//		PCADataSet transformed = PCA.performPCA(data, 0.6);
-//		LDADataSet lda = LDA.performLDA(transformed, data);
-//		ProfileBuilder.build(
-//										transformed, 
-//										lda,
-//										data, 
-//										"mini", 
-//										"/home/wens/MINI_samples", 
-//										"/home/wens/lda-profile.profile", 
-//										1.0);
+		// open output file
+		PrintWriter writer = new PrintWriter(args[6], "UTF-8");
+		DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+		Date date = new Date();
+		writer.println("created: " + df.format(date));
+		writer.println("csv files from: " + args[5]);
+		writer.println("profile used: " + args[3]+"/"+args[4]);
+		writer.println("Filename\tassigned class ED\tEDdistance\tEDscore"
+				+ "\tassigned class MD\tMDdistance\tMDscore"
+				+ "\tassigned class LDA\tLDAcoefficient\tLDAscore");
 		
-//		Profile profile = Reader.readProfile("/home/wens/lda-profile.profile");
-//		Spectrum test = new Spectrum("/home/wens/MINI_samples/Pflaume_49AVG5.csv", 2);
-//		ClassificationResult x = profile.ldaCoefficient(test);
-//		System.out.println(x);
-		
-//		CheckBoxTree checkboxTree = new CheckBoxTree();
-		
-		// build profile
-		//ProfileBuilder.build(transformed, data, "test", "test", "/home/wens/testprofile_LDA", 1.0);
-//		data.toCSV("/home/wens/samples_milk2u.csv");
-		
-//		
-//		 read data from a folder
-//		SpectraMatrix data = Reader.readData("/home/wens/MINI_samples", 1);
-//		PCADataSet pca_data = PCA.performPCA(data, 0.6);
-//		ProfileBuilder.build(pca_data, data, "MINI11", "/home/wens/MINI_samples", "/home/wens/testprofile2", 1.0);
-//		Profile profile = Reader.readProfile("/home/wens/testprofile2");
-//		Spectrum spectrum = new Spectrum("/home/wens/MINI_samples/Dakapo_Accent_5AVG5.csv", 1);
-//		ClassificationResult res = profile.euclideanDistance(spectrum);
-//		System.out.println(res);
-//		res = profile.mahalanobisDistance(spectrum);
-//		System.out.println(res);
-		
-//		 transform data via PCA
-//		 SpectraMatrix transformed = PCA.performPCA(data);
-//		 build profile
-//		ProfileBuilder.build(data);
-		
-		// WEKA PCA Test
-//		writeToARFF(data, "/home/wens/test.arff");
-//		weka.core.Instances PCA_dataset = new Instances(new DataSource("/home/wens/test.arff").getDataSet());
-//		weka.attributeSelection.PrincipalComponents PCA = new weka.attributeSelection.PrincipalComponents();
-//		PCA.setTransformBackToOriginal(false);
-//		PCA.setCenterData(true);
-//		PCA.setVarianceCovered(0.9);
-//		PCA.buildEvaluator(PCA_dataset);
-//		weka.core.Instances transformed_data = PCA.transformedData(PCA_dataset);
-//		PrintWriter writer = new PrintWriter("/home/wens/pcaResult_4u_var09.arff", "UTF-8");
-//		writer.print(transformed_data.toString());
-//		writer.close();
-	}
-	
-	/** writes a SpectraMatrix to a WEKA ARFF file
-	 * 
-	 * @param data the SpectraMatrix to write
-	 * @param filepath the complete path to the file
-	 * @throws FileNotFoundException
-	 * @throws UnsupportedEncodingException 
-	 */
-	private static void writeToARFF(SpectraMatrix data, String filepath) 
-			throws FileNotFoundException, 
-			UnsupportedEncodingException{
-		double[][] intensities = data.getData();
-		PrintWriter writer = new PrintWriter(filepath, "UTF-8");
-		writer.print("@RELATION " + "test\n\n");
-		double[] mz = data.getMz();
-		for(int i=0; i<intensities[0].length; i++){
-			writer.println("@ATTRIBUTE " + "mz" + mz[i] + "\tNUMERIC");
-		}
-		writer.println();
-		writer.println("@DATA");
-		for(int i=0; i<intensities.length; i++){
-			for(int j=0; j<intensities[i].length-1; j++){
-				writer.print(intensities[i][j] + ",");
-			}
-			writer.println(intensities[i][intensities[i].length-1]);
+		// classify
+		for(int i=0; i<csv.length; i++){
+			Spectrum spectrum = new Spectrum(csv[i], null, (int)profile.getBinSize(), "Mini 11");
+			ClassificationResult res_ed = profile.euclideanDistance(spectrum);
+			spectrum = new Spectrum(csv[i], null, (int)profile.getBinSize(), "Mini 11");
+			ClassificationResult res_md = profile.mahalanobisDistance(spectrum);
+			spectrum = new Spectrum(csv[i], null, (int)profile.getBinSize(), "Mini 11");
+			ClassificationResult res_lda = profile.ldaCoefficient(spectrum);
+			writer.println(spectrum.getFilename() + "\t" 
+					+ res_ed.getAssignedClass() + "\t" 
+					+ res_ed.getDistance() + "\t" 
+					+ res_ed.getScore() + "\t" 
+					+ res_md.getAssignedClass() + "\t" 
+					+ res_md.getDistance() + "\t" 
+					+ res_md.getScore() + "\t" 
+					+ res_lda.getAssignedClass() + "\t" 
+					+ res_lda.getDistance() + "\t" 
+					+ res_lda.getScore() 
+			);
 		}
 		writer.close();
+	}
+	
+	private static String[] readProfilePaths(String root){
+		File dir = new File(root);
+		
+		// get all the files from a directory
+		File[] files = dir.listFiles();
+		ArrayList<String> subDir = new ArrayList<>();
+		for (File file : files) {
+			if(file.isDirectory()) {
+				subDir.add(file.getAbsolutePath());
+			}
+		}
+		
+		String[] res = new String[subDir.size()];
+		for(int i=0; i<subDir.size(); i++){
+			res[i] = subDir.get(i);
+		}
+		
+		return res;
 	}
 }

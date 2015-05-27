@@ -27,12 +27,17 @@ import io.ProfileBuilder;
 import io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
 import javax.swing.JScrollPane;
+import javax.swing.ListModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import preprocessing.LDA;
 import preprocessing.LDADataSet;
@@ -47,6 +52,8 @@ public class newDatabaseWindow extends JFrame {
 	JPanel main;
 	JLabel databaseLabel;
 	DefaultMutableTreeNode root;
+	DefaultTreeModel treeModel;
+	JList selectedList = new JList();
 	String rootPath;
 	CheckBoxTree tree;
 	HashMap<String, Integer> selectionCounter = new HashMap<>();
@@ -112,7 +119,8 @@ public class newDatabaseWindow extends JFrame {
 		
 		databaseLabel = new JLabel("chose the folders containing the csv files");
 		root = new DefaultMutableTreeNode("please choose folder");
-		tree = new CheckBoxTree(root);
+		treeModel = new DefaultTreeModel(root);
+		tree = new CheckBoxTree(treeModel);
 		databasePane = new JScrollPane(tree, 
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, 
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -176,29 +184,6 @@ public class newDatabaseWindow extends JFrame {
 	 * for the GUI elements
 	 */
 	public void runProgram(){
-		
-		/** Listener for changes in the CheckBox Tree.
-		 * Writes new selections/deselections into Hash.
-		 * 
-		 */
-		tree.getCheckBoxTreeSelectionModel().addTreeSelectionListener(new TreeSelectionListener(){
-
-			@Override
-			public void valueChanged(TreeSelectionEvent e) {
-				TreePath[] x = e.getPaths();
-				for(TreePath p : x){
-					if(selectionCounter.get(p.toString())!=null){
-						// either selection of deselection
-						Integer val = selectionCounter.get(p.toString());
-						selectionCounter.put(p.toString(), val+1);
-					}else{
-						// new selection
-						selectionCounter.put(p.toString(), 1);
-					}
-				}
-			}
-		});
-		
 		/** adds a Listener to the button for searching
 		 * for the root folder to create a folder tree.
 		 * 
@@ -250,6 +235,45 @@ public class newDatabaseWindow extends JFrame {
 					}
 				}
 		);
+		
+		selectedList = new JList();
+        final JList eventsList = new JList();
+        final DefaultListModel eventsModel = new DefaultListModel();
+		tree.getCheckBoxTreeSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
+            public void valueChanged(TreeSelectionEvent e) {
+                TreePath[] paths = e.getPaths();
+                for (TreePath path : paths) {
+                    eventsModel.addElement((e.isAddedPath(path) ? "Added - " : "Removed - ") + path);
+                }
+                eventsModel.addElement("---------------");
+                eventsList.ensureIndexIsVisible(eventsModel.size() - 1);
+
+                TreePath[] treePaths = tree.getCheckBoxTreeSelectionModel().getSelectionPaths();
+                DefaultListModel selectedModel = new DefaultListModel();
+                if (treePaths != null) {
+                    for (TreePath path : treePaths) {
+                        selectedModel.addElement(path);
+                        for (TreePath childPath : getChildrenElement(path)) {
+                            selectedModel.addElement(childPath);
+                        }
+                    }
+                }
+                selectedList.setModel(selectedModel);
+            }
+
+            private List<TreePath> getChildrenElement(TreePath parentPath) {
+                List<TreePath> childList = new ArrayList<TreePath>();
+                Object parentNode = parentPath.getLastPathComponent();
+                int childCount = tree.getModel().getChildCount(parentNode);
+                for (int i = 0; i < childCount; i++) {
+                    Object child = tree.getModel().getChild(parentNode, i);
+                    final TreePath childPath = parentPath.pathByAddingChild(child);
+                    childList.add(childPath);
+                    childList.addAll(getChildrenElement(childPath));
+                }
+                return childList;
+            }
+        });
 		
 		profileSearch.addActionListener(
 				new ActionListener(){
@@ -303,7 +327,7 @@ public class newDatabaseWindow extends JFrame {
 					@Override
 					public void actionPerformed(ActionEvent e){
 						// get data from text fields
-						String[] profilePaths = getSelected();
+						String[] profilePaths = getSelected(selectedList.getModel());
 						String machineName = (String)machine.getSelectedItem();
 						String profileName = profile.getText();
 						String binTmp = bin.getText();
@@ -317,10 +341,10 @@ public class newDatabaseWindow extends JFrame {
 									"Invalid Input", 
 									JOptionPane.ERROR_MESSAGE);
 						}else{
-							int binSize = (int)Double.parseDouble(binTmp);
+							double binSize = Double.parseDouble(binTmp);
 							double varianceCovered = Double.parseDouble(varianceTmp);
 							try{
-								SpectraMatrix data = Reader.readData(profilePaths, rootPath, binSize);
+								SpectraMatrix data = Reader.readData(profilePaths, rootPath, binSize, machineName);
 								PCADataSet pca_data = PCA.performPCA(data, varianceCovered);
 								LDADataSet lda_data = LDA.performLDA(pca_data, data);
 								// create profile
@@ -444,44 +468,44 @@ public class newDatabaseWindow extends JFrame {
 						}
 					}
 					
-					private String[] getSelected(){
+					private String[] getSelected(ListModel x){
 						ArrayList<String> tmp = new ArrayList<>();
+						int listSize = x.getSize();
 						
-						for(Map.Entry<String, Integer> e : selectionCounter.entrySet()){
-							if((e.getValue()%2)!=0){
-								// selected
-								String tmp2 = e.getKey().replaceAll("[\\[\\]]", "");
-								String tmp3 = tmp2.replace(", ", File.separator).replace((String)(root.getUserObject()), "");
-								String folder = rootPath + tmp3;
-								String folderFinal = followUnfinishedPath(folder);
-								tmp.add(folderFinal);
+						// change treepaths to actual folder paths
+						for(int i=0; i<listSize; i++){
+							String a = x.getElementAt(i).toString().replaceAll("[\\[\\]]", "");
+							String[] b = a.split(", ");
+							String c = "";
+							for(int j=1; j<b.length; j++){
+								c += File.separator + b[j];
+							}
+							// filter out root
+							if(!(c.equals(""))){
+								tmp.add(c);
 							}
 						}
 						
-						String[] res = new String[tmp.size()];
+						ArrayList<String> tmp2 = new ArrayList<>();
+						// check if there are parent folders in the list
+						// and delete them
 						for(int i=0; i<tmp.size(); i++){
-							res[i] = tmp.get(i);
-						}
-						
-						return res;
-					}
-					
-					private String followUnfinishedPath(String path){
-						String res = "";
-						File rootFolder = new File(path);
-						File[] files = rootFolder.listFiles();
-						ArrayList<String> dir = new ArrayList<>();
-						if(!(files==null)){
-							for(File f : files){
-								if(f.isDirectory()){
-									dir.add(f.getName());
+							boolean unique = true;
+							for(int j=0; j<tmp.size(); j++){
+								// if path in index i is subpath of another one
+								// then it is a parent and kicked out
+								if(i!=j && tmp.get(j).startsWith(tmp.get(i))){
+									unique = false;
 								}
 							}
+							if(unique){
+								tmp2.add(tmp.get(i));
+							}
 						}
-						if(dir.size()==1){
-							res += followUnfinishedPath(path + File.separator + dir.get(0));
-						}else{
-							res = path;
+						
+						String[] res = new String[tmp2.size()];
+						for(int i=0; i<tmp2.size(); i++){
+							res[i] = rootPath + tmp2.get(i);
 						}
 						
 						return res;

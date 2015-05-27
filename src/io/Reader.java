@@ -31,7 +31,7 @@ public class Reader {
 	 * @return a SpectraMatrix Object created from all the csv files in the directory
 	 * @throws IOException 
 	 */
-	public static SpectraMatrix readData(String[] group, String rootPath, int binSize) throws IOException{
+	public static SpectraMatrix readData(String[] group, String rootPath, double binSize, String device) throws IOException{
 		ArrayList<Spectrum> tmp = new ArrayList<>();
 		
 		for(String path : group){
@@ -39,15 +39,16 @@ public class Reader {
 			String groupName = path.replace(rootPath+File.separator, "").replaceAll("/", "-");
 			String[] csv = readFolder(path);
 			for(int i=0; i<csv.length; i++){
-				tmp.add(new Spectrum(csv[i], groupName, binSize));
+				tmp.add(new Spectrum(csv[i], groupName, binSize, device));
 			}
 		}
 		
 		Spectrum[] spectra = new Spectrum[tmp.size()];
 		for(int i=0; i<tmp.size(); i++){
 			spectra[i] = tmp.get(i);
-		}		
-		return new SpectraMatrix(spectra);
+		}
+		
+		return new SpectraMatrix(spectra, binSize);
 	} 
 	
 	/** reads the content of a directory and returns the complete paths
