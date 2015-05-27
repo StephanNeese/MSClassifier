@@ -38,7 +38,7 @@ public class SpectraMatrix {
 			}
 			double[] tmp = spectra[i].getMz();
 			if(biggest<tmp[tmp.length-1]){
-				biggest = spectra[i].getMz()[spectra[0].getLength()-1];
+				biggest = tmp[tmp.length-1];
 			}
 		}
 		// write mz bins
