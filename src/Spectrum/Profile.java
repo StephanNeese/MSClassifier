@@ -417,7 +417,7 @@ public class Profile {
 			Matrix secondRight = secondMiddle.times(UTransposed);
 			
 			// substract the terms and add the fraction of class i
-			coefficients[i] = firstRight.get(0, 0) - secondRight.get(0, 0) + fractions[i];
+			coefficients[i] = firstRight.get(0, 0) - secondRight.get(0, 0) + Math.log(fractions[i]);
 		}
 		
 		// find biggest and smallest coefficient
