@@ -285,7 +285,7 @@ public class SpectraMatrix {
 		
 		// datatable
 		for(int spec=0; spec<voltage.length; spec++){
-//			writer.print(samples[spec]);
+			writer.print(groups[spec]);
 			for(int mzVal=0; mzVal<voltage[0].length; mzVal++){
 				writer.print("\t" + voltage[spec][mzVal]);
 			}

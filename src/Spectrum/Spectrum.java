@@ -108,7 +108,7 @@ public class Spectrum {
 				for(int i=1; i<mzTmp2.size(); i++){
 					low = cnt+1;
 					// increase upper limit if value is still below bin border
-					while(mzTmp.get(cnt+1)<=mzTmp2.get(i)){
+					while((cnt+1)<mzTmp.size() && mzTmp.get(cnt+1)<mzTmp2.get(i)){
 						cnt++;
 					}
 					// sum up all values that lie in the mz range of the bin
@@ -117,8 +117,16 @@ public class Spectrum {
 						for(int x=low; x<=cnt; x++){
 							sum += voltageTmp.get(x);
 					    }
-						voltageTmp2.set(i, sum);
+						voltageTmp2.set(i-1, sum);
 					}
+				}
+				// last bin should also be filled
+				if(cnt<(voltageTmp.size()-1)){
+					double sum = 0.0;
+					for(int i=cnt+1; i<=voltageTmp.size()-1; i++){
+						sum += voltageTmp.get(i);
+					}
+					voltageTmp2.set(mzTmp2.size()-1, sum);
 				}
 		
 				/** parse from ArrayList to arrays **/
@@ -223,6 +231,10 @@ public class Spectrum {
 	public int getLength(){
 		return length;
 	}
+	
+	public void setLength(int length){
+		this.length = length;
+	}
 
 	@Override
 	public String toString() {
@@ -255,7 +267,8 @@ public class Spectrum {
 	public void center(double[] means){
 		if(voltage.length!=means.length){
 			throw new IllegalArgumentException("Spectrum and Data in the profile do not have the same M/Z range. "
-			+ "Please adjust the device.");
+			+ "Please adjust the device."
+			+ " Corrupted file: " + filename);
 		}else{
 			for(int i=0; i<voltage.length; i++){
 				voltage[i] = voltage[i] - means[i];

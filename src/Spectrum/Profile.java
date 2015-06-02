@@ -24,6 +24,8 @@ public class Profile {
 	private final String[] filenames;		// filenames of original csv files 
 	private final double[][] data;			// pca transformed data [dimensions][samples]
 	private final double[][] features;		// feature vector (used for transformation)
+	private final double mzStart;
+	private final double mzEnd;
 	// inv. cov. matrices of classes
 	private HashMap<String, double[][]> invertedCovarianceMatrices;
 	private final double[][] mean;			// [class][dimension]
@@ -62,6 +64,8 @@ public class Profile {
 			String[] filenames, 
 			double[][] data, 
 			double[][] features,
+			double mzStart,
+			double mzEnd,
 			HashMap<String, double[][]> invertedCovarianceMatrices,
 			double[][] mean,
 			double[] originalMeans,
@@ -78,6 +82,8 @@ public class Profile {
 		this.filenames = filenames;
 		this.data = data;
 		this.features = features;
+		this.mzStart = mzStart;
+		this.mzEnd = mzEnd;
 		this.invertedCovarianceMatrices = invertedCovarianceMatrices;
 		this.mean = mean;
 		this.originalMeans = originalMeans;
@@ -267,11 +273,8 @@ public class Profile {
 	 * @return a ClassificationResult object
 	 */
 	public ClassificationResult mahalanobisDistance(Spectrum spectrum){
-		// check if same length
-		if(spectrum.getLength()!=originalMeans.length){
-			throw new IllegalArgumentException("Spectrum and Data in the profile do not have the same M/Z range. "
-			+ "Please adjust the device.");
-		}
+		adjustRangeOfSpectrum(spectrum);
+		
 		// normalize and center the spectrum
 		spectrum.normalizationDivideByMean(originalMean);
 		spectrum.center(originalMeans);
@@ -332,11 +335,8 @@ public class Profile {
 	 * @return a ClassificationResult object
 	 */
 	public ClassificationResult euclideanDistance(Spectrum spectrum){
-		// check if same length
-		if(spectrum.getLength()!=originalMeans.length){
-			throw new IllegalArgumentException("Spectrum and Data in the profile do not have the same M/Z range. "
-			+ "Please adjust the device.");
-		}
+		adjustRangeOfSpectrum(spectrum);
+		
 		// normalize and center the spectrum
 		spectrum.normalizationDivideByMean(originalMean);
 		spectrum.center(originalMeans);
@@ -381,11 +381,8 @@ public class Profile {
 	 * @return a ClassificationResult object
 	 */
 	public ClassificationResult ldaCoefficient(Spectrum spectrum){
-		// check if same length
-		if(spectrum.getLength()!=originalMeans.length){
-			throw new IllegalArgumentException("Spectrum and Data in the profile do not have the same M/Z range. "
-			+ "Please adjust the device.");
-		}
+		adjustRangeOfSpectrum(spectrum);
+		
 		// normalize and center the spectrum
 		spectrum.normalizationDivideByMean(originalMean);
 		spectrum.center(originalMeans);
@@ -462,5 +459,112 @@ public class Profile {
 				coefficients[index], 
 				score
 		);
+	}
+	
+	public void adjustRangeOfSpectrum(Spectrum spectrum){
+		// cut off bins at the beginning or fill empty bins
+		double diff = mzStart - spectrum.getMZ(0);
+		if(diff>0){
+			// find number of bins to cut from spectrum start
+			// parse correctly from double to int and incorporate rounding errors
+			double fillBinsTmp = diff/binSize;
+			int fillBins = 0;
+			if(diff-(fillBinsTmp*binSize)>0){
+				fillBins = (int)fillBinsTmp+1;
+			}else{
+				fillBins = (int)fillBinsTmp;
+			}
+			// now cut off the calculated amount
+			int size = spectrum.getLength();
+			double[] mzTmp = new double[size-fillBins];
+			double[] voltTmp = new double[size-fillBins];
+			for(int i=fillBins; i<size; i++){
+				mzTmp[i-fillBins] = spectrum.getMZ(i);
+				voltTmp[i-fillBins] = spectrum.getVoltage(i);
+			}
+			spectrum.setMz(mzTmp);
+			spectrum.setVoltage(voltTmp);
+			spectrum.setLength(size-fillBins);
+			
+		}else if(diff<0){
+			double fillBinsTmp = diff/binSize*-1;
+			int fillBins = 0;
+			if((diff*-1)-(fillBinsTmp*binSize)>0){
+				fillBins = (int)fillBinsTmp+1;
+			}else{
+				fillBins = (int)fillBinsTmp;
+			}
+			// now fill in the calculated amount
+			int size = spectrum.getLength();
+			double[] mzTmp = new double[size+fillBins];
+			double[] voltTmp = new double[size+fillBins];
+			// put empty bins in front
+			for(int i=0; i<fillBins; i++){
+				mzTmp[i] = spectrum.getMZ(0)-(fillBins-i);
+				voltTmp[i] = 0.0;
+			}
+			// put rest of bins after empty bins
+			for(int i=0; i<size; i++){
+				mzTmp[i+fillBins] = spectrum.getMZ(i);
+				voltTmp[i+fillBins] = spectrum.getVoltage(i);
+			}
+			spectrum.setMz(mzTmp);
+			spectrum.setVoltage(voltTmp);
+			spectrum.setLength(size+fillBins);
+		}
+		
+		// cut off bins at the end or fill empty bins
+		double[] mzSpectrum = spectrum.getMz();
+		double diffEnd = mzEnd - mzSpectrum[mzSpectrum.length-1];
+		if(diffEnd>0){
+			// find number of bins to fill into spectrum end
+			// parse correctly from double to int and incorporate rounding errors
+			double fillBinsTmp = diffEnd/binSize;
+			int fillBins = 0;
+			if(diffEnd-(fillBinsTmp*binSize)>0){
+				fillBins = (int)fillBinsTmp+1;
+			}else{
+				fillBins = (int)fillBinsTmp;
+			}
+			
+			// now fill in the calculated amount
+			int size = spectrum.getLength();
+			double[] mzTmp = new double[size+fillBins];
+			double[] voltTmp = new double[size+fillBins];
+			
+			// fill in bins up to prior end
+			for(int i=0; i<size; i++){
+				mzTmp[i] = spectrum.getMZ(i);
+				voltTmp[i] = spectrum.getVoltage(i);
+			}
+			// put empty bins at end
+			for(int i=size; i<size+fillBins; i++){
+				mzTmp[i] = spectrum.getMZ(size-1)+(i-(size-1));
+				voltTmp[i] = 0.0;
+			}
+			spectrum.setMz(mzTmp);
+			spectrum.setVoltage(voltTmp);
+			spectrum.setLength(size+fillBins);
+			
+		}else if(diffEnd<0){
+			double fillBinsTmp = diffEnd/binSize*-1;
+			int fillBins = 0;
+			if((diffEnd*-1)-(fillBinsTmp*binSize)>0){
+				fillBins = (int)fillBinsTmp+1;
+			}else{
+				fillBins = (int)fillBinsTmp;
+			}
+			// now cut off the calculated amount
+			int size = spectrum.getLength();
+			double[] mzTmp = new double[size-fillBins];
+			double[] voltTmp = new double[size-fillBins];
+			for(int i=0; i<size-fillBins; i++){
+				mzTmp[i] = spectrum.getMZ(i);
+				voltTmp[i] = spectrum.getVoltage(i);
+			}
+			spectrum.setMz(mzTmp);
+			spectrum.setVoltage(voltTmp);
+			spectrum.setLength(size-fillBins);
+		}
 	}
 }

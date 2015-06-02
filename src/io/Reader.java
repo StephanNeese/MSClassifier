@@ -108,6 +108,8 @@ public class Reader {
 		double binSize = 0;
 		double[][] data = null;
 		double[][] features = null;
+		double mzStart = 0;
+		double mzEnd = 0;
 		HashMap<String, double[][]> invertedCovarianceMatrices = null;
 		double[][] mean = null;
 		double[][] ldaCovarianceMatrix = null;
@@ -173,6 +175,10 @@ public class Reader {
 						features[j-1][k] = Double.parseDouble(column[k]);
 					}
 				}
+			}else if(tmp.startsWith("mz-range:")){
+				String[] row = segment[i].split("\t");
+				mzStart = Double.parseDouble(row[1]);
+				mzEnd = Double.parseDouble(row[2]);
 			}else if(tmp.startsWith("covariances:")){
 				invertedCovarianceMatrices = obtainCovarianceMatrices(segment[i]);
 			}else if(tmp.startsWith("mean:")){
@@ -219,7 +225,9 @@ public class Reader {
 				variance, 
 				filenames, 
 				data, 
-				features, 
+				features,
+				mzStart,
+				mzEnd,
 				invertedCovarianceMatrices,
 				mean, 
 				originalMeans, 

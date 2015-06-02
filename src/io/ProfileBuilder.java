@@ -114,6 +114,9 @@ public class ProfileBuilder {
 			writer.println();
 		}
 		writer.println("//#");
+		// print the mz range
+		writer.println("mz-range:\t" + bins[0] + "\t" + bins[bins.length-1]);
+		writer.println("//#");
 		// print the inverse covariance matrices for each group
 		writer.println("covariances:");
 		for(String s : classes){
