@@ -267,6 +267,21 @@ public class SpectraMatrix {
 		return res;
 	}
 	
+	public void print() throws FileNotFoundException, UnsupportedEncodingException{
+		PrintWriter writer = new PrintWriter("/home/wens/xyz.csv", "UTF-8");
+		for(int mzVal=0; mzVal<mz.length; mzVal++){
+				writer.print("\t" + mz[mzVal]);
+			}
+		writer.println("");
+		for(int spec=0; spec<voltage.length; spec++){
+			writer.print(groups[spec]); 
+			for(int mzVal=0; mzVal<voltage[spec].length; mzVal++){
+				writer.print("\t" + voltage[spec][mzVal]);
+			}
+			writer.println("");
+		}
+	}
+	
 	/** writes the spectraMatrix to a csv file
 	 * 
 	 * @param path the complete path to the csv file
