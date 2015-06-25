@@ -21,6 +21,7 @@ public class Main extends JFrame {
 	
 	JPanel main;
 	JButton newDB;
+	JButton testDB;
 	JButton classification;
 	JButton liveClassification;
 	
@@ -69,15 +70,19 @@ public class Main extends JFrame {
 		main = new JPanel();
 		
 		newDB = new JButton("create new profile");
-		newDB.setBounds(10, 30, 380, 50);
+		newDB.setBounds(10, 20, 380, 50);
 		main.add(newDB);
 		
+		testDB = new JButton("test a profile");
+		testDB.setBounds(10, 80, 380, 50);
+		main.add(testDB);
+		
 		classification = new JButton("classify spectograms");
-		classification.setBounds(10, 100, 380, 50);
+		classification.setBounds(10, 140, 380, 50);
 		main.add(classification);
 		
 		liveClassification = new JButton("live classification");
-		liveClassification.setBounds(10, 170, 380, 50);
+		liveClassification.setBounds(10, 200, 380, 50);
 		main.add(liveClassification);
 		
 		add(main);
@@ -113,6 +118,30 @@ public class Main extends JFrame {
 					
 				}
 		);
+		
+		testDB.addActionListener(
+				new ActionListener(){
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						try {
+							TestProfileWindow x = new TestProfileWindow();
+							setVisible(false);
+							x.runProgram();
+						} catch (InstantiationException ex) {
+							Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+						} catch (IllegalAccessException ex) {
+							Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+						} catch (UnsupportedLookAndFeelException ex) {
+							Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+						} catch (ClassNotFoundException ex) {
+							Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+						}
+					}
+					
+				}
+		);
+		
 		classification.addActionListener(
 				new ActionListener(){
 
@@ -135,6 +164,7 @@ public class Main extends JFrame {
 					
 				}
 		);
+		
 		liveClassification.addActionListener(
 				new ActionListener(){
 

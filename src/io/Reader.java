@@ -102,7 +102,7 @@ public class Reader {
 		String device = null;
 		String inputPath = null;
 		double variance = 0.0;
-		String[] filenames = null;
+		String[] sampleGroups = null;
 		double[] originalMeans = null;
 		double originalMean = 0;
 		double binSize = 0;
@@ -139,11 +139,11 @@ public class Reader {
 			}else if(tmp.startsWith("variance:")){
 				String[] content = segment[i].split("\t");
 				variance = Double.parseDouble(content[1]);
-			}else if(tmp.startsWith("filenames:")){
+			}else if(tmp.startsWith("groups:")){
 				String[] content = segment[i].split("\n");
-				filenames = new String[content.length-1];
+				sampleGroups = new String[content.length-1];
 				for(int j=1; j<content.length; j++){
-					filenames[j-1] = content[j];
+					sampleGroups[j-1] = content[j];
 				}
 			}else if(tmp.startsWith("original-means:")){
 				String[] content = segment[i].split("\n");
@@ -223,7 +223,7 @@ public class Reader {
 				device, 
 				inputPath, 
 				variance, 
-				filenames, 
+				sampleGroups, 
 				data, 
 				features,
 				mzStart,

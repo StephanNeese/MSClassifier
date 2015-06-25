@@ -21,7 +21,7 @@ public class Profile {
 	private final String device;			// MS device
 	private final String path;				// path to profile (original path)
 	private final double variance;			// covered variance by profile
-	private final String[] filenames;		// filenames of original csv files 
+	private final String[] sampleGroups;	// sampleGroups of original csv files 
 	private final double[][] data;			// pca transformed data [dimensions][samples]
 	private final double[][] features;		// feature vector (used for transformation)
 	private final double mzStart;
@@ -44,7 +44,7 @@ public class Profile {
 	 * @param device the name of the device
 	 * @param path the path to the csv files the profile has been constructed from
 	 * @param variance the amount of covered variance by the PCA
-	 * @param filenames the filenames of the csv files
+	 * @param filenames the sampleGroups of the csv files
 	 * @param data pca transformed data
 	 * @param features the feature matrix
 	 * @param invertedCovarianceMatrices the inverted covariance matrices of the pca data classes
@@ -61,7 +61,7 @@ public class Profile {
 			String device, 
 			String path, 
 			double variance, 
-			String[] filenames, 
+			String[] sampleGroups, 
 			double[][] data, 
 			double[][] features,
 			double mzStart,
@@ -79,7 +79,7 @@ public class Profile {
 		this.device = device;
 		this.path = path;
 		this.variance = variance;
-		this.filenames = filenames;
+		this.sampleGroups = sampleGroups;
 		this.data = data;
 		this.features = features;
 		this.mzStart = mzStart;
@@ -134,12 +134,12 @@ public class Profile {
 		return variance;
 	}
 
-	/** returns all the filenames of the original csv files
+	/** returns all the sampleGroups of the original csv files
 	 * 
 	 * @return the csv file names as array
 	 */
-	public String[] getFilenames() {
-		return filenames;
+	public String[] getSampleGroups() {
+		return sampleGroups;
 	}
 
 	/** returns the pca transformed data matrix. 
