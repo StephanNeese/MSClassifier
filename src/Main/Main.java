@@ -24,74 +24,6 @@ public class Main {
 	
 	public static void main(String[] args) throws IOException, Exception {
 		
-		String[] profilePath = readProfilePaths("/home/wens/exactive_data");
-		
-		SpectraMatrix data = Reader.readData(profilePath, 
-				"/home/wens/exactive_data", 
-				2.0, 
-				"exactive");
-		
-		//data.print();
-		PCADataSet pca_data = PCA.performPCA(data, 0.9);
-		LDADataSet lda_data = LDA.performLDA(pca_data, data);
-		
-		// create profile
-		ProfileBuilder.build(
-				pca_data, 
-				lda_data,
-				data, 
-				"exactive", 
-				"/home/wens/cross-validation/cross-validation-1", 
-				"/home/wens/profile.profile", 
-				1.0);
-		
-		// open profile
-		Profile profile = Reader.readProfile("/home/wens/profile.profile");
-		
-		System.out.println(profile);
-		
-//		String[] profilePath = readProfilePaths("/home/wens/cross-validation/cross-validation-1");
-//		
-//		SpectraMatrix data = Reader.readData(profilePath, 
-//				"/home/wens/cross-validation/cross-validation-1", 
-//				2.0, 
-//				"Mini 11");
-//		PCADataSet pca_data = PCA.performPCA(data, 0.9);
-//		LDADataSet lda_data = LDA.performLDA(pca_data, data);
-//		
-//		// create profile
-//		ProfileBuilder.build(
-//				pca_data, 
-//				lda_data,
-//				data, 
-//				"Mini 11", 
-//				"/home/wens/cross-validation/cross-validation-1", 
-//				"/home/wens/xyz.profile", 
-//				1.0);
-		
-		// open profile
-//		Profile profile = Reader.readProfile("/home/wens/xyz.profile");
-		
-//		Spectrum spectrum = new Spectrum(
-//				"/home/wens/cross-validation/cross-validation-2-destination/data/Dakapo_Accent_54AVG5.csv", 
-//				null, 
-//				(int)profile.getBinSize(), 
-//				"Mini 11");
-//		ClassificationResult res_ed = profile.euclideanDistance(spectrum);
-//		
-//		// open folder with csv files to classify
-//		String[] csv = Reader.readFolder("/home/wens/cross-validation/cross-validation-2-destination/data");
-//		
-//		for(int i=0; i<csv.length; i++){
-//			System.out.println(csv[i]);
-//			Spectrum spectrum = new Spectrum(csv[i], null, (int)profile.getBinSize(), "Mini 11");
-//			ClassificationResult res_ed = profile.euclideanDistance(spectrum);
-//			spectrum = new Spectrum(csv[i], null, (int)profile.getBinSize(), "Mini 11");
-//			ClassificationResult res_md = profile.mahalanobisDistance(spectrum);
-//			spectrum = new Spectrum(csv[i], null, (int)profile.getBinSize(), "Mini 11");
-//			ClassificationResult res_lda = profile.ldaCoefficient(spectrum);
-//		}
-		
 		/*
 		args[0] = root directory path
 		args[1] = binsize
@@ -102,62 +34,60 @@ public class Main {
 		args[6] = output file for results
 		*/
 		
-//		String[] profilePath = readProfilePaths(args[0]);
-//		
-//		SpectraMatrix data = Reader.readData(profilePath, args[0], Double.parseDouble(args[1]), "Mini 11");
-//		PCADataSet pca_data = PCA.performPCA(data, Double.parseDouble(args[2]));
-//		LDADataSet lda_data = LDA.performLDA(pca_data, data);
-//		
-//		// create profile
-//		ProfileBuilder.build(
-//				pca_data, 
-//				lda_data,
-//				data, 
-//				"Mini 11", 
-//				args[0], 
-//				args[3]+"/"+args[4], 
-//				1.0);
-//		
-//		// open profile
-//		Profile profile = Reader.readProfile(args[3]+"/"+args[4]);
-//		
-//		System.out.println(profile);
+		String[] profilePath = readProfilePaths(args[0]);
+		
+		SpectraMatrix data = Reader.readData(profilePath, args[0], Double.parseDouble(args[1]), "Mini 11");
+		PCADataSet pca_data = PCA.performPCA(data, Double.parseDouble(args[2]));
+		LDADataSet lda_data = LDA.performLDA(pca_data, data);
+		
+		// create profile
+		ProfileBuilder.build(
+				pca_data, 
+				lda_data,
+				data, 
+				"Mini 11", 
+				args[0], 
+				args[3]+"/"+args[4], 
+				1.0);
+		
+		// open profile
+		Profile profile = Reader.readProfile(args[3]+"/"+args[4]);
 		
 		// open folder with csv files to classify
-//		String[] csv = Reader.readFolder(args[5]);
-//		
-//		// open output file
-//		PrintWriter writer = new PrintWriter(args[6], "UTF-8");
-//		DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-//		Date date = new Date();
-//		writer.println("created: " + df.format(date));
-//		writer.println("csv files from: " + args[5]);
-//		writer.println("profile used: " + args[3]+"/"+args[4]);
-//		writer.println("Filename\tassigned class ED\tEDdistance\tEDscore"
-//				+ "\tassigned class MD\tMDdistance\tMDscore"
-//				+ "\tassigned class LDA\tLDAcoefficient\tLDAscore");
-//		
-//		// classify
-//		for(int i=0; i<csv.length; i++){
-//			Spectrum spectrum = new Spectrum(csv[i], null, profile.getBinSize(), "Mini 11");
-//			ClassificationResult res_ed = profile.euclideanDistance(spectrum);
-//			spectrum = new Spectrum(csv[i], null, profile.getBinSize(), "Mini 11");
-//			ClassificationResult res_md = profile.mahalanobisDistance(spectrum);
-//			spectrum = new Spectrum(csv[i], null, profile.getBinSize(), "Mini 11");
-//			ClassificationResult res_lda = profile.ldaCoefficient(spectrum);
-//			writer.println(spectrum.getFilename() + "\t" 
-//					+ res_ed.getAssignedClass() + "\t" 
-//					+ res_ed.getDistance() + "\t" 
-//					+ res_ed.getScore() + "\t" 
-//					+ res_md.getAssignedClass() + "\t" 
-//					+ res_md.getDistance() + "\t" 
-//					+ res_md.getScore() + "\t" 
-//					+ res_lda.getAssignedClass() + "\t" 
-//					+ res_lda.getDistance() + "\t" 
-//					+ res_lda.getScore() 
-//			);
-//		}
-//		writer.close();
+		String[] csv = Reader.readFolder(args[5]);
+		
+		// open output file
+		PrintWriter writer = new PrintWriter(args[6], "UTF-8");
+		DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+		Date date = new Date();
+		writer.println("created: " + df.format(date));
+		writer.println("csv files from: " + args[5]);
+		writer.println("profile used: " + args[3]+"/"+args[4]);
+		writer.println("Filename\tassigned class ED\tEDdistance\tEDscore"
+				+ "\tassigned class MD\tMDdistance\tMDscore"
+				+ "\tassigned class LDA\tLDAcoefficient\tLDAscore");
+		
+		// classify
+		for(int i=0; i<csv.length; i++){
+			Spectrum spectrum = new Spectrum(csv[i], null, profile.getBinSize(), "Mini 11");
+			ClassificationResult res_ed = profile.euclideanDistance(spectrum);
+			spectrum = new Spectrum(csv[i], null, profile.getBinSize(), "Mini 11");
+			ClassificationResult res_md = profile.mahalanobisDistance(spectrum);
+			spectrum = new Spectrum(csv[i], null, profile.getBinSize(), "Mini 11");
+			ClassificationResult res_lda = profile.ldaCoefficient(spectrum);
+			writer.println(spectrum.getFilename() + "\t" 
+					+ res_ed.getAssignedClass() + "\t" 
+					+ res_ed.getDistance() + "\t" 
+					+ res_ed.getScore() + "\t" 
+					+ res_md.getAssignedClass() + "\t" 
+					+ res_md.getDistance() + "\t" 
+					+ res_md.getScore() + "\t" 
+					+ res_lda.getAssignedClass() + "\t" 
+					+ res_lda.getDistance() + "\t" 
+					+ res_lda.getScore() 
+			);
+		}
+		writer.close();
 	}
 	
 	private static String[] readProfilePaths(String root){

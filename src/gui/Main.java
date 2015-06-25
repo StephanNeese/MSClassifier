@@ -97,7 +97,7 @@ public class Main extends JFrame {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						try {
-							newDatabaseWindow x = new newDatabaseWindow();
+							NewProfileWindow x = new NewProfileWindow();
 							setVisible(false);
 							x.runProgram();
 						} catch (ClassNotFoundException ex) {
