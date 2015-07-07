@@ -49,6 +49,7 @@ public class liveWindow extends Thread {
 	private String output;
 	private String distanceMeasure;
 	private double cutoff;
+	private Profile profile;
 	// GUI
 	private JFrame frame;
 	private JPanel main;
@@ -86,10 +87,13 @@ public class liveWindow extends Thread {
 			IllegalAccessException, 
 			UnsupportedLookAndFeelException,
 			FileNotFoundException,
-			UnsupportedEncodingException {
+			UnsupportedEncodingException,
+			IOException,
+			ParseException {
 		this.threadName = threadName;
 		this.dir = dir;
 		this.profilePath = profilePath;
+		profile = Reader.readProfile(profilePath);
 		this.output = output;
 		this.distanceMeasure = distanceMeasure;
 		this.cutoff = cutoff;
@@ -174,7 +178,6 @@ public class liveWindow extends Thread {
         try{
 			Path path = new File(dir).toPath();
 			FileSystem fs = path.getFileSystem();
-			Profile profile = Reader.readProfile(profilePath);
 			
 			// write logfile header
 			DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm");
@@ -312,9 +315,7 @@ public class liveWindow extends Thread {
             }
         } catch(IOException | InterruptedException ioe){
             ioe.printStackTrace();
-        } catch (ParseException ex) {
-			Logger.getLogger(liveWindow.class.getName()).log(Level.SEVERE, null, ex);
-		}
+        }
     }
 	
 	/** Overwritten method from class Thread. 
