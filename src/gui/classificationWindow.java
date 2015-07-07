@@ -305,7 +305,7 @@ public class classificationWindow extends JFrame {
 									Profile profile = Reader.readProfile(profilePath);
 									// get worst possible score from first result
 									for(int i=0; i<csv.length; i++){
-										Spectrum spectrum = new Spectrum(csv[i], null, (int)profile.getBinSize(), profile.getDevice());
+										Spectrum spectrum = new Spectrum(csv[i], null, profile.getBinSize(), profile.getDevice());
 										ClassificationResult res = profile.euclideanDistance(spectrum);
 										rowData[i][0] = spectrum.getFilename();
 										if(res.getScore()<cutoffValue){
@@ -326,7 +326,7 @@ public class classificationWindow extends JFrame {
 									Profile profile = Reader.readProfile(profilePath);
 									// get worst possible score from first result
 									for(int i=0; i<csv.length; i++){
-										Spectrum spectrum = new Spectrum(csv[i], null, (int)profile.getBinSize(), profile.getDevice());
+										Spectrum spectrum = new Spectrum(csv[i], null, profile.getBinSize(), profile.getDevice());
 										ClassificationResult res = profile.mahalanobisDistance(spectrum);
 										rowData[i][0] = spectrum.getFilename();
 										if(res.getScore()<cutoffValue){
@@ -347,7 +347,7 @@ public class classificationWindow extends JFrame {
 									Profile profile = Reader.readProfile(profilePath);
 									// get worst possible score from first result
 									for(int i=0; i<csv.length; i++){
-										Spectrum spectrum = new Spectrum(csv[i], null, (int)profile.getBinSize(), profile.getDevice());
+										Spectrum spectrum = new Spectrum(csv[i], null, profile.getBinSize(), profile.getDevice());
 										ClassificationResult res = profile.ldaCoefficient(spectrum);
 										rowData[i][0] = spectrum.getFilename();
 										if(res.getScore()<cutoffValue){

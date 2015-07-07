@@ -101,7 +101,14 @@ public class Spectrum {
 					voltageTmp2.add(0.0);
 					from = to;
 					to = from + bin;
+//					System.out.println("bin = " + from);
 				}
+				
+//				if(mzTmp.size()>0){
+//					for(Double d : mzTmp2){
+//						System.out.println("bin = " + d);
+//					}
+//				}
 				// loop through the created bins
 				int low = -1;
 				int cnt = -1;
@@ -148,7 +155,7 @@ public class Spectrum {
 				length = mzTmp2.size();
 				check = true;
 			}catch(Exception ex){
-				ex.printStackTrace();
+				//ex.printStackTrace();
 			}
 		}
 	}

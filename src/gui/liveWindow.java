@@ -208,7 +208,7 @@ public class liveWindow extends Thread {
 							Spectrum spectrum = new Spectrum(
 									path.toString() + File.separator + file.toString(), 
 									null,
-									(int)profile.getBinSize(),
+									profile.getBinSize(),
 									profile.getDevice());
 							if(distanceMeasure.equals("euclidean distance")){
 								ClassificationResult res = profile.euclideanDistance(spectrum);
