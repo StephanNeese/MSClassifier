@@ -71,7 +71,7 @@ public class classificationWindow extends JFrame {
 			InstantiationException, 
 			IllegalAccessException, 
 			UnsupportedLookAndFeelException {
-		super("setup for classification of Mass-spectograms");
+		super("setup for classification of Mass-spectras");
 		initGui();
 	}
 	

@@ -36,7 +36,7 @@ public class Reader {
 		
 		for(String path : group){
 			// group name
-			String groupName = path.replace(rootPath+File.separator, "").replaceAll("/", "-");
+			String groupName = path.replace(rootPath+File.separator, "").replaceAll("/", "-").replaceAll("\\\\", "-");
 			String[] csv = readFolder(path);
 			for(int i=0; i<csv.length; i++){
 				tmp.add(new Spectrum(csv[i], groupName, binSize, device));

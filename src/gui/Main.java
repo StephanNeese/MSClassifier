@@ -73,11 +73,11 @@ public class Main extends JFrame {
 		newDB.setBounds(10, 20, 380, 50);
 		main.add(newDB);
 		
-		testDB = new JButton("test a profile");
+		testDB = new JButton("score plot of profile");
 		testDB.setBounds(10, 80, 380, 50);
 		main.add(testDB);
 		
-		classification = new JButton("classify spectograms");
+		classification = new JButton("classify spectrums");
 		classification.setBounds(10, 140, 380, 50);
 		main.add(classification);
 		

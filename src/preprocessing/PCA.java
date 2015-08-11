@@ -140,7 +140,10 @@ public class PCA {
 	 * @return the final data as 2d double array 
 	 * with samples in columns and dimensions along rows
 	 */
-	private static PCADataSet getFinalData(EigenVector[] features, SpectraMatrix data, double varianceCovered) {
+	private static PCADataSet getFinalData(
+			EigenVector[] features, 
+			SpectraMatrix data, 
+			double varianceCovered) {
 		double[][] originalData = data.getData();
 		double[][] originalDataTransposed = transpose(originalData);
 		// already transposed when extracted

@@ -155,7 +155,7 @@ public class LDA {
 			fractions.put(cls, ((double)matrix.length)/((double)data.length));
 		}
 		
-		// calc global covariance matrix
+		// calc global pooled covariance matrix
 		for(int i=0; i<res.length; i++){
 			for(int j=0; j<res[0].length; j++){
 				// add up the values from all covariance matrices * their fraction

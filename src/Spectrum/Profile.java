@@ -23,7 +23,7 @@ public class Profile {
 	private final double variance;			// covered variance by profile
 	private final String[] sampleGroups;	// sampleGroups of original csv files 
 	private final double[][] data;			// pca transformed data [dimensions][samples]
-	private final double[][] features;		// feature vector (used for transformation)
+	private final double[][] features;		// feature vector (used for transformation) [vectors][dimensions]
 	private final double mzStart;
 	private final double mzEnd;
 	// inv. cov. matrices of classes
@@ -33,9 +33,10 @@ public class Profile {
 	private final double originalMean;		// mean of all spectras and dimensions of untransformed
 	private final double binSize;			// size of a bin
 	// lda data
-	private final double[][] ldaCovarianceMatrix;
-	private final double[] globalMean;
-	private final double[] fractions;
+	private final double[][] ldaCovarianceMatrix;	// pooled cov. matrix
+	private final double[] globalMean;				// means of pca dimensions - used for centering sample
+	private final double[] fractions;				// amount of samples of all samples that belong
+													// a single group
 
 	/** constructs a Profile Object
 	 * 

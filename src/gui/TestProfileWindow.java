@@ -55,7 +55,7 @@ public class TestProfileWindow extends JFrame {
 			InstantiationException, 
 			IllegalAccessException, 
 			UnsupportedLookAndFeelException {
-		super("Plotting a profile");
+		super("score plot of a profile");
 		initGui();
 	}
 	

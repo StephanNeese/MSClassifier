@@ -7,7 +7,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -60,7 +62,7 @@ public class liveClassificationWindow extends JFrame {
 			InstantiationException, 
 			IllegalAccessException, 
 			UnsupportedLookAndFeelException {
-		super("setup for classification of Mass-spectograms");
+		super("setup for classification of Mass-spectras");
 		initGui();
 	}
 	
@@ -288,6 +290,10 @@ public class liveClassificationWindow extends JFrame {
 								watch = new liveWindow("live", folderPath, profilePath, savePath, distanceMeasure, cutoffValue);
 								watch.start();
 							} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException | FileNotFoundException | UnsupportedEncodingException ex) {
+								Logger.getLogger(liveClassificationWindow.class.getName()).log(Level.SEVERE, null, ex);
+							} catch (IOException ex) {
+								Logger.getLogger(liveClassificationWindow.class.getName()).log(Level.SEVERE, null, ex);
+							} catch (ParseException ex) {
 								Logger.getLogger(liveClassificationWindow.class.getName()).log(Level.SEVERE, null, ex);
 							}
 						}
