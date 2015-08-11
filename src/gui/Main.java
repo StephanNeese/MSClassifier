@@ -77,7 +77,7 @@ public class Main extends JFrame {
 		testDB.setBounds(10, 80, 380, 50);
 		main.add(testDB);
 		
-		classification = new JButton("classify spectrums");
+		classification = new JButton("classify spectra");
 		classification.setBounds(10, 140, 380, 50);
 		main.add(classification);
 		
