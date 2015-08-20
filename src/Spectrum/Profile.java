@@ -277,7 +277,7 @@ public class Profile {
 		adjustRangeOfSpectrum(spectrum);
 		
 		// normalize and center the spectrum
-		spectrum.normalizationDivideByMean(originalMean);
+		//spectrum.normalizationDivideByMean(originalMean);
 		spectrum.center(originalMeans);
 		// transform the spectrum into PCA space
 		double[] pca_spectrum = PCA.transformSpectrum(spectrum, features);
@@ -339,7 +339,7 @@ public class Profile {
 		adjustRangeOfSpectrum(spectrum);
 		
 		// normalize and center the spectrum
-		spectrum.normalizationDivideByMean(originalMean);
+		//spectrum.normalizationDivideByMean(originalMean);
 		spectrum.center(originalMeans);
 		// transform the spectrum into PCA space
 		double[] pca_spectrum = PCA.transformSpectrum(spectrum, features);
@@ -385,7 +385,7 @@ public class Profile {
 		adjustRangeOfSpectrum(spectrum);
 		
 		// normalize and center the spectrum
-		spectrum.normalizationDivideByMean(originalMean);
+		//spectrum.normalizationDivideByMean(originalMean);
 		spectrum.center(originalMeans);
 		// transform the spectrum into PCA space
 		double[] pca_spectrum = PCA.transformSpectrum(spectrum, features);

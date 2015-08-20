@@ -82,7 +82,7 @@ public class SpectraMatrix {
 		}
 		
 		mean = calculateMean();
-		this.normalizationDivideByMean();
+		//this.normalizationDivideByMean();
 		dimensionsMean = calculateDimensionMeans();
 	}
 	
@@ -256,6 +256,10 @@ public class SpectraMatrix {
 	@Override
 	public String toString() {
 		String res = "";
+		for(int bin=0; bin<mz.length; bin++){
+			res += "\t" + mz[bin];
+		}
+		res += "\n";
 		for(int spec=0; spec<voltage.length; spec++){
 			res += "Spectrum " + spec;
 			for(int mzVal=0; mzVal<voltage[spec].length; mzVal++){
@@ -266,21 +270,7 @@ public class SpectraMatrix {
 		
 		return res;
 	}
-	
-	public void print() throws FileNotFoundException, UnsupportedEncodingException{
-		PrintWriter writer = new PrintWriter("/home/wens/xyz.csv", "UTF-8");
-		for(int mzVal=0; mzVal<mz.length; mzVal++){
-				writer.print("\t" + mz[mzVal]);
-			}
-		writer.println("");
-		for(int spec=0; spec<voltage.length; spec++){
-			writer.print(groups[spec]); 
-			for(int mzVal=0; mzVal<voltage[spec].length; mzVal++){
-				writer.print("\t" + voltage[spec][mzVal]);
-			}
-			writer.println("");
-		}
-	}
+
 	
 	/** writes the spectraMatrix to a csv file
 	 * 

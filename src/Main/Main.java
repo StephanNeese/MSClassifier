@@ -36,16 +36,17 @@ public class Main {
 		
 		String[] profilePath = readProfilePaths(args[0]);
 		
-		SpectraMatrix data = Reader.readData(profilePath, args[0], Double.parseDouble(args[1]), "Exactive");
+		SpectraMatrix data = Reader.readData(profilePath, args[0], Double.parseDouble(args[1]), "Mini 11");
 		PCADataSet pca_data = PCA.performPCA(data, Double.parseDouble(args[2]));
 		LDADataSet lda_data = LDA.performLDA(pca_data, data);
+
 		
 		// create profile
 		ProfileBuilder.build(
 				pca_data, 
 				lda_data,
 				data, 
-				"Exactive", 
+				"Mini 11", 
 				args[0], 
 				args[3]+"/"+args[4], 
 				1.0);
@@ -67,13 +68,14 @@ public class Main {
 				+ "\tassigned class MD\tMDdistance\tMDscore"
 				+ "\tassigned class LDA\tLDAcoefficient\tLDAscore");
 		
+		
 		// classify
 		for(int i=0; i<csv.length; i++){
-			Spectrum spectrum = new Spectrum(csv[i], null, profile.getBinSize(), "Exactive");
+			Spectrum spectrum = new Spectrum(csv[i], null, profile.getBinSize(), "Mini 11");
 			ClassificationResult res_ed = profile.euclideanDistance(spectrum);
-			spectrum = new Spectrum(csv[i], null, profile.getBinSize(), "Exactive");
+			spectrum = new Spectrum(csv[i], null, profile.getBinSize(), "Mini 11");
 			ClassificationResult res_md = profile.mahalanobisDistance(spectrum);
-			spectrum = new Spectrum(csv[i], null, profile.getBinSize(), "Exactive");
+			spectrum = new Spectrum(csv[i], null, profile.getBinSize(), "Mini 11");
 			ClassificationResult res_lda = profile.ldaCoefficient(spectrum);
 			writer.println(spectrum.getFilename() + "\t" 
 					+ res_ed.getAssignedClass() + "\t" 

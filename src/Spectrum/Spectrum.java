@@ -79,7 +79,7 @@ public class Spectrum {
 						}else{
 							lineTmp = text.split("\t");
 						}
-						mzTmp.add(Double.parseDouble(lineTmp[0])); 
+						mzTmp.add(Double.parseDouble(lineTmp[0]));
 						voltageTmp.add(Double.parseDouble(lineTmp[1]));
 					}
 					// check if we reached the headline of the csv table
@@ -89,7 +89,7 @@ public class Spectrum {
 					}
 				}
 			
-				/** binning **/
+				/** create bins **/
 				ArrayList<Double> mzTmp2 = new ArrayList<>();
 				ArrayList<Double> voltageTmp2 = new ArrayList<>();
 				// first bin
@@ -101,15 +101,10 @@ public class Spectrum {
 					voltageTmp2.add(0.0);
 					from = to;
 					to = from + bin;
-//					System.out.println("bin = " + from);
 				}
 				
-//				if(mzTmp.size()>0){
-//					for(Double d : mzTmp2){
-//						System.out.println("bin = " + d);
-//					}
-//				}
 				// loop through the created bins
+				// and bin the voltage values
 				int low = -1;
 				int cnt = -1;
 				for(int i=1; i<mzTmp2.size(); i++){
@@ -141,7 +136,11 @@ public class Spectrum {
 				voltage = new double[voltageTmp2.size()];
 				for(int i=0; i<mzTmp2.size(); i++){
 					mz[i] = mzTmp2.get(i);
-					voltage[i] = voltageTmp2.get(i);
+					if(voltageTmp2.get(i)>0){
+						voltage[i] = Math.log10(voltageTmp2.get(i));
+					}else{
+						voltage[i] = voltageTmp2.get(i);
+					}
 				}
 		
 				if(System.getProperty("os.name").startsWith("Windows")){
