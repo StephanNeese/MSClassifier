@@ -82,7 +82,7 @@ public class SpectraMatrix {
 		}
 		
 		mean = calculateMean();
-		//this.normalizationDivideByMean();
+		this.normalizationDivideByMean();
 		dimensionsMean = calculateDimensionMeans();
 	}
 	

@@ -22,6 +22,7 @@ public class Main extends JFrame {
 	JPanel main;
 	JButton newDB;
 	JButton testDB;
+	JButton crossValidation;
 	JButton classification;
 	JButton liveClassification;
 	
@@ -58,7 +59,7 @@ public class Main extends JFrame {
 		setLayout(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		setSize(400, 300);
+		setSize(400, 350);
 		setVisible(true);
 		setResizable(false);
 		// positon on screen
@@ -77,18 +78,22 @@ public class Main extends JFrame {
 		testDB.setBounds(10, 80, 380, 50);
 		main.add(testDB);
 		
+		crossValidation = new JButton("cross validation of profile parameters");
+		crossValidation.setBounds(10, 140, 380, 50);
+		main.add(crossValidation);
+		
 		classification = new JButton("classify spectra");
-		classification.setBounds(10, 140, 380, 50);
+		classification.setBounds(10, 200, 380, 50);
 		main.add(classification);
 		
 		liveClassification = new JButton("live classification");
-		liveClassification.setBounds(10, 200, 380, 50);
+		liveClassification.setBounds(10, 260, 380, 50);
 		main.add(liveClassification);
 		
 		add(main);
 		main.setVisible(true);
 		main.setLayout(null); 
-		main.setBounds(0, 0, 400, 300);
+		main.setBounds(0, 0, 400, 340);
 	}
 	
 	/** This method makes the program usable. 
@@ -126,6 +131,29 @@ public class Main extends JFrame {
 					public void actionPerformed(ActionEvent e) {
 						try {
 							TestProfileWindow x = new TestProfileWindow();
+							setVisible(false);
+							x.runProgram();
+						} catch (InstantiationException ex) {
+							Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+						} catch (IllegalAccessException ex) {
+							Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+						} catch (UnsupportedLookAndFeelException ex) {
+							Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+						} catch (ClassNotFoundException ex) {
+							Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+						}
+					}
+					
+				}
+		);
+		
+		crossValidation.addActionListener(
+				new ActionListener(){
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						try {
+							crossValidationWindow x = new crossValidationWindow();
 							setVisible(false);
 							x.runProgram();
 						} catch (InstantiationException ex) {

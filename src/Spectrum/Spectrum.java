@@ -136,11 +136,7 @@ public class Spectrum {
 				voltage = new double[voltageTmp2.size()];
 				for(int i=0; i<mzTmp2.size(); i++){
 					mz[i] = mzTmp2.get(i);
-					if(voltageTmp2.get(i)>0){
-						voltage[i] = Math.log10(voltageTmp2.get(i));
-					}else{
-						voltage[i] = voltageTmp2.get(i);
-					}
+					voltage[i] = voltageTmp2.get(i);
 				}
 		
 				if(System.getProperty("os.name").startsWith("Windows")){
