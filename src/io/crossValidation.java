@@ -1,13 +1,26 @@
 package io;
 
+import Spectrum.ClassificationResult;
+import Spectrum.Profile;
 import Spectrum.SpectraMatrix;
+import Spectrum.Spectrum;
 import gui.NewProfileWindow;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,13 +34,15 @@ import preprocessing.PCADataSet;
 public class crossValidation {
 	
 	public static void validate(
-			String crossValidationLocation,
 			String[] paths, 
 			String rootPath, 
 			double binSize,
 			double varianceCovered,
 			String machineName,
-			File cvDir) throws IOException{
+			String cvDir,
+			String resultsDir) throws IOException, 
+			FileNotFoundException, 
+			ParseException{
 		HashMap<String, String[]> files = new HashMap<>();
 		
 		// load files into hash
@@ -42,8 +57,8 @@ public class crossValidation {
 		// repeat until everything has been used for profile creation and classification
 		for(int i=0; i<10; i++){
 			// create folders for profile csv files and classification csv files
-			File profileDir = new File(cvDir.getAbsolutePath() + File.separator + "profile");
-			File classDir = new File(cvDir.getAbsolutePath() + File.separator + "data");
+			File profileDir = new File(cvDir + File.separator + "profile");
+			File classDir = new File(cvDir + File.separator + "data");
 			if(profileDir.exists()){
 				profileDir.delete();
 				profileDir.mkdir();
@@ -89,9 +104,7 @@ public class crossValidation {
 			}
 			
 			// now make profile and classify
-			String profileName = crossValidationLocation 
-					+ File.separator  
-					+ "crossValidation" 
+			String profileName = cvDir
 					+ File.separator 
 					+ "profiles" 
 					+ File.separator 
@@ -100,11 +113,16 @@ public class crossValidation {
 					+ ".profile";
 			makeProfile(paths, rootPath, binSize, varianceCovered, machineName, profileName);
 			// classify
-			classify();
+			String results = resultsDir + File.separator + "results" + i + ".csv";
+			classify(
+					profileName, 
+					classDir.getAbsolutePath(),
+					results,
+					machineName);
 		}
 		
-		// evaluate
-		evaluate();
+		// evaluate everything
+		evaluate(resultsDir);
 	}
 	
 	private static void makeProfile(
@@ -132,11 +150,75 @@ public class crossValidation {
 		}
 	}
 	
-	private static void classify(){
+	private static void classify(
+			String profileName, 
+			String classDir, 
+			String results,
+			String machine)
+			throws IOException, 
+			FileNotFoundException, 
+			ParseException{
+		// open profile
+		Profile profile = Reader.readProfile(profileName);
 		
+		// open folder with csv files to classify
+		String[] csv = Reader.readFolder(classDir);
+		
+		// open output file
+		PrintWriter writer = new PrintWriter(results, "UTF-8");
+		DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+		Date date = new Date();
+		writer.println("created: " + df.format(date));
+		writer.println("csv files from: " + classDir);
+		writer.println("profile used: " + profileName);
+		writer.println("Filename\tassigned class ED\tEDdistance\tEDscore"
+				+ "\tassigned class MD\tMDdistance\tMDscore"
+				+ "\tassigned class LDA\tLDAcoefficient\tLDAscore");
+		
+		// classify
+		for(int i=0; i<csv.length; i++){
+			Spectrum spectrum = new Spectrum(csv[i], null, profile.getBinSize(), machine);
+			ClassificationResult res_ed = profile.euclideanDistance(spectrum);
+			spectrum = new Spectrum(csv[i], null, profile.getBinSize(), machine);
+			ClassificationResult res_md = profile.mahalanobisDistance(spectrum);
+			spectrum = new Spectrum(csv[i], null, profile.getBinSize(), machine);
+			ClassificationResult res_lda = profile.ldaCoefficient(spectrum);
+			writer.println(spectrum.getFilename() + "\t" 
+					+ res_ed.getAssignedClass() + "\t" 
+					+ res_ed.getDistance() + "\t" 
+					+ res_ed.getScore() + "\t" 
+					+ res_md.getAssignedClass() + "\t" 
+					+ res_md.getDistance() + "\t" 
+					+ res_md.getScore() + "\t" 
+					+ res_lda.getAssignedClass() + "\t" 
+					+ res_lda.getDistance() + "\t" 
+					+ res_lda.getScore() 
+			);
+		}
+		writer.close();
 	}
 	
-	private static void evaluate(){
+	private static void evaluate(String resultsDir) 
+			throws FileNotFoundException, IOException{
+		// read all result csv files from folder
+		String[] results = Reader.readFolder(resultsDir);
 		
+		// read results tables into List
+		List<String> table = new ArrayList<>();
+		for(String file : results){
+			BufferedReader buff = new BufferedReader(new FileReader(file));
+			String text = null;
+			while ((text = buff.readLine()) != null) {
+				if(!(text.startsWith("created:")) 
+						&& !(text.startsWith("csv files from:"))
+						&& !(text.startsWith("profile used:"))
+						&& !(text.startsWith("Filename"))){
+					table.add(text);
+				}
+			}
+		}
+		
+		//rename files according to group they belong to
+		// so they can be checked by their filename
 	}
 }

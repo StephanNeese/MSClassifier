@@ -11,7 +11,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -340,22 +342,28 @@ public class crossValidationWindow extends JFrame {
 								cvDir.mkdir();
 							}
 							// make subfolders data, profiles and results
-							File data = new File(crossValidationLocation + File.separator + "crossValidation" + File.separator + "data");
+							File data = new File(cvDir.getAbsolutePath() + File.separator + "data");
 							data.mkdir();
-							File profiles = new File(crossValidationLocation + File.separator  + "crossValidation" + File.separator + "profiles");
+							File profiles = new File(cvDir.getAbsolutePath() + File.separator + "profiles");
 							profiles.mkdir();
-							File results = new File(crossValidationLocation + File.separator  + "crossValidation" + File.separator + "results");
+							File results = new File(cvDir.getAbsolutePath() + File.separator + "results");
 							results.mkdir();
 							try {
-								// carry out cross validation
-								crossValidation.validate(
-										crossValidationLocation,
-										profilePaths, 
-										rootPath, 
-										Double.parseDouble(binTmp),
-										Double.parseDouble(varianceTmp),
-										machineName,
-										cvDir);
+								try {
+									// carry out cross validation
+									crossValidation.validate(
+											profilePaths,
+											rootPath,
+											Double.parseDouble(binTmp),
+											Double.parseDouble(varianceTmp),
+											machineName,
+											cvDir.getAbsolutePath(),
+											results.getAbsolutePath());
+								} catch (FileNotFoundException ex) {
+									Logger.getLogger(crossValidationWindow.class.getName()).log(Level.SEVERE, null, ex);
+								} catch (ParseException ex) {
+									Logger.getLogger(crossValidationWindow.class.getName()).log(Level.SEVERE, null, ex);
+								}
 							} catch (IOException ex) {
 								Logger.getLogger(crossValidationWindow.class.getName()).log(Level.SEVERE, null, ex);
 							}
