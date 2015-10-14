@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -81,8 +82,10 @@ public class crossValidation {
 				subDir.mkdir();
 				// split content from paths
 				// start and end index for files to classify
-				int start = (e.getValue().length/10*i)+1;
-				int end = (e.getValue().length/10)*(i+1);
+				double startTmp = ((double)e.getValue().length/10*i)+1;
+				int start = (int)startTmp;
+				double endTmp = ((double)e.getValue().length/10)*(i+1);
+				int end = (int)endTmp;
 				// load into files from subdir into 
 				// classification dir if they fall inbetween
 				// start and end
@@ -92,8 +95,10 @@ public class crossValidation {
 					String fileName = file.getName();
 					if(j>=(start-1) && j<=(end-1)){
 						// into classification folder
+						// with correct group in front of filename
+						// for evaluation of the cross validation process
 						Files.copy(new File(e.getValue()[j]).toPath(), 
-								new File(classDir.getAbsolutePath() + File.separator + fileName).toPath(), 
+								new File(classDir.getAbsolutePath() + File.separator + e.getKey() + "_" + fileName).toPath(), 
 								StandardCopyOption.REPLACE_EXISTING);
 					}else{
 						// into profile folder
@@ -172,7 +177,8 @@ public class crossValidation {
 		writer.println("created: " + df.format(date));
 		writer.println("csv files from: " + classDir);
 		writer.println("profile used: " + profileName);
-		writer.println("Filename\tassigned class ED\tEDdistance\tEDscore"
+		writer.println("Filename"
+				+ "\tassigned class ED\tEDdistance\tEDscore"
 				+ "\tassigned class MD\tMDdistance\tMDscore"
 				+ "\tassigned class LDA\tLDAcoefficient\tLDAscore");
 		
@@ -219,10 +225,37 @@ public class crossValidation {
 			}
 		}
 		
-		//rename files according to group they belong to
-		// so they can be checked by their filename
+		int EDcnt = 0;
+		int MDcnt = 0;
+		int LDAcnt = 0;
+		// beginning of the filenames is their actual group
 		for(String s : table){
-			System.out.println(s);
+			String[] line = s.split("\t");
+			// count as correctly classified
+			// iff name of file start with assigned group
+			if(line[0].startsWith(line[1])){
+				EDcnt++;
+			}
+			if(line[0].startsWith(line[4])){
+				MDcnt++;
+			}
+			if(line[0].startsWith(line[7])){
+				LDAcnt++;
+			}
 		}
+		
+		String msg = "Cross validation results:\n"
+				+ "euclidean distance: " + new DecimalFormat("##.##").format((double)EDcnt/table.size()*100) + "%"
+				+ " which are " + EDcnt + " out of " + table.size() + "\n"
+				+ "mahalanobis distance: " + new DecimalFormat("##.##").format((double)MDcnt/table.size()*100) + "%"
+				+ " which are " + MDcnt + " out of " + table.size() + "\n"
+				+ "LDA coefficient: " + new DecimalFormat("##.##").format((double)LDAcnt/table.size()*100) + "%"
+				+ " which are " + LDAcnt + " out of " + table.size() + "\n";
+		
+		JFrame frame = new JFrame();
+		JOptionPane.showMessageDialog(frame, 
+			msg, 
+			"Results", 
+			JOptionPane.INFORMATION_MESSAGE);
 	}
 }

@@ -202,8 +202,10 @@ public class crossValidationWindow extends JFrame {
 						if (result == JFileChooser.APPROVE_OPTION){
 							
 							rootPath = fileChooser.getSelectedFile().getAbsolutePath();
+							root.removeAllChildren();
 							root.setUserObject(fileChooser.getSelectedFile().getName());
 							listFolders(rootPath, root);
+							treeModel.reload(root);
 							tree.repaint();
 							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 						}else if(result != JFileChooser.APPROVE_OPTION){
@@ -346,7 +348,6 @@ public class crossValidationWindow extends JFrame {
 							}else{
 								cvDir.mkdir();
 							}
-							System.out.println(cvDir.getAbsolutePath());
 							// make subfolders data, profiles and results
 							File data = new File(cvDir.getAbsolutePath() + File.separator + "data");
 							data.mkdir();
