@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import org.apache.commons.io.FileUtils;
 import preprocessing.LDA;
 import preprocessing.LDADataSet;
 import preprocessing.PCA;
@@ -60,19 +61,19 @@ public class crossValidation {
 			File profileDir = new File(cvDir + File.separator + "profile");
 			File classDir = new File(cvDir + File.separator + "data");
 			if(profileDir.exists()){
-				profileDir.delete();
+				FileUtils.deleteDirectory(profileDir);
 				profileDir.mkdir();
 			}else{
 				profileDir.mkdir();
 			}
 			if(classDir.exists()){
-				classDir.delete();
+				FileUtils.deleteDirectory(classDir);
 				classDir.mkdir();
 			}else{
 				classDir.mkdir();
 			}
 			
-			// split content of subdirs (paths)
+			// split content of groups
 			// into a profile part and a classification part
 			for(Map.Entry<String, String[]> e : files.entrySet()){
 				// create folder for group
@@ -198,7 +199,7 @@ public class crossValidation {
 		writer.close();
 	}
 	
-	private static void evaluate(String resultsDir) 
+	public static void evaluate(String resultsDir) 
 			throws FileNotFoundException, IOException{
 		// read all result csv files from folder
 		String[] results = Reader.readFolder(resultsDir);
@@ -220,5 +221,8 @@ public class crossValidation {
 		
 		//rename files according to group they belong to
 		// so they can be checked by their filename
+		for(String s : table){
+			System.out.println(s);
+		}
 	}
 }

@@ -40,6 +40,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import org.apache.commons.io.FileUtils;
 import preprocessing.LDA;
 import preprocessing.LDADataSet;
 import preprocessing.PCA;
@@ -283,7 +284,7 @@ public class crossValidationWindow extends JFrame {
 						
 						// if file is selected 
 						if (result == JFileChooser.APPROVE_OPTION){
-							crossValidationFolder.setText(fileChooser.getSelectedFile().getAbsolutePath() + ".profile");
+							crossValidationFolder.setText(fileChooser.getSelectedFile().getAbsolutePath());
 							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 						}else if(result != JFileChooser.APPROVE_OPTION){
 							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
@@ -336,11 +337,16 @@ public class crossValidationWindow extends JFrame {
 							// make cross validation folder
 							File cvDir = new File(crossValidationLocation + File.separator + "crossValidation");
 							if(cvDir.exists() && cvDir.isDirectory()){
-								cvDir.delete();
-								cvDir.mkdir();
+								try {
+									FileUtils.deleteDirectory(cvDir);
+									cvDir.mkdir();
+								} catch (IOException ex) {
+									Logger.getLogger(crossValidationWindow.class.getName()).log(Level.SEVERE, null, ex);
+								}
 							}else{
 								cvDir.mkdir();
 							}
+							System.out.println(cvDir.getAbsolutePath());
 							// make subfolders data, profiles and results
 							File data = new File(cvDir.getAbsolutePath() + File.separator + "data");
 							data.mkdir();
