@@ -1,5 +1,6 @@
 package Spectrum;
 
+import io.Reader;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -81,6 +82,7 @@ public class SpectraMatrix {
 			}
 		}
 		
+		// mean centering
 		mean = calculateMean();
 		this.normalizationDivideByMean();
 		dimensionsMean = calculateDimensionMeans();
@@ -298,5 +300,25 @@ public class SpectraMatrix {
 		}
 		
 		writer.close();
+	}
+	
+	
+	/**
+	 * 
+	 * @param path 
+	 */
+	public void substractBackground(SpectraMatrix background){
+		// get the mean values for all the m/z bins  of the background Spectras
+		double[] meanSpectrum = background.getDimensionsMean();
+		// substract the means of the background
+		for(int i=0; i<voltage.length; i++){
+			for(int j=0; j<voltage[0].length; j++){
+				if((voltage[i][j] - meanSpectrum[j])<0){
+					voltage[i][j] = 0;
+				}else{
+					voltage[i][j] -= meanSpectrum[j];
+				}
+			}
+		}
 	}
 }

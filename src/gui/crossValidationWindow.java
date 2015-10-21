@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -67,6 +68,11 @@ public class crossValidationWindow extends JFrame {
 	JTextField bin;
 	JLabel varianceLabel;
 	JTextField variance;
+	JLabel backgroundLabel;
+	JTextField background;
+	JButton backgroundSearch;
+	JLabel logLabel;
+	JCheckBox log;
 	JButton cancel;
 	JButton go;
 	JButton help;
@@ -97,19 +103,19 @@ public class crossValidationWindow extends JFrame {
 		setLayout(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		setSize(640, 400);
+		setSize(640, 470);
 		setVisible(true);
 		setResizable(false);
 		// positon on screen
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		int x = (dim.width-640)/2;
-		int y = (dim.height-320)/2;
+		int y = (dim.height-470)/2;
 		this.setLocation(x, y);
 		
 		main = new JPanel();
 		main.setVisible(true);
 		main.setLayout(null); 
-		main.setBounds(0, 0, 640, 400);
+		main.setBounds(0, 0, 640, 470);
 		
 		databaseLabel = new JLabel("chose the folders containing the csv files");
 		root = new DefaultMutableTreeNode("please choose folder");
@@ -118,10 +124,10 @@ public class crossValidationWindow extends JFrame {
 		databasePane = new JScrollPane(tree, 
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, 
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		databasePane.setBounds(10, 30, 300, 240);
+		databasePane.setBounds(10, 30, 300, 310);
 		databaseLabel.setBounds(10, 10, 280, 15);
 		databaseButton = new JButton("choose root folder");
-		databaseButton.setBounds(10, 280, 150, 30);
+		databaseButton.setBounds(10, 350, 150, 30);
 		main.add(databaseLabel);
 		main.add(databasePane);
 		main.add(databaseButton);
@@ -159,16 +165,33 @@ public class crossValidationWindow extends JFrame {
 		main.add(crossValidationFolder);
 		main.add(crossValidationFolderSearch);
 		
+		backgroundLabel = new JLabel("Path to background spectra");
+		background = new JTextField();
+		backgroundSearch = new JButton("search");
+		backgroundLabel.setBounds(330, 290, 250, 15);
+		background.setBounds(330, 310, 200, 30);
+		backgroundSearch.setBounds(540, 310, 90, 30);
+		main.add(backgroundLabel);
+		main.add(background);
+		main.add(backgroundSearch);
+		
+		logLabel = new JLabel("log transformation");
+		logLabel.setBounds(360, 357, 200, 15);
+		main.add(logLabel);
+		log = new JCheckBox();
+		log.setBounds(330, 350, 30, 30);
+		main.add(log);
+		
 		cancel = new JButton("cancel");
-		cancel.setBounds(420, 330, 100, 30);
+		cancel.setBounds(420, 400, 100, 30);
 		main.add(cancel);
 		
 		go = new JButton("go");
-		go.setBounds(530, 330, 100, 30);
+		go.setBounds(530, 400, 100, 30);
 		main.add(go);
 		
 		help = new JButton("help");
-		help.setBounds(10, 330, 100, 30);
+		help.setBounds(10, 400, 100, 30);
 		main.add(help);
 		
 		add(main);
@@ -313,6 +336,30 @@ public class crossValidationWindow extends JFrame {
 				}
 		);
 		
+		backgroundSearch.addActionListener(
+				new ActionListener(){
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						JFileChooser fileChooser = new JFileChooser();
+						// set only directories and disable "all files" option
+						fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+						fileChooser.setAcceptAllFileFilterUsed(false);
+						
+						JFrame frame = new JFrame();
+						int result = fileChooser.showOpenDialog(frame);
+						
+						// if file is selected 
+						if (result == JFileChooser.APPROVE_OPTION){
+							background.setText(fileChooser.getSelectedFile().getAbsolutePath());
+							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+						}else if(result != JFileChooser.APPROVE_OPTION){
+							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+						}
+					}
+				}
+		);
+		
 		go.addActionListener(new ActionListener(){
 					
 					/** calculate distances for spectras when pressed
@@ -327,6 +374,7 @@ public class crossValidationWindow extends JFrame {
 						String crossValidationLocation = crossValidationFolder.getText();
 						String binTmp = bin.getText();
 						String varianceTmp = variance.getText();
+						String backgroundPath = background.getText();
 						
 						// check parameters first
 						if(!("".equals(checkParams(profilePaths, crossValidationLocation, binTmp, varianceTmp)))){
@@ -365,7 +413,9 @@ public class crossValidationWindow extends JFrame {
 											Double.parseDouble(varianceTmp),
 											machineName,
 											cvDir.getAbsolutePath(),
-											results.getAbsolutePath());
+											results.getAbsolutePath(),
+											backgroundPath,
+											log.isSelected());
 								} catch (FileNotFoundException ex) {
 									Logger.getLogger(crossValidationWindow.class.getName()).log(Level.SEVERE, null, ex);
 								} catch (ParseException ex) {

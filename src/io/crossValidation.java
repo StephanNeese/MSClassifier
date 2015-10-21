@@ -42,7 +42,8 @@ public class crossValidation {
 			double varianceCovered,
 			String machineName,
 			String cvDir,
-			String resultsDir) throws IOException, 
+			String resultsDir,
+			String background, boolean log) throws IOException, 
 			FileNotFoundException, 
 			ParseException{
 		HashMap<String, String[]> files = new HashMap<>();
@@ -117,7 +118,7 @@ public class crossValidation {
 					+ "profile" 
 					+ i 
 					+ ".profile";
-			makeProfile(paths, rootPath, binSize, varianceCovered, machineName, profileName);
+			makeProfile(paths, rootPath, binSize, varianceCovered, machineName, profileName, background, log);
 			// classify
 			String results = resultsDir + File.separator + "results" + i + ".csv";
 			classify(
@@ -137,9 +138,25 @@ public class crossValidation {
 			double binSize,
 			double varianceCovered,
 			String machineName,
-			String profileName){
+			String profileName,
+			String background,
+			boolean log){
 		try{
-			SpectraMatrix data = Reader.readData(profilePaths, rootPath, binSize, machineName);
+			SpectraMatrix data = Reader.readData(profilePaths, rootPath, binSize, machineName, log);
+			// substract background
+			if(!("".equals(background))){
+				try{
+					String bgPath[] = {background};
+					SpectraMatrix bg = Reader.readData(bgPath, background, binSize, machineName, log);
+					data.substractBackground(bg);
+				}catch(Exception ex){
+					JFrame frame = new JFrame();						
+					JOptionPane.showMessageDialog(frame, 
+						"The path to the background csv files can't be accessed!",
+						"Invalid Input", 
+						JOptionPane.ERROR_MESSAGE);
+					}
+			}
 			PCADataSet pca_data = PCA.performPCA(data, varianceCovered);
 			LDADataSet lda_data = LDA.performLDA(pca_data, data);
 			// create profile

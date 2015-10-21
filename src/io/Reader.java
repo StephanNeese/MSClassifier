@@ -31,7 +31,7 @@ public class Reader {
 	 * @return a SpectraMatrix Object created from all the csv files in the directory
 	 * @throws IOException 
 	 */
-	public static SpectraMatrix readData(String[] group, String rootPath, double binSize, String device) throws IOException{
+	public static SpectraMatrix readData(String[] group, String rootPath, double binSize, String device, boolean log) throws IOException{
 		ArrayList<Spectrum> tmp = new ArrayList<>();
 		
 		for(String path : group){

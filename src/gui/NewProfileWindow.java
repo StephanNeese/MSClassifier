@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.DefaultListModel;
+import javax.swing.JCheckBox;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListModel;
@@ -68,6 +69,11 @@ public class NewProfileWindow extends JFrame {
 	JTextField bin;
 	JLabel varianceLabel;
 	JTextField variance;
+	JLabel backgroundLabel;
+	JTextField background;
+	JButton backgroundSearch;
+	JLabel logLabel;
+	JCheckBox log;
 	JButton cancel;
 	JButton create;
 	JButton help;
@@ -103,19 +109,19 @@ public class NewProfileWindow extends JFrame {
 		setLayout(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		setSize(640, 400);
+		setSize(640, 470);
 		setVisible(true);
 		setResizable(false);
 		// positon on screen
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		int x = (dim.width-640)/2;
-		int y = (dim.height-320)/2;
+		int y = (dim.height-470)/2;
 		this.setLocation(x, y);
 		
 		main = new JPanel();
 		main.setVisible(true);
 		main.setLayout(null); 
-		main.setBounds(0, 0, 640, 400);
+		main.setBounds(0, 0, 640, 470);
 		
 		databaseLabel = new JLabel("chose the folders containing the csv files");
 		root = new DefaultMutableTreeNode("please choose folder");
@@ -124,10 +130,10 @@ public class NewProfileWindow extends JFrame {
 		databasePane = new JScrollPane(tree, 
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, 
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		databasePane.setBounds(10, 30, 300, 240);
+		databasePane.setBounds(10, 30, 300, 310);
 		databaseLabel.setBounds(10, 10, 280, 15);
 		databaseButton = new JButton("choose root folder");
-		databaseButton.setBounds(10, 280, 150, 30);
+		databaseButton.setBounds(10, 350, 150, 30);
 		main.add(databaseLabel);
 		main.add(databasePane);
 		main.add(databaseButton);
@@ -165,16 +171,33 @@ public class NewProfileWindow extends JFrame {
 		main.add(profile);
 		main.add(profileSearch);
 		
+		backgroundLabel = new JLabel("Path to background spectra");
+		background = new JTextField();
+		backgroundSearch = new JButton("search");
+		backgroundLabel.setBounds(330, 290, 250, 15);
+		background.setBounds(330, 310, 200, 30);
+		backgroundSearch.setBounds(540, 310, 90, 30);
+		main.add(backgroundLabel);
+		main.add(background);
+		main.add(backgroundSearch);
+		
+		logLabel = new JLabel("log transformation");
+		logLabel.setBounds(360, 357, 200, 15);
+		main.add(logLabel);
+		log = new JCheckBox();
+		log.setBounds(330, 350, 30, 30);
+		main.add(log);
+		
 		cancel = new JButton("cancel");
-		cancel.setBounds(420, 330, 100, 30);
+		cancel.setBounds(420, 400, 100, 30);
 		main.add(cancel);
 		
 		create = new JButton("create");
-		create.setBounds(530, 330, 100, 30);
+		create.setBounds(530, 400, 100, 30);
 		main.add(create);
 		
 		help = new JButton("help");
-		help.setBounds(10, 330, 100, 30);
+		help.setBounds(10, 400, 100, 30);
 		main.add(help);
 		
 		add(main);
@@ -208,8 +231,10 @@ public class NewProfileWindow extends JFrame {
 						if (result == JFileChooser.APPROVE_OPTION){
 							
 							rootPath = fileChooser.getSelectedFile().getAbsolutePath();
+							root.removeAllChildren();
 							root.setUserObject(fileChooser.getSelectedFile().getName());
 							listFolders(rootPath, root);
+							treeModel.reload(root);
 							tree.repaint();
 							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 						}else if(result != JFileChooser.APPROVE_OPTION){
@@ -317,6 +342,30 @@ public class NewProfileWindow extends JFrame {
 				}
 		);
 		
+		backgroundSearch.addActionListener(
+				new ActionListener(){
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						JFileChooser fileChooser = new JFileChooser();
+						// set only directories and disable "all files" option
+						fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+						fileChooser.setAcceptAllFileFilterUsed(false);
+						
+						JFrame frame = new JFrame();
+						int result = fileChooser.showOpenDialog(frame);
+						
+						// if file is selected 
+						if (result == JFileChooser.APPROVE_OPTION){
+							background.setText(fileChooser.getSelectedFile().getAbsolutePath());
+							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+						}else if(result != JFileChooser.APPROVE_OPTION){
+							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+						}
+					}
+				}
+		);
+		
 		create.addActionListener(new ActionListener(){
 					
 					/** calculate distances for spectras when pressed
@@ -331,6 +380,7 @@ public class NewProfileWindow extends JFrame {
 						String profileName = profile.getText();
 						String binTmp = bin.getText();
 						String varianceTmp = variance.getText();
+						String backgroundPath = background.getText();
 						
 						// check parameters first
 						if(!("".equals(checkParams(profilePaths, profileName, binTmp, varianceTmp)))){
@@ -343,7 +393,21 @@ public class NewProfileWindow extends JFrame {
 							double binSize = Double.parseDouble(binTmp);
 							double varianceCovered = Double.parseDouble(varianceTmp);
 							try{
-								SpectraMatrix data = Reader.readData(profilePaths, rootPath, binSize, machineName);
+								SpectraMatrix data = Reader.readData(profilePaths, rootPath, binSize, machineName, log.isSelected());
+								// substract background
+								if(!("".equals(backgroundPath))){
+									try{
+										String bgPath[] = {backgroundPath};
+										SpectraMatrix bg = Reader.readData(bgPath, backgroundPath, binSize, machineName, log.isSelected());
+										data.substractBackground(bg);
+									}catch(Exception ex){
+										JFrame frame = new JFrame();						
+										JOptionPane.showMessageDialog(frame, 
+											"The path to the background csv files can't be accessed!",
+											"Invalid Input", 
+											JOptionPane.ERROR_MESSAGE);
+										}
+								}
 								PCADataSet pca_data = PCA.performPCA(data, varianceCovered);
 								LDADataSet lda_data = LDA.performLDA(pca_data, data);
 								// create profile
