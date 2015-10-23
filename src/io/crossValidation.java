@@ -43,7 +43,8 @@ public class crossValidation {
 			String machineName,
 			String cvDir,
 			String resultsDir,
-			String background, boolean log) throws IOException, 
+			String background, 
+			boolean log) throws IOException, 
 			FileNotFoundException, 
 			ParseException{
 		HashMap<String, String[]> files = new HashMap<>();
@@ -125,7 +126,8 @@ public class crossValidation {
 					profileName, 
 					classDir.getAbsolutePath(),
 					results,
-					machineName);
+					machineName,
+					log);
 		}
 		
 		// evaluate everything
@@ -177,7 +179,8 @@ public class crossValidation {
 			String profileName, 
 			String classDir, 
 			String results,
-			String machine)
+			String machine,
+			boolean log)
 			throws IOException, 
 			FileNotFoundException, 
 			ParseException{
@@ -201,11 +204,11 @@ public class crossValidation {
 		
 		// classify
 		for(int i=0; i<csv.length; i++){
-			Spectrum spectrum = new Spectrum(csv[i], null, profile.getBinSize(), machine);
+			Spectrum spectrum = new Spectrum(csv[i], null, profile.getBinSize(), machine, log);
 			ClassificationResult res_ed = profile.euclideanDistance(spectrum);
-			spectrum = new Spectrum(csv[i], null, profile.getBinSize(), machine);
+			spectrum = new Spectrum(csv[i], null, profile.getBinSize(), machine, log);
 			ClassificationResult res_md = profile.mahalanobisDistance(spectrum);
-			spectrum = new Spectrum(csv[i], null, profile.getBinSize(), machine);
+			spectrum = new Spectrum(csv[i], null, profile.getBinSize(), machine, log);
 			ClassificationResult res_lda = profile.ldaCoefficient(spectrum);
 			writer.println(spectrum.getFilename() + "\t" 
 					+ res_ed.getAssignedClass() + "\t" 

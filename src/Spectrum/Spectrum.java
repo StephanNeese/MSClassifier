@@ -19,20 +19,6 @@ public class Spectrum {
 	private String group;			// the group of this sample
 	private int length;				// num dimensions
 	
-	/** constructs a spectrum from given values
-	 * 
-	 * @param mz array with mz values
-	 * @param voltage array with voltage values
-	 * @param filename the filename as identifier
-	 * @param group ssigned group of this spectrum
-	 */
-	public Spectrum(double[] mz, double[] voltage, String filename, String group){
-		this.mz = mz;
-		this.voltage = voltage;
-		this.filename = filename;
-		this.group = group;
-		length = mz.length;
-	}
 	
 	/** constructs a spectrum from a file
 	 * 
@@ -40,8 +26,8 @@ public class Spectrum {
 	 * @param group assigned group of this spectrum
 	 * @param bin size of a bin
 	 */
-	public Spectrum(String path, String group, double bin, String device){
-		readCSV(path, bin, device);
+	public Spectrum(String path, String group, double bin, String device, boolean log){
+		readCSV(path, bin, device, log);
 		this.group = group;
 	}
 	
@@ -52,7 +38,7 @@ public class Spectrum {
 	 * @throws FileNotFoundException
 	 * @throws IOException 
 	 */
-	private void readCSV(String path, double bin, String device){
+	private void readCSV(String path, double bin, String device, boolean log){
 		File csv = new File(path);
 		
 		/* continuous loop until file can be opened
@@ -136,7 +122,16 @@ public class Spectrum {
 				voltage = new double[voltageTmp2.size()];
 				for(int i=0; i<mzTmp2.size(); i++){
 					mz[i] = mzTmp2.get(i);
-					voltage[i] = voltageTmp2.get(i);
+					// check for log transformation
+					if(log){
+						if(voltageTmp2.get(i) > 0){
+							voltage[i] = Math.log(voltageTmp2.get(i));
+						}else{
+							voltage[i] = 0.0;
+						}
+					}else{
+						voltage[i] = voltageTmp2.get(i);
+					}
 				}
 		
 				if(System.getProperty("os.name").startsWith("Windows")){
@@ -150,7 +145,7 @@ public class Spectrum {
 				length = mzTmp2.size();
 				check = true;
 			}catch(Exception ex){
-				//ex.printStackTrace();
+				// print nothing
 			}
 		}
 	}

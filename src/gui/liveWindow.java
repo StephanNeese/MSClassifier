@@ -212,7 +212,8 @@ public class liveWindow extends Thread {
 									path.toString() + File.separator + file.toString(), 
 									null,
 									profile.getBinSize(),
-									profile.getDevice());
+									profile.getDevice(), 
+									profile.getLog());
 							if(distanceMeasure.equals("euclidean distance")){
 								ClassificationResult res = profile.euclideanDistance(spectrum);
 								filename.setText(file.toString());

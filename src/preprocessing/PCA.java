@@ -115,9 +115,11 @@ public class PCA {
 		for(int i=0; i<eigenVectors.length; i++){
 			sum += eigenVectors[i].getEigenValue();
 		}
+		// get eigenvectors until variance cover is reached
+		// OR the maximum Number of dimensions is reached (max. = 60)
 		double varianceCovered = 0;
 		int index = eigenVectors.length-1;
-		while((varianceCovered/sum) <= variance){
+		while((varianceCovered/sum) <= variance && (((eigenVectors.length-1) - index)<60)){
 			varianceCovered += eigenVectors[index].getEigenValue();
 			index--;
 		}

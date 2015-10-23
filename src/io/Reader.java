@@ -39,7 +39,7 @@ public class Reader {
 			String groupName = path.replace(rootPath+File.separator, "").replaceAll("/", "-").replaceAll("\\\\", "-");
 			String[] csv = readFolder(path);
 			for(int i=0; i<csv.length; i++){
-				tmp.add(new Spectrum(csv[i], groupName, binSize, device));
+				tmp.add(new Spectrum(csv[i], groupName, binSize, device, log));
 			}
 		}
 		
@@ -102,6 +102,7 @@ public class Reader {
 		String device = null;
 		String inputPath = null;
 		double variance = 0.0;
+		boolean log = false;
 		String[] sampleGroups = null;
 		double[] originalMeans = null;
 		double originalMean = 0;
@@ -139,6 +140,9 @@ public class Reader {
 			}else if(tmp.startsWith("variance:")){
 				String[] content = segment[i].split("\t");
 				variance = Double.parseDouble(content[1]);
+			}else if(tmp.startsWith("log:")){
+				String[] content = segment[i].split("\t");
+				log = Boolean.parseBoolean(content[1]);
 			}else if(tmp.startsWith("groups:")){
 				String[] content = segment[i].split("\n");
 				sampleGroups = new String[content.length-1];
@@ -223,6 +227,7 @@ public class Reader {
 				device, 
 				inputPath, 
 				variance, 
+				log,
 				sampleGroups, 
 				data, 
 				features,

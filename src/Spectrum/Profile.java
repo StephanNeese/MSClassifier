@@ -21,6 +21,7 @@ public class Profile {
 	private final String device;			// MS device
 	private final String path;				// path to profile (original path)
 	private final double variance;			// covered variance by profile
+	private final boolean log;				// log transformation of data or not?
 	private final String[] sampleGroups;	// sampleGroups of original csv files 
 	private final double[][] data;			// pca transformed data [dimensions][samples]
 	private final double[][] features;		// feature vector (used for transformation) [vectors][dimensions]
@@ -62,6 +63,7 @@ public class Profile {
 			String device, 
 			String path, 
 			double variance, 
+			boolean log,
 			String[] sampleGroups, 
 			double[][] data, 
 			double[][] features,
@@ -80,6 +82,7 @@ public class Profile {
 		this.device = device;
 		this.path = path;
 		this.variance = variance;
+		this.log = log;
 		this.sampleGroups = sampleGroups;
 		this.data = data;
 		this.features = features;
@@ -226,6 +229,15 @@ public class Profile {
 	 */
 	public double[] getFractions() {
 		return fractions;
+	}
+	
+	/** returns the boolean value to declare if
+	 * log transformation was applied on this profiles data.
+	 * 
+	 * @return boolean true if log transformation was applied, false otherwise
+	 */
+	public boolean getLog(){
+		return log;
 	}
 
 	@Override
