@@ -159,6 +159,7 @@ public class crossValidation {
 						JOptionPane.ERROR_MESSAGE);
 					}
 			}
+			data.deleteEmptyBins();
 			PCADataSet pca_data = PCA.performPCA(data, varianceCovered);
 			LDADataSet lda_data = LDA.performLDA(pca_data, data);
 			// create profile

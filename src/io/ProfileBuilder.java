@@ -114,8 +114,16 @@ public class ProfileBuilder {
 			writer.println();
 		}
 		writer.println("//#");
+		
 		// print the mz range
-		writer.println("mz-range:\t" + bins[0] + "\t" + bins[bins.length-1]);
+		// all bins are printed into profile 
+		// because empty bins can have been deleted during creation
+		writer.print("mz-range:");
+		for(int i=0; i<bins.length; i++){
+			writer.print("\t" + bins[i]);
+		}
+		writer.println();
+		
 		writer.println("//#");
 		// print the inverse covariance matrices for each group
 		writer.println("covariances:");

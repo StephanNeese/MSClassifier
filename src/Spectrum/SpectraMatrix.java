@@ -158,6 +158,51 @@ public class SpectraMatrix {
 		}
 	}
 	
+	/** searches for bins in the SpectraMatrix
+	 * that are empty among all spectras 
+	 * and deletes them. <b>CAUTION: For consistency always
+	 * call this method after substractBackground(SpectraMatrix background) </b>
+	 * 
+	 */
+	public void deleteEmptyBins(){
+		ArrayList<Double> mzTmp = new ArrayList<>();
+		double[][] voltTmp = new double[voltage.length][voltage[0].length];
+		
+		int cnt = 0;
+		for(int mzCnt=0; mzCnt<voltage[0].length; mzCnt++){
+			// loop through all spectras for this mz bin
+			// if the bin is not 0.0000001 in at least one spectra
+			// then its not empty
+			boolean empty = true;
+			for(int spec=0; spec<voltage.length; spec++){
+				if(voltage[spec][mzCnt]>0.0000001){
+					// not empty
+					empty = false;
+				}
+			}
+			// if the bin is empty do not load it into tmp variables
+			if(!empty){
+				mzTmp.add(mz[mzCnt]);
+				for(int spec=0; spec<voltage.length; spec++){
+					voltTmp[spec][cnt] = voltage[spec][mzCnt];
+				}
+				cnt++;
+			}
+		}
+		
+		// load tmp variables into class variables
+		mz = new double[mzTmp.size()];
+		for(int i=0; i<mzTmp.size(); i++){
+			mz[i] = mzTmp.get(i);
+		}
+		voltage = new double[voltTmp.length][cnt];
+		for(int spec=0; spec<voltTmp.length; spec++){
+			for(int mzCnt=0; mzCnt<cnt; mzCnt++){
+				voltage[spec][mzCnt] = voltTmp[spec][mzCnt];
+			}
+		}
+	}
+	
 	/** returns the mz array
 	 * 
 	 * @return mz values as double array

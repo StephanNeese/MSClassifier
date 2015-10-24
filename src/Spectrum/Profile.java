@@ -1,5 +1,6 @@
 package Spectrum;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import preprocessing.LDA;
@@ -27,6 +28,7 @@ public class Profile {
 	private final double[][] features;		// feature vector (used for transformation) [vectors][dimensions]
 	private final double mzStart;
 	private final double mzEnd;
+	private final double[] bins;			// all m/z bins
 	// inv. cov. matrices of classes
 	private HashMap<String, double[][]> invertedCovarianceMatrices;
 	private final double[][] mean;			// [class][dimension]
@@ -69,6 +71,7 @@ public class Profile {
 			double[][] features,
 			double mzStart,
 			double mzEnd,
+			double[] bins,
 			HashMap<String, double[][]> invertedCovarianceMatrices,
 			double[][] mean,
 			double[] originalMeans,
@@ -88,6 +91,7 @@ public class Profile {
 		this.features = features;
 		this.mzStart = mzStart;
 		this.mzEnd = mzEnd;
+		this.bins = bins;
 		this.invertedCovarianceMatrices = invertedCovarianceMatrices;
 		this.mean = mean;
 		this.originalMeans = originalMeans;
@@ -287,6 +291,7 @@ public class Profile {
 	 */
 	public ClassificationResult mahalanobisDistance(Spectrum spectrum){
 		adjustRangeOfSpectrum(spectrum);
+		deleteEmptyBins(spectrum);
 		
 		// normalize and center the spectrum
 		spectrum.normalizationDivideByMean(originalMean);
@@ -349,6 +354,7 @@ public class Profile {
 	 */
 	public ClassificationResult euclideanDistance(Spectrum spectrum){
 		adjustRangeOfSpectrum(spectrum);
+		deleteEmptyBins(spectrum);
 		
 		// normalize and center the spectrum
 		spectrum.normalizationDivideByMean(originalMean);
@@ -395,6 +401,7 @@ public class Profile {
 	 */
 	public ClassificationResult ldaCoefficient(Spectrum spectrum){
 		adjustRangeOfSpectrum(spectrum);
+		deleteEmptyBins(spectrum);
 		
 		// normalize and center the spectrum
 		spectrum.normalizationDivideByMean(originalMean);
@@ -579,5 +586,46 @@ public class Profile {
 			spectrum.setVoltage(voltTmp);
 			spectrum.setLength(size-fillBins);
 		}
+	}
+	
+	/** Deletes all the bins in the spectrum that are not in the
+	 * profile. These bins are missing 
+	 * because they were empty on creation of the profile
+	 * 
+	 * @param spectrum the spectrum to delete bins from
+	 */
+	private void deleteEmptyBins(Spectrum spectrum){
+		double[] mzSpec = spectrum.getMz();
+		double[] voltSpec = spectrum.getVoltage();
+		HashMap<Double, Boolean> exists = new HashMap<>();
+		// load all values from spectrum into hash
+		for(int i=0; i<mzSpec.length; i++){
+			exists.put(mzSpec[i], false);
+		}
+		// check if they are in the profile
+		for(int i=0; i<bins.length; i++){
+			if(exists.containsKey(bins[i])){
+				exists.put(bins[i], true);
+			}
+		}
+		// load existing into tmp variables and then convert to arrays
+		ArrayList<Double> mzTmp = new ArrayList<>();
+		ArrayList<Double> voltTmp = new ArrayList<>();
+		for(int i=0; i<mzSpec.length; i++){
+			if(exists.get(mzSpec[i])){
+				mzTmp.add(mzSpec[i]);
+				voltTmp.add(voltSpec[i]);
+			}
+		}
+		// convert to Arrays
+		double[] mzFinal = new double[mzTmp.size()];
+		double[] voltFinal = new double[voltTmp.size()];
+		for(int i=0; i<mzTmp.size(); i++){
+			mzFinal[i] = mzTmp.get(i);
+			voltFinal[i] = voltTmp.get(i);
+		}
+		
+		spectrum.setMz(mzFinal);
+		spectrum.setVoltage(voltFinal);
 	}
 }
