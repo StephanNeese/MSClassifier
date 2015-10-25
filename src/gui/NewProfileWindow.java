@@ -25,6 +25,7 @@ import preprocessing.PCA;
 import preprocessing.PCADataSet;
 import io.ProfileBuilder;
 import io.Reader;
+import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,9 +49,9 @@ import preprocessing.LDADataSet;
  * 
  * @author Stephan Neese
  */
-public class NewProfileWindow extends JFrame {
+public class NewProfileWindow extends JPanel {
 	
-	JPanel main;
+//	JPanel main;
 	JLabel databaseLabel;
 	DefaultMutableTreeNode root;
 	DefaultTreeModel treeModel;
@@ -90,8 +91,85 @@ public class NewProfileWindow extends JFrame {
 			InstantiationException, 
 			IllegalAccessException, 
 			UnsupportedLookAndFeelException {
-		super("Creation of a new profile");
-		initGui();
+		super(new BorderLayout());
+		setLayout(null);
+		
+		databaseLabel = new JLabel("chose the folders containing the csv files");
+		root = new DefaultMutableTreeNode("please choose folder");
+		treeModel = new DefaultTreeModel(root);
+		tree = new CheckBoxTree(treeModel);
+		databasePane = new JScrollPane(tree, 
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, 
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		databasePane.setBounds(10, 30, 300, 310);
+		databaseLabel.setBounds(10, 10, 280, 15);
+		databaseButton = new JButton("choose root folder");
+		databaseButton.setBounds(10, 350, 150, 30);
+		this.add(databaseLabel);
+		this.add(databasePane);
+		this.add(databaseButton);
+		
+		machineLabel = new JLabel("Type of machine");
+		machine = new JComboBox();
+		machine.addItem("Mini 11");
+		machine.addItem("Exactive");
+		machineLabel.setBounds(330, 10, 200, 15);
+		machine.setBounds(330, 30, 300, 30);
+		this.add(machineLabel);
+		this.add(machine);
+		
+		binLabel = new JLabel("Size of a bin");
+		bin = new JTextField();
+		binLabel.setBounds(330, 80, 200, 15);
+		bin.setBounds(330, 100, 300, 30);
+		this.add(binLabel);
+		this.add(bin);
+		
+		varianceLabel = new JLabel("variance covered");
+		variance = new JTextField();
+		varianceLabel.setBounds(330, 150, 200, 15);
+		variance.setBounds(330, 170, 300, 30);
+		this.add(varianceLabel);
+		this.add(variance);
+		
+		profileLabel = new JLabel("Name and path of the profile");
+		profile = new JTextField();
+		profileSearch = new JButton("search");
+		profileLabel.setBounds(330, 220, 250, 15);
+		profile.setBounds(330, 240, 200, 30);
+		profileSearch.setBounds(540, 240, 90, 30);
+		this.add(profileLabel);
+		this.add(profile);
+		this.add(profileSearch);
+		
+		backgroundLabel = new JLabel("Path to background spectra");
+		background = new JTextField();
+		backgroundSearch = new JButton("search");
+		backgroundLabel.setBounds(330, 290, 250, 15);
+		background.setBounds(330, 310, 200, 30);
+		backgroundSearch.setBounds(540, 310, 90, 30);
+		this.add(backgroundLabel);
+		this.add(background);
+		this.add(backgroundSearch);
+		
+		logLabel = new JLabel("log transformation");
+		logLabel.setBounds(360, 357, 200, 15);
+		this.add(logLabel);
+		log = new JCheckBox();
+		log.setBounds(330, 350, 30, 30);
+		this.add(log);
+		
+		cancel = new JButton("cancel");
+		cancel.setBounds(420, 400, 100, 30);
+		this.add(cancel);
+		
+		create = new JButton("create");
+		create.setBounds(530, 400, 100, 30);
+		this.add(create);
+		
+		help = new JButton("help");
+		help.setBounds(10, 400, 100, 30);
+		this.add(help);
 	}
 	
 	/** initializes and places all the GUI elements
@@ -106,101 +184,101 @@ public class NewProfileWindow extends JFrame {
 			InstantiationException, 
 			IllegalAccessException, 
 			UnsupportedLookAndFeelException {
-		setLayout(null);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		setSize(640, 470);
-		setVisible(true);
-		setResizable(false);
-		// positon on screen
-		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		int x = (dim.width-640)/2;
-		int y = (dim.height-470)/2;
-		this.setLocation(x, y);
-		
-		main = new JPanel();
-		main.setVisible(true);
-		main.setLayout(null); 
-		main.setBounds(0, 0, 640, 470);
-		
-		databaseLabel = new JLabel("chose the folders containing the csv files");
-		root = new DefaultMutableTreeNode("please choose folder");
-		treeModel = new DefaultTreeModel(root);
-		tree = new CheckBoxTree(treeModel);
-		databasePane = new JScrollPane(tree, 
-				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, 
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		databasePane.setBounds(10, 30, 300, 310);
-		databaseLabel.setBounds(10, 10, 280, 15);
-		databaseButton = new JButton("choose root folder");
-		databaseButton.setBounds(10, 350, 150, 30);
-		main.add(databaseLabel);
-		main.add(databasePane);
-		main.add(databaseButton);
-		
-		machineLabel = new JLabel("Type of machine");
-		machine = new JComboBox();
-		machine.addItem("Mini 11");
-		machine.addItem("Exactive");
-		machineLabel.setBounds(330, 10, 200, 15);
-		machine.setBounds(330, 30, 300, 30);
-		main.add(machineLabel);
-		main.add(machine);
-		
-		binLabel = new JLabel("Size of a bin");
-		bin = new JTextField();
-		binLabel.setBounds(330, 80, 200, 15);
-		bin.setBounds(330, 100, 300, 30);
-		main.add(binLabel);
-		main.add(bin);
-		
-		varianceLabel = new JLabel("variance covered");
-		variance = new JTextField();
-		varianceLabel.setBounds(330, 150, 200, 15);
-		variance.setBounds(330, 170, 300, 30);
-		main.add(varianceLabel);
-		main.add(variance);
-		
-		profileLabel = new JLabel("Name and path of the profile");
-		profile = new JTextField();
-		profileSearch = new JButton("search");
-		profileLabel.setBounds(330, 220, 250, 15);
-		profile.setBounds(330, 240, 200, 30);
-		profileSearch.setBounds(540, 240, 90, 30);
-		main.add(profileLabel);
-		main.add(profile);
-		main.add(profileSearch);
-		
-		backgroundLabel = new JLabel("Path to background spectra");
-		background = new JTextField();
-		backgroundSearch = new JButton("search");
-		backgroundLabel.setBounds(330, 290, 250, 15);
-		background.setBounds(330, 310, 200, 30);
-		backgroundSearch.setBounds(540, 310, 90, 30);
-		main.add(backgroundLabel);
-		main.add(background);
-		main.add(backgroundSearch);
-		
-		logLabel = new JLabel("log transformation");
-		logLabel.setBounds(360, 357, 200, 15);
-		main.add(logLabel);
-		log = new JCheckBox();
-		log.setBounds(330, 350, 30, 30);
-		main.add(log);
-		
-		cancel = new JButton("cancel");
-		cancel.setBounds(420, 400, 100, 30);
-		main.add(cancel);
-		
-		create = new JButton("create");
-		create.setBounds(530, 400, 100, 30);
-		main.add(create);
-		
-		help = new JButton("help");
-		help.setBounds(10, 400, 100, 30);
-		main.add(help);
-		
-		add(main);
+//		setLayout(null);
+////		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//		setSize(640, 470);
+//		setVisible(true);
+////		setResizable(false);
+//		// positon on screen
+//		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+//		int x = (dim.width-640)/2;
+//		int y = (dim.height-470)/2;
+//		this.setLocation(x, y);
+//		
+//		main = new JPanel();
+//		main.setVisible(true);
+//		main.setLayout(null); 
+//		main.setBounds(0, 0, 640, 470);
+//		
+//		databaseLabel = new JLabel("chose the folders containing the csv files");
+//		root = new DefaultMutableTreeNode("please choose folder");
+//		treeModel = new DefaultTreeModel(root);
+//		tree = new CheckBoxTree(treeModel);
+//		databasePane = new JScrollPane(tree, 
+//				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, 
+//				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+//		databasePane.setBounds(10, 30, 300, 310);
+//		databaseLabel.setBounds(10, 10, 280, 15);
+//		databaseButton = new JButton("choose root folder");
+//		databaseButton.setBounds(10, 350, 150, 30);
+//		this.add(databaseLabel);
+//		this.add(databasePane);
+//		this.add(databaseButton);
+//		
+//		machineLabel = new JLabel("Type of machine");
+//		machine = new JComboBox();
+//		machine.addItem("Mini 11");
+//		machine.addItem("Exactive");
+//		machineLabel.setBounds(330, 10, 200, 15);
+//		machine.setBounds(330, 30, 300, 30);
+//		this.add(machineLabel);
+//		this.add(machine);
+//		
+//		binLabel = new JLabel("Size of a bin");
+//		bin = new JTextField();
+//		binLabel.setBounds(330, 80, 200, 15);
+//		bin.setBounds(330, 100, 300, 30);
+//		this.add(binLabel);
+//		this.add(bin);
+//		
+//		varianceLabel = new JLabel("variance covered");
+//		variance = new JTextField();
+//		varianceLabel.setBounds(330, 150, 200, 15);
+//		variance.setBounds(330, 170, 300, 30);
+//		this.add(varianceLabel);
+//		this.add(variance);
+//		
+//		profileLabel = new JLabel("Name and path of the profile");
+//		profile = new JTextField();
+//		profileSearch = new JButton("search");
+//		profileLabel.setBounds(330, 220, 250, 15);
+//		profile.setBounds(330, 240, 200, 30);
+//		profileSearch.setBounds(540, 240, 90, 30);
+//		this.add(profileLabel);
+//		this.add(profile);
+//		this.add(profileSearch);
+//		
+//		backgroundLabel = new JLabel("Path to background spectra");
+//		background = new JTextField();
+//		backgroundSearch = new JButton("search");
+//		backgroundLabel.setBounds(330, 290, 250, 15);
+//		background.setBounds(330, 310, 200, 30);
+//		backgroundSearch.setBounds(540, 310, 90, 30);
+//		this.add(backgroundLabel);
+//		this.add(background);
+//		this.add(backgroundSearch);
+//		
+//		logLabel = new JLabel("log transformation");
+//		logLabel.setBounds(360, 357, 200, 15);
+//		this.add(logLabel);
+//		log = new JCheckBox();
+//		log.setBounds(330, 350, 30, 30);
+//		this.add(log);
+//		
+//		cancel = new JButton("cancel");
+//		cancel.setBounds(420, 400, 100, 30);
+//		this.add(cancel);
+//		
+//		create = new JButton("create");
+//		create.setBounds(530, 400, 100, 30);
+//		this.add(create);
+//		
+//		help = new JButton("help");
+//		help.setBounds(10, 400, 100, 30);
+//		this.add(help);
+//		
+//		add(main);
 	}
 	
 	/** initializes all the ActionListeners 
