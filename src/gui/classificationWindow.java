@@ -33,15 +33,16 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Pattern;
+import javax.swing.ImageIcon;
+import javax.swing.JSeparator;
 
 /** This class is the window for
  * non live classification.
  * 
  * @author Stephan Neese
  */
-public class classificationWindow extends JFrame {
+public class classificationWindow extends JPanel {
 	
-	private JPanel main;
 	private JLabel folderLabel;
 	private JTextField folder;
 	private JButton folderSearch;
@@ -55,6 +56,7 @@ public class classificationWindow extends JFrame {
 	private JButton saveSearch;
 	private JLabel cutoffLabel;
 	private JTextField cutoff;
+	private JSeparator sep;
 	private JButton cancel;
 	private JButton classify;
 	private JButton help;
@@ -71,8 +73,10 @@ public class classificationWindow extends JFrame {
 			InstantiationException, 
 			IllegalAccessException, 
 			UnsupportedLookAndFeelException {
-		super("setup for classification of Mass-spectra");
+		super(new BorderLayout());
+		setLayout(null);
 		initGui();
+		runProgram();
 	}
 	
 	/** initializes and places all the GUI elements
@@ -87,83 +91,85 @@ public class classificationWindow extends JFrame {
 			InstantiationException, 
 			IllegalAccessException, 
 			UnsupportedLookAndFeelException{
-		setLayout(null);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		setSize(640, 310);
-		setVisible(true);
-		setResizable(false);
-		// positon on screen
-		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		int x = (dim.width-640)/2;
-		int y = (dim.height-310)/2;
-		this.setLocation(x, y);
-		
-		main = new JPanel();
+//		setLayout(null);
+//		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//		setSize(640, 310);
+//		setVisible(true);
+//		setResizable(false);
+//		// positon on screen
+//		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+//		int x = (dim.width-640)/2;
+//		int y = (dim.height-310)/2;
+//		this.setLocation(x, y);
+//		
+//		main = new JPanel();
 		
 		folderLabel = new JLabel("folder with CSV files");
 		folder = new JTextField();
 		folderSearch = new JButton("search");
-		folderLabel.setBounds(10, 10, 200, 15);
-		folder.setBounds(10, 30, 200, 30);
-		folderSearch.setBounds(220, 30, 90, 30);
-		main.add(folderLabel);
-		main.add(folder);
-		main.add(folderSearch);
+		folderLabel.setBounds(100, 10, 200, 15);
+		folder.setBounds(100, 30, 310, 30);
+		folderSearch.setBounds(420, 30, 90, 30);
+		this.add(folderLabel);
+		this.add(folder);
+		this.add(folderSearch);
 		
 		profileLabel = new JLabel("path to the profile file");
 		profile = new JTextField();
 		profileSearch = new JButton("search");
-		profileLabel.setBounds(330, 10, 200, 15);
-		profile.setBounds(330, 30, 200, 30);
-		profileSearch.setBounds(540, 30, 90, 30);
-		main.add(profileLabel);
-		main.add(profile);
-		main.add(profileSearch);
+		profileLabel.setBounds(100, 80, 200, 15);
+		profile.setBounds(100, 100, 310, 30);
+		profileSearch.setBounds(420, 100, 90, 30);
+		this.add(profileLabel);
+		this.add(profile);
+		this.add(profileSearch);
 		
 		distanceLabel = new JLabel("distance measure");
 		distance = new JComboBox();
 		distance.addItem("euclidean distance");
 		distance.addItem("mahalanobis distance");
 		distance.addItem("LDA coefficient");
-		distanceLabel.setBounds(10, 80, 200, 15);
-		distance.setBounds(10, 100, 299, 25);
-		main.add(distanceLabel);
-		main.add(distance);
+		distanceLabel.setBounds(100, 150, 200, 15);
+		distance.setBounds(100, 170, 410, 25);
+		this.add(distanceLabel);
+		this.add(distance);
 		
 		saveLabel = new JLabel("where to save the results");
 		save = new JTextField();
 		saveSearch = new JButton("search");
-		saveLabel.setBounds(330, 80, 200, 15);
-		save.setBounds(330, 100, 200, 30);
-		saveSearch.setBounds(540, 100, 90, 30);
-		main.add(saveLabel);
-		main.add(save);
-		main.add(saveSearch);
+		saveLabel.setBounds(100, 220, 200, 15);
+		save.setBounds(100, 240, 310, 30);
+		saveSearch.setBounds(420, 240, 90, 30);
+		this.add(saveLabel);
+		this.add(save);
+		this.add(saveSearch);
 		
 		cutoffLabel = new JLabel("minimal score for results to classify");
 		cutoff = new JTextField();
-		cutoffLabel.setBounds(10, 145, 200, 15);
-		cutoff.setBounds(10, 165, 299, 30);
-		main.add(cutoffLabel);
-		main.add(cutoff);
+		cutoffLabel.setBounds(100, 290, 300, 15);
+		cutoff.setBounds(100, 310, 410, 30);
+		this.add(cutoffLabel);
+		this.add(cutoff);
+		
+		sep = new JSeparator();
+		sep.setBounds(10, 405, 620, 10);
+		this.add(sep);
 		
 		cancel = new JButton("cancel");
-		cancel.setBounds(420, 240, 100, 30);
-		main.add(cancel);
+		cancel.setBounds(420, 420, 100, 35);
+		cancel.setIcon(new ImageIcon(this.getClass().getResource("img/exit.png")));
+		this.add(cancel);
 		
 		classify = new JButton("classify");
-		classify.setBounds(530, 240, 100, 30);
-		main.add(classify);
+		classify.setBounds(530, 420, 100, 35);
+		classify.setIcon(new ImageIcon(this.getClass().getResource("img/go.png")));
+		this.add(classify);
 		
 		help = new JButton("help");
-		help.setBounds(10, 240, 100, 30);
-		main.add(help);
-		
-		add(main);
-		main.setVisible(true);
-		main.setLayout(null); 
-		main.setBounds(0, 0, 640, 310);
+		help.setBounds(10, 420, 100, 35);
+		help.setIcon(new ImageIcon(this.getClass().getResource("img/help.png")));
+		this.add(help);
 	}
 	
 	/** initializes all the ActionListeners 

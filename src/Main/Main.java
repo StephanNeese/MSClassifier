@@ -25,7 +25,7 @@ public class Main {
 	
 	public static void main(String[] args) throws IOException, Exception {
 		
-		crossValidation.evaluate("/home/wens/cross-validation/crossValidation/results");
+//		crossValidation.evaluate("/home/wens/cross-validation/crossValidation/results");
 		
 		/*
 		args[0] = root directory path
@@ -37,9 +37,12 @@ public class Main {
 		args[6] = output file for results
 		*/
 //		
-//		String[] profilePath = readProfilePaths(args[0]);
+		String[] profilePath = readProfilePaths("/home/wens/mini_all");
 //		
-//		SpectraMatrix data = Reader.readData(profilePath, args[0], Double.parseDouble(args[1]), "Mini 11");
+		SpectraMatrix data = Reader.readData(profilePath, "/home/wens/mini_all", 2.0, "Mini 11", true);
+		data.deleteEmptyBins();
+		data.calculateDimensionMeans();
+		data.center();
 //		PCADataSet pca_data = PCA.performPCA(data, Double.parseDouble(args[2]));
 //		LDADataSet lda_data = LDA.performLDA(pca_data, data);
 //

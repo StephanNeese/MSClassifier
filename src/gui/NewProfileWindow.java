@@ -31,9 +31,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.ListModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.TreeSelectionEvent;
@@ -75,6 +77,7 @@ public class NewProfileWindow extends JPanel {
 	JButton backgroundSearch;
 	JLabel logLabel;
 	JCheckBox log;
+	JSeparator sep;
 	JButton cancel;
 	JButton create;
 	JButton help;
@@ -93,6 +96,38 @@ public class NewProfileWindow extends JPanel {
 			UnsupportedLookAndFeelException {
 		super(new BorderLayout());
 		setLayout(null);
+		initGui();
+		runProgram();
+	}
+	
+	/** initializes and places all the GUI elements
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws UnsupportedLookAndFeelException 
+	 */
+	private void initGui()
+			throws ClassNotFoundException, 
+			InstantiationException, 
+			IllegalAccessException, 
+			UnsupportedLookAndFeelException {
+//		setLayout(null);
+////		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//		setSize(640, 470);
+//		setVisible(true);
+////		setResizable(false);
+//		// positon on screen
+//		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+//		int x = (dim.width-640)/2;
+//		int y = (dim.height-470)/2;
+//		this.setLocation(x, y);
+//		
+//		main = new JPanel();
+//		main.setVisible(true);
+//		main.setLayout(null); 
+//		main.setBounds(0, 0, 640, 470);
 		
 		databaseLabel = new JLabel("chose the folders containing the csv files");
 		root = new DefaultMutableTreeNode("please choose folder");
@@ -159,126 +194,24 @@ public class NewProfileWindow extends JPanel {
 		log.setBounds(330, 350, 30, 30);
 		this.add(log);
 		
+		sep = new JSeparator();
+		sep.setBounds(10, 405, 620, 10);
+		this.add(sep);
+		
 		cancel = new JButton("cancel");
-		cancel.setBounds(420, 400, 100, 30);
+		cancel.setBounds(420, 420, 100, 35);
+		cancel.setIcon(new ImageIcon(this.getClass().getResource("img/exit.png")));
 		this.add(cancel);
 		
 		create = new JButton("create");
-		create.setBounds(530, 400, 100, 30);
+		create.setBounds(530, 420, 100, 35);
+		create.setIcon(new ImageIcon(this.getClass().getResource("img/go.png")));
 		this.add(create);
 		
 		help = new JButton("help");
-		help.setBounds(10, 400, 100, 30);
+		help.setBounds(10, 420, 100, 35);
+		help.setIcon(new ImageIcon(this.getClass().getResource("img/help.png")));
 		this.add(help);
-	}
-	
-	/** initializes and places all the GUI elements
-	 * 
-	 * @throws ClassNotFoundException
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
-	 * @throws UnsupportedLookAndFeelException 
-	 */
-	private void initGui()
-			throws ClassNotFoundException, 
-			InstantiationException, 
-			IllegalAccessException, 
-			UnsupportedLookAndFeelException {
-//		setLayout(null);
-////		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-//		setSize(640, 470);
-//		setVisible(true);
-////		setResizable(false);
-//		// positon on screen
-//		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-//		int x = (dim.width-640)/2;
-//		int y = (dim.height-470)/2;
-//		this.setLocation(x, y);
-//		
-//		main = new JPanel();
-//		main.setVisible(true);
-//		main.setLayout(null); 
-//		main.setBounds(0, 0, 640, 470);
-//		
-//		databaseLabel = new JLabel("chose the folders containing the csv files");
-//		root = new DefaultMutableTreeNode("please choose folder");
-//		treeModel = new DefaultTreeModel(root);
-//		tree = new CheckBoxTree(treeModel);
-//		databasePane = new JScrollPane(tree, 
-//				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, 
-//				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-//		databasePane.setBounds(10, 30, 300, 310);
-//		databaseLabel.setBounds(10, 10, 280, 15);
-//		databaseButton = new JButton("choose root folder");
-//		databaseButton.setBounds(10, 350, 150, 30);
-//		this.add(databaseLabel);
-//		this.add(databasePane);
-//		this.add(databaseButton);
-//		
-//		machineLabel = new JLabel("Type of machine");
-//		machine = new JComboBox();
-//		machine.addItem("Mini 11");
-//		machine.addItem("Exactive");
-//		machineLabel.setBounds(330, 10, 200, 15);
-//		machine.setBounds(330, 30, 300, 30);
-//		this.add(machineLabel);
-//		this.add(machine);
-//		
-//		binLabel = new JLabel("Size of a bin");
-//		bin = new JTextField();
-//		binLabel.setBounds(330, 80, 200, 15);
-//		bin.setBounds(330, 100, 300, 30);
-//		this.add(binLabel);
-//		this.add(bin);
-//		
-//		varianceLabel = new JLabel("variance covered");
-//		variance = new JTextField();
-//		varianceLabel.setBounds(330, 150, 200, 15);
-//		variance.setBounds(330, 170, 300, 30);
-//		this.add(varianceLabel);
-//		this.add(variance);
-//		
-//		profileLabel = new JLabel("Name and path of the profile");
-//		profile = new JTextField();
-//		profileSearch = new JButton("search");
-//		profileLabel.setBounds(330, 220, 250, 15);
-//		profile.setBounds(330, 240, 200, 30);
-//		profileSearch.setBounds(540, 240, 90, 30);
-//		this.add(profileLabel);
-//		this.add(profile);
-//		this.add(profileSearch);
-//		
-//		backgroundLabel = new JLabel("Path to background spectra");
-//		background = new JTextField();
-//		backgroundSearch = new JButton("search");
-//		backgroundLabel.setBounds(330, 290, 250, 15);
-//		background.setBounds(330, 310, 200, 30);
-//		backgroundSearch.setBounds(540, 310, 90, 30);
-//		this.add(backgroundLabel);
-//		this.add(background);
-//		this.add(backgroundSearch);
-//		
-//		logLabel = new JLabel("log transformation");
-//		logLabel.setBounds(360, 357, 200, 15);
-//		this.add(logLabel);
-//		log = new JCheckBox();
-//		log.setBounds(330, 350, 30, 30);
-//		this.add(log);
-//		
-//		cancel = new JButton("cancel");
-//		cancel.setBounds(420, 400, 100, 30);
-//		this.add(cancel);
-//		
-//		create = new JButton("create");
-//		create.setBounds(530, 400, 100, 30);
-//		this.add(create);
-//		
-//		help = new JButton("help");
-//		help.setBounds(10, 400, 100, 30);
-//		this.add(help);
-//		
-//		add(main);
 	}
 	
 	/** initializes all the ActionListeners 
@@ -487,6 +420,7 @@ public class NewProfileWindow extends JPanel {
 										}
 								}
 								data.deleteEmptyBins();
+								data.calculateDimensionMeans();
 								PCADataSet pca_data = PCA.performPCA(data, varianceCovered);
 								LDADataSet lda_data = LDA.performLDA(pca_data, data);
 								// create profile

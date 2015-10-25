@@ -2,6 +2,7 @@ package gui;
 
 import Spectrum.Profile;
 import io.Reader;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -13,6 +14,7 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -20,6 +22,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -31,14 +34,14 @@ import org.math.plot.Plot3DPanel;
  *
  * @author wens
  */
-public class TestProfileWindow extends JFrame {
+public class TestProfileWindow extends JPanel {
 	
-	JPanel main;
 	JLabel profileLabel;
 	JTextField profile;
 	JButton profileSearch;
 	JLabel dimensionLabel;
 	JComboBox dimension;
+	JSeparator sep;
 	JButton cancel;
 	JButton plot;
 	JButton help;
@@ -55,8 +58,10 @@ public class TestProfileWindow extends JFrame {
 			InstantiationException, 
 			IllegalAccessException, 
 			UnsupportedLookAndFeelException {
-		super("score plot of a profile");
+		super(new BorderLayout());
+		setLayout(null);
 		initGui();
+		runProgram();
 	}
 	
 	/** initializes and places all the GUI elements
@@ -71,55 +76,60 @@ public class TestProfileWindow extends JFrame {
 			InstantiationException, 
 			IllegalAccessException, 
 			UnsupportedLookAndFeelException {
-		setLayout(null);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		setSize(400, 300);
-		setVisible(true);
-		setResizable(false);
-		// positon on screen
-		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		int x = (dim.width-400)/2;
-		int y = (dim.height-300)/2;
-		this.setLocation(x, y);
-		
-		main = new JPanel();
-		main.setVisible(true);
-		main.setLayout(null); 
-		main.setBounds(0, 0, 400, 300);
+//		setLayout(null);
+//		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//		setSize(400, 300);
+//		setVisible(true);
+//		setResizable(false);
+//		// positon on screen
+//		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+//		int x = (dim.width-400)/2;
+//		int y = (dim.height-300)/2;
+//		this.setLocation(x, y);
+//		
+//		main = new JPanel();
+//		main.setVisible(true);
+//		main.setLayout(null); 
+//		main.setBounds(0, 0, 400, 300);
 		
 		profileLabel = new JLabel("path to the profile file");
 		profile = new JTextField();
 		profileSearch = new JButton("search");
-		profileLabel.setBounds(10, 10, 200, 15);
-		profile.setBounds(10, 30, 280, 30);
-		profileSearch.setBounds(300, 30, 90, 30);
-		main.add(profileLabel);
-		main.add(profile);
-		main.add(profileSearch);
+		profileLabel.setBounds(100, 10, 200, 15);
+		profile.setBounds(100, 30, 310, 30);
+		profileSearch.setBounds(420, 30, 90, 30);
+		this.add(profileLabel);
+		this.add(profile);
+		this.add(profileSearch);
 		
 		dimensionLabel = new JLabel("chose how many dimensions should be plottet");
 		dimension = new JComboBox();
 		dimension.addItem("2 Dimensions");
 		dimension.addItem("3 Dimensions");
-		dimensionLabel.setBounds(10, 80, 300, 15);
-		dimension.setBounds(10, 100, 380, 30);
-		main.add(dimensionLabel);
-		main.add(dimension);
+		dimensionLabel.setBounds(100, 80, 300, 15);
+		dimension.setBounds(100, 100, 410, 30);
+		this.add(dimensionLabel);
+		this.add(dimension);
+		
+		sep = new JSeparator();
+		sep.setBounds(10, 405, 620, 10);
+		this.add(sep);
 		
 		cancel = new JButton("cancel");
-		cancel.setBounds(180, 235, 100, 30);
-		main.add(cancel);
+		cancel.setBounds(420, 420, 100, 35);
+		cancel.setIcon(new ImageIcon(this.getClass().getResource("img/exit.png")));
+		this.add(cancel);
 		
 		plot = new JButton("create");
-		plot.setBounds(290, 235, 100, 30);
-		main.add(plot);
+		plot.setBounds(530, 420, 100, 35);
+		plot.setIcon(new ImageIcon(this.getClass().getResource("img/go.png")));
+		this.add(plot);
 		
 		help = new JButton("help");
-		help.setBounds(10, 235, 100, 30);
-		main.add(help);
-		
-		add(main);
+		help.setBounds(10, 420, 100, 35);
+		help.setIcon(new ImageIcon(this.getClass().getResource("img/help.png")));
+		this.add(help);
 	}
 	
 	public void runProgram(){

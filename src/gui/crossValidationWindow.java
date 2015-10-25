@@ -5,6 +5,7 @@ import com.jidesoft.swing.CheckBoxTree;
 import io.ProfileBuilder;
 import io.Reader;
 import io.crossValidation;
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -21,6 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -31,6 +33,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
 import javax.swing.ScrollPaneConstants;
@@ -47,9 +50,8 @@ import preprocessing.LDADataSet;
 import preprocessing.PCA;
 import preprocessing.PCADataSet;
 
-public class crossValidationWindow extends JFrame {
+public class crossValidationWindow extends JPanel {
 	
-	JPanel main;
 	JLabel databaseLabel;
 	DefaultMutableTreeNode root;
 	DefaultTreeModel treeModel;
@@ -73,6 +75,7 @@ public class crossValidationWindow extends JFrame {
 	JButton backgroundSearch;
 	JLabel logLabel;
 	JCheckBox log;
+	JSeparator sep;
 	JButton cancel;
 	JButton go;
 	JButton help;
@@ -83,8 +86,10 @@ public class crossValidationWindow extends JFrame {
 			InstantiationException, 
 			IllegalAccessException, 
 			UnsupportedLookAndFeelException {
-		super("check profile parameters via cross validation");
+		super(new BorderLayout());
+		setLayout(null);
 		initGui();
+		runProgram();
 	}
 	
 	
@@ -100,22 +105,22 @@ public class crossValidationWindow extends JFrame {
 			InstantiationException, 
 			IllegalAccessException, 
 			UnsupportedLookAndFeelException {
-		setLayout(null);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		setSize(640, 470);
-		setVisible(true);
-		setResizable(false);
-		// positon on screen
-		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		int x = (dim.width-640)/2;
-		int y = (dim.height-470)/2;
-		this.setLocation(x, y);
-		
-		main = new JPanel();
-		main.setVisible(true);
-		main.setLayout(null); 
-		main.setBounds(0, 0, 640, 470);
+//		setLayout(null);
+//		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//		setSize(640, 470);
+//		setVisible(true);
+//		setResizable(false);
+//		// positon on screen
+//		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+//		int x = (dim.width-640)/2;
+//		int y = (dim.height-470)/2;
+//		this.setLocation(x, y);
+//		
+//		main = new JPanel();
+//		main.setVisible(true);
+//		main.setLayout(null); 
+//		main.setBounds(0, 0, 640, 470);
 		
 		databaseLabel = new JLabel("chose the folders containing the csv files");
 		root = new DefaultMutableTreeNode("please choose folder");
@@ -128,9 +133,9 @@ public class crossValidationWindow extends JFrame {
 		databaseLabel.setBounds(10, 10, 280, 15);
 		databaseButton = new JButton("choose root folder");
 		databaseButton.setBounds(10, 350, 150, 30);
-		main.add(databaseLabel);
-		main.add(databasePane);
-		main.add(databaseButton);
+		this.add(databaseLabel);
+		this.add(databasePane);
+		this.add(databaseButton);
 		
 		machineLabel = new JLabel("Type of machine");
 		machine = new JComboBox();
@@ -138,32 +143,32 @@ public class crossValidationWindow extends JFrame {
 		machine.addItem("Exactive");
 		machineLabel.setBounds(330, 10, 200, 15);
 		machine.setBounds(330, 30, 300, 30);
-		main.add(machineLabel);
-		main.add(machine);
+		this.add(machineLabel);
+		this.add(machine);
 		
 		binLabel = new JLabel("Size of a bin");
 		bin = new JTextField();
 		binLabel.setBounds(330, 80, 200, 15);
 		bin.setBounds(330, 100, 300, 30);
-		main.add(binLabel);
-		main.add(bin);
+		this.add(binLabel);
+		this.add(bin);
 		
 		varianceLabel = new JLabel("variance covered");
 		variance = new JTextField();
 		varianceLabel.setBounds(330, 150, 200, 15);
 		variance.setBounds(330, 170, 300, 30);
-		main.add(varianceLabel);
-		main.add(variance);
+		this.add(varianceLabel);
+		this.add(variance);
 		
 		crossValidationFolderLabel = new JLabel("where to store the cross validation data");
 		crossValidationFolder = new JTextField();
 		crossValidationFolderSearch = new JButton("search");
-		crossValidationFolderLabel.setBounds(330, 220, 250, 15);
+		crossValidationFolderLabel.setBounds(330, 220, 300, 15);
 		crossValidationFolder.setBounds(330, 240, 200, 30);
 		crossValidationFolderSearch.setBounds(540, 240, 90, 30);
-		main.add(crossValidationFolderLabel);
-		main.add(crossValidationFolder);
-		main.add(crossValidationFolderSearch);
+		this.add(crossValidationFolderLabel);
+		this.add(crossValidationFolder);
+		this.add(crossValidationFolderSearch);
 		
 		backgroundLabel = new JLabel("Path to background spectra");
 		background = new JTextField();
@@ -171,30 +176,35 @@ public class crossValidationWindow extends JFrame {
 		backgroundLabel.setBounds(330, 290, 250, 15);
 		background.setBounds(330, 310, 200, 30);
 		backgroundSearch.setBounds(540, 310, 90, 30);
-		main.add(backgroundLabel);
-		main.add(background);
-		main.add(backgroundSearch);
+		this.add(backgroundLabel);
+		this.add(background);
+		this.add(backgroundSearch);
 		
 		logLabel = new JLabel("log transformation");
 		logLabel.setBounds(360, 357, 200, 15);
-		main.add(logLabel);
+		this.add(logLabel);
 		log = new JCheckBox();
 		log.setBounds(330, 350, 30, 30);
-		main.add(log);
+		this.add(log);
+		
+		sep = new JSeparator();
+		sep.setBounds(10, 405, 620, 10);
+		this.add(sep);
 		
 		cancel = new JButton("cancel");
-		cancel.setBounds(420, 400, 100, 30);
-		main.add(cancel);
+		cancel.setBounds(420, 420, 100, 35);
+		cancel.setIcon(new ImageIcon(this.getClass().getResource("img/exit.png")));
+		this.add(cancel);
 		
 		go = new JButton("go");
-		go.setBounds(530, 400, 100, 30);
-		main.add(go);
+		go.setBounds(530, 420, 100, 35);
+		go.setIcon(new ImageIcon(this.getClass().getResource("img/go.png")));
+		this.add(go);
 		
 		help = new JButton("help");
-		help.setBounds(10, 400, 100, 30);
-		main.add(help);
-		
-		add(main);
+		help.setBounds(10, 420, 100, 35);
+		help.setIcon(new ImageIcon(this.getClass().getResource("img/help.png")));
+		this.add(help);
 	}
 	
 	/** initializes all the ActionListeners 

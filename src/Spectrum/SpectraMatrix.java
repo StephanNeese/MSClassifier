@@ -85,7 +85,7 @@ public class SpectraMatrix {
 		// mean centering
 		mean = calculateMean();
 		this.normalizationDivideByMean();
-		dimensionsMean = calculateDimensionMeans();
+//		dimensionsMean = calculateDimensionMeans();
 	}
 	
 	/** Normalizes the data by division of each value
@@ -121,14 +121,12 @@ public class SpectraMatrix {
 	 * 
 	 * @return the mean values as double array
 	 */
-	private double[] calculateDimensionMeans(){
-		double[] res = new double[voltage[0].length];
+	public void calculateDimensionMeans(){
+		dimensionsMean = new double[voltage[0].length];
 		// loop though dimensions
 		for(int dim=0; dim<voltage[0].length; dim++){
-			res[dim] = calculateMean(dim);
+			dimensionsMean[dim] = calculateMean(dim);
 		}
-		
-		return res;
 	}
 	
 	/** calculates the mean for a given dimension
