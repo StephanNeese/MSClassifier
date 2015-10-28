@@ -12,6 +12,7 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -39,12 +40,14 @@ public class TestProfileWindow extends JPanel {
 	JLabel profileLabel;
 	JTextField profile;
 	JButton profileSearch;
+	JButton profileInfo;
 	JLabel dimensionLabel;
 	JComboBox dimension;
 	JSeparator sep;
 	JButton cancel;
 	JButton plot;
 	JButton help;
+	Profile data;
 	
 	/** constructs a new newDatabaseWindow
 	 * 
@@ -93,15 +96,20 @@ public class TestProfileWindow extends JPanel {
 //		main.setLayout(null); 
 //		main.setBounds(0, 0, 400, 300);
 		
+		data = null;
+		
 		profileLabel = new JLabel("path to the profile file");
 		profile = new JTextField();
 		profileSearch = new JButton("search");
+		profileInfo = new JButton("Info");
 		profileLabel.setBounds(100, 10, 200, 15);
-		profile.setBounds(100, 30, 310, 30);
-		profileSearch.setBounds(420, 30, 90, 30);
+		profile.setBounds(100, 30, 210, 30);
+		profileSearch.setBounds(320, 30, 90, 30);
+		profileInfo.setBounds(420, 30, 90, 30);
 		this.add(profileLabel);
 		this.add(profile);
 		this.add(profileSearch);
+		this.add(profileInfo);
 		
 		dimensionLabel = new JLabel("chose how many dimensions should be plottet");
 		dimension = new JComboBox();
@@ -158,6 +166,41 @@ public class TestProfileWindow extends JPanel {
 							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 						}else if(result != JFileChooser.APPROVE_OPTION){
 							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+						}
+					}
+				}
+		);
+		
+		profileInfo.addActionListener(
+				new ActionListener(){
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						if("".equals(profile.getText())){
+							JFrame frame = new JFrame();						
+							JOptionPane.showMessageDialog(frame, 
+									"Please select a Profile to load first.",
+									"No Profile", 
+									JOptionPane.ERROR_MESSAGE);
+						}else{
+							try {
+								// display waiting message
+								String path = profile.getText();
+								WaitMessage msg = new WaitMessage();
+								msg.join();
+								// load model
+								data = Reader.readProfile(path);
+								// close message automatically
+								msg.close();
+								
+							} catch (Exception ex) {
+								ex.printStackTrace();
+								JFrame frame2 = new JFrame();
+								JOptionPane.showMessageDialog(frame2, 
+									ex.toString(),
+									"An error occured", 
+									JOptionPane.ERROR_MESSAGE);
+							}
 						}
 					}
 				}
