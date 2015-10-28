@@ -37,15 +37,30 @@ public class Main {
 		args[6] = output file for results
 		*/
 //		
-		String[] profilePath = readProfilePaths("/home/wens/mini_all");
-//		
-		SpectraMatrix data = Reader.readData(profilePath, "/home/wens/mini_all", 2.0, "Mini 11", true);
-		data.deleteEmptyBins();
-		data.calculateDimensionMeans();
-		data.center();
+//		String[] profilePath = readProfilePaths("/home/wens/mini_all");
+////		
+//		SpectraMatrix data = Reader.readData(profilePath, "/home/wens/mini_all", 2.0, "Mini 11", true);
+//		data.deleteEmptyBins();
+//		data.calculateDimensionMeans();
+//		data.center();
 //		PCADataSet pca_data = PCA.performPCA(data, Double.parseDouble(args[2]));
 //		LDADataSet lda_data = LDA.performLDA(pca_data, data);
 //
+		
+		Profile profile = Reader.readProfile("/home/wens/profiles/profile-log.profile");
+		Spectrum spectrum = new Spectrum(
+									"/home/wens/live/Ziegenmilch_41.csv", 
+									null,
+									profile.getBinSize(),
+									profile.getDevice(), 
+									profile.getLog());
+		profile.adjustRangeOfSpectrum(spectrum);
+		profile.deleteEmptyBins(spectrum);
+		profile.euclideanDistance(spectrum);
+		profile.mahalanobisDistance(spectrum);
+		profile.ldaCoefficient(spectrum);
+		
+		
 //		
 //		// create profile
 //		ProfileBuilder.build(

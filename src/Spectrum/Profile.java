@@ -23,6 +23,7 @@ public class Profile {
 	private final String path;				// path to profile (original path)
 	private final double variance;			// covered variance by profile
 	private final boolean log;				// log transformation of data or not?
+	private final double[] background;		// the background data substracted from this profiles raw data
 	private final String[] sampleGroups;	// sampleGroups of original csv files 
 	private final double[][] data;			// pca transformed data [dimensions][samples]
 	private final double[][] features;		// feature vector (used for transformation) [vectors][dimensions]
@@ -66,6 +67,7 @@ public class Profile {
 			String path, 
 			double variance, 
 			boolean log,
+			double[] background,
 			String[] sampleGroups, 
 			double[][] data, 
 			double[][] features,
@@ -86,6 +88,7 @@ public class Profile {
 		this.path = path;
 		this.variance = variance;
 		this.log = log;
+		this.background = background;
 		this.sampleGroups = sampleGroups;
 		this.data = data;
 		this.features = features;
@@ -290,7 +293,10 @@ public class Profile {
 	 * @return a ClassificationResult object
 	 */
 	public ClassificationResult mahalanobisDistance(Spectrum spectrum){
+		// preprocessing of spectrum to adjust range and delete bins
+		// keep this order even if changes in the method are made
 		adjustRangeOfSpectrum(spectrum);
+		substractBackgroundFromSpectrum(spectrum);
 		deleteEmptyBins(spectrum);
 		
 		// normalize and center the spectrum
@@ -353,7 +359,10 @@ public class Profile {
 	 * @return a ClassificationResult object
 	 */
 	public ClassificationResult euclideanDistance(Spectrum spectrum){
+		// preprocessing of spectrum to adjust range and delete bins
+		// keep this order even if changes in the method are made
 		adjustRangeOfSpectrum(spectrum);
+		substractBackgroundFromSpectrum(spectrum);
 		deleteEmptyBins(spectrum);
 		
 		// normalize and center the spectrum
@@ -400,7 +409,10 @@ public class Profile {
 	 * @return a ClassificationResult object
 	 */
 	public ClassificationResult ldaCoefficient(Spectrum spectrum){
+		// preprocessing of spectrum to adjust range and delete bins
+		// keep this order even if changes in the method are made
 		adjustRangeOfSpectrum(spectrum);
+		substractBackgroundFromSpectrum(spectrum);
 		deleteEmptyBins(spectrum);
 		
 		// normalize and center the spectrum
@@ -520,7 +532,7 @@ public class Profile {
 			double[] voltTmp = new double[size+fillBins];
 			// put empty bins in front
 			for(int i=0; i<fillBins; i++){
-				mzTmp[i] = spectrum.getMZ(0)-(fillBins-i);
+				mzTmp[i] = spectrum.getMZ(0)-((fillBins-i)*binSize);
 				voltTmp[i] = 0.0;
 			}
 			// put rest of bins after empty bins
@@ -594,7 +606,7 @@ public class Profile {
 	 * 
 	 * @param spectrum the spectrum to delete bins from
 	 */
-	private void deleteEmptyBins(Spectrum spectrum){
+	public void deleteEmptyBins(Spectrum spectrum){
 		double[] mzSpec = spectrum.getMz();
 		double[] voltSpec = spectrum.getVoltage();
 		HashMap<Double, Boolean> exists = new HashMap<>();
@@ -627,5 +639,13 @@ public class Profile {
 		
 		spectrum.setMz(mzFinal);
 		spectrum.setVoltage(voltFinal);
+	}
+	
+	/**
+	 * 
+	 * @param spectrum 
+	 */
+	private void substractBackgroundFromSpectrum(Spectrum spectrum){
+		
 	}
 }

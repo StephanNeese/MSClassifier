@@ -21,6 +21,9 @@ public class SpectraMatrix {
 	private final int numDimensions;	// no of dimensions (mz bins)
 	private double mean;				// mean of all values in the matrix
 	private double[] dimensionsMean;	// mean for each dimension
+	private boolean log;				// logarithmic scaling or not
+	private double[] mzBackground;		// mz values of background
+	private double[] voltBackground;	// voltage values of the background
 	
 	/** constructs a SpectraMatrix from a Spectrum array
 	 * 
@@ -29,6 +32,10 @@ public class SpectraMatrix {
 	public SpectraMatrix(Spectrum[] spectra, double bin){
 		numSpectra = spectra.length;
 		groups = new String[numSpectra];
+		log = spectra[0].getLog();
+		// init background as null
+		mzBackground = null;
+		voltBackground = null;
 		
 		// obtain the smallest bin and the biggest bin from all spectra
 		double smallest = spectra[0].getMz()[0];
@@ -85,7 +92,78 @@ public class SpectraMatrix {
 		// mean centering
 		mean = calculateMean();
 		this.normalizationDivideByMean();
-//		dimensionsMean = calculateDimensionMeans();
+	}
+	
+	
+	/** constructs a SpectraMatrix from a Spectrum array
+	 * and substracts the background data of another matrix
+	 * 
+	 * @param spectra the spectrum array
+	 */
+	public SpectraMatrix(Spectrum[] spectra, SpectraMatrix background, double bin){
+		numSpectra = spectra.length;
+		groups = new String[numSpectra];
+		log = spectra[0].getLog();
+		// init background as null
+		mzBackground = null;
+		voltBackground = null;
+		
+		// obtain the smallest bin and the biggest bin from all spectra
+		double smallest = spectra[0].getMz()[0];
+		double biggest = spectra[0].getMz()[spectra[0].getLength()-1];
+		for(int i=1; i<spectra.length; i++){
+			if(smallest>spectra[i].getMz()[0]){
+				smallest = spectra[i].getMz()[0];
+			}
+			double[] tmp = spectra[i].getMz();
+			if(biggest<tmp[tmp.length-1]){
+				biggest = tmp[tmp.length-1];
+			}
+		}
+		// write mz bins
+		double currentBin = smallest;
+		ArrayList<Double> binTmp = new ArrayList<>();
+		while(currentBin<=biggest){
+			binTmp.add(currentBin);
+			currentBin += bin;
+		}
+		mz = new double[binTmp.size()];
+		for(int i=0; i<binTmp.size(); i++){
+			mz[i] = binTmp.get(i);
+		}
+		
+		// write number of dimensions
+		numDimensions = mz.length;
+		
+		// init the groups for each sample
+		for(int i=0; i<spectra.length; i++){
+			groups[i] = spectra[i].getGroup();
+		}
+		
+		// init voltage array
+		voltage = new double[numSpectra][numDimensions];
+		for(int i=0; i<numSpectra; i++){
+			for(int j=0; j<numDimensions; j++){
+				voltage[i][j] = 0.0;
+			}
+		}
+		// write voltage values
+		for(int i=0; i<numSpectra; i++){
+			// calc the offset of the beginning of the spectrum
+			double[] volt = spectra[i].getVoltage();
+			double[] mass = spectra[i].getMz();
+			Double diffTmp = (mass[0] - mz[0])/bin;
+			// inserting the first element from spectrum at this index
+			int diff = (int)Math.round(diffTmp);
+			for(int j=0; j<volt.length; j++){
+				voltage[i][j+diff] = volt[j];
+			}
+		}
+		
+		// mean centering
+		mean = calculateMean();
+		this.normalizationDivideByMean();
+		substractBackground(background);
 	}
 	
 	/** Normalizes the data by division of each value
@@ -297,6 +375,15 @@ public class SpectraMatrix {
 		return dimensionsMean;
 	}
 	
+	/** returns wether the data in this spectraMatrix
+	 * has been log transformed or not
+	 * 
+	 * @return true if log transformed, false if not
+	 */
+	public boolean getLog(){
+		return log;
+	}
+	
 
 	@Override
 	public String toString() {
@@ -350,17 +437,38 @@ public class SpectraMatrix {
 	 * 
 	 * @param path 
 	 */
-	public void substractBackground(SpectraMatrix background){
-		// get the mean values for all the m/z bins  of the background Spectras
-		double[] meanSpectrum = background.getDimensionsMean();
-		// substract the means of the background
-		for(int i=0; i<voltage.length; i++){
-			for(int j=0; j<voltage[0].length; j++){
-				if((voltage[i][j] - meanSpectrum[j])<0){
-					voltage[i][j] = 0;
+	private void substractBackground(SpectraMatrix background){
+		mzBackground = background.getMz();
+		voltBackground = background.getDimensionsMean();
+		
+		// find beginning of background bins in this matrix
+		int indexMatrixStart = 0;
+		int indexBGStart = 0;
+		if((int)((mz[0] - mzBackground[0])/(mz[1] - mz[0]))>0){
+			// background bins start earlier
+			indexBGStart = (int) ((mz[0] - mzBackground[0])/(mz[1] - mz[0]));
+		}else if((int)((mz[0] - mzBackground[0])/(mz[1] - mz[0]))<0){
+			// background bins start later
+			indexMatrixStart = (int)((mz[0] - mzBackground[0])/(mz[1] - mz[0]));
+		}
+		// find end of background bins in this matrix
+		int EndIndex = 0;
+		if((mzBackground.length + indexBGStart) >= (mz.length + indexMatrixStart)){
+			EndIndex = mz.length-1;
+		}else{
+			EndIndex = mzBackground.length + indexBGStart;
+		}
+		
+		// use found starting and ending points in matrices to substract the background
+		for(int i=0; i<EndIndex; i++){
+			// substract from every spectra in matrix
+			for(int spec=0; spec<voltage.length; spec++){
+				if((voltage[spec][indexMatrixStart + i] -= voltBackground[indexBGStart + i]) > 0){
+					voltage[spec][indexMatrixStart + i] -= voltBackground[indexBGStart + i];
 				}else{
-					voltage[i][j] -= meanSpectrum[j];
+					voltage[spec][indexMatrixStart + i] = 0.0;
 				}
+				
 			}
 		}
 	}

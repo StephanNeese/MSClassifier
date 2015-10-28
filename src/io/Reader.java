@@ -31,7 +31,7 @@ public class Reader {
 	 * @return a SpectraMatrix Object created from all the csv files in the directory
 	 * @throws IOException 
 	 */
-	public static SpectraMatrix readData(String[] group, String rootPath, double binSize, String device, boolean log) throws IOException{
+	public static SpectraMatrix readData(String[] group, String rootPath, double binSize, String device, boolean log, String backgroundPath) throws IOException{
 		ArrayList<Spectrum> tmp = new ArrayList<>();
 		
 		for(String path : group){
@@ -48,7 +48,15 @@ public class Reader {
 			spectra[i] = tmp.get(i);
 		}
 		
-		return new SpectraMatrix(spectra, binSize);
+		// if backgroundPath contains a path then get backgrounddata 
+		// and init background substracted matrix by calling constructor
+		// SpectraMatrix(Spectrum[] spectra, SpectraMatrix background, double binSize)
+		if(!("".equals(backgroundPath))){
+			SpectraMatrix background = Reader.readData(group, backgroundPath, binSize, device, log, "");
+			return new SpectraMatrix(spectra, background, binSize);
+		}else{
+			return new SpectraMatrix(spectra, binSize);
+		}
 	} 
 	
 	/** reads the content of a directory and returns the complete paths
@@ -103,6 +111,7 @@ public class Reader {
 		String inputPath = null;
 		double variance = 0.0;
 		boolean log = false;
+		double[] background = null;
 		String[] sampleGroups = null;
 		double[] originalMeans = null;
 		double originalMean = 0;
@@ -144,6 +153,12 @@ public class Reader {
 			}else if(tmp.startsWith("log:")){
 				String[] content = segment[i].split("\t");
 				log = Boolean.parseBoolean(content[1]);
+			}else if(tmp.startsWith("background:")){
+				String[] content = segment[i].split("\n");
+				background = new double[content.length-1];
+				for(int j=1; j<content.length; j++){
+					background[j-1] = Double.parseDouble(content[j]);
+				}
 			}else if(tmp.startsWith("groups:")){
 				String[] content = segment[i].split("\n");
 				sampleGroups = new String[content.length-1];
@@ -183,7 +198,7 @@ public class Reader {
 			}else if(tmp.startsWith("mz-range:")){
 				String[] row = segment[i].split("\t");
 				mzStart = Double.parseDouble(row[1]);
-				mzEnd = Double.parseDouble(row[2]);
+				mzEnd = Double.parseDouble(row[row.length-1]);
 				bins = new double[row.length-1];
 				for(int k=1; k<row.length; k++){
 					bins[k-1] = Double.parseDouble(row[k]);
@@ -233,6 +248,7 @@ public class Reader {
 				inputPath, 
 				variance, 
 				log,
+				background,
 				sampleGroups, 
 				data, 
 				features,

@@ -394,31 +394,17 @@ public class NewProfileWindow extends JPanel {
 						String backgroundPath = background.getText();
 						
 						// check parameters first
-						if(!("".equals(checkParams(profilePaths, profileName, binTmp, varianceTmp)))){
+						if(!("".equals(checkParams(profilePaths, profileName, binTmp, varianceTmp, backgroundPath)))){
 							JFrame frame = new JFrame();						
 							JOptionPane.showMessageDialog(frame, 
-									checkParams(profilePaths, profileName, binTmp, varianceTmp),
+									checkParams(profilePaths, profileName, binTmp, varianceTmp, backgroundPath),
 									"Invalid Input", 
 									JOptionPane.ERROR_MESSAGE);
 						}else{
 							double binSize = Double.parseDouble(binTmp);
 							double varianceCovered = Double.parseDouble(varianceTmp);
 							try{
-								SpectraMatrix data = Reader.readData(profilePaths, rootPath, binSize, machineName, log.isSelected());
-								// substract background
-								if(!("".equals(backgroundPath))){
-									try{
-										String bgPath[] = {backgroundPath};
-										SpectraMatrix bg = Reader.readData(bgPath, backgroundPath, binSize, machineName, log.isSelected());
-										data.substractBackground(bg);
-									}catch(Exception ex){
-										JFrame frame = new JFrame();						
-										JOptionPane.showMessageDialog(frame, 
-											"The path to the background csv files can't be accessed!",
-											"Invalid Input", 
-											JOptionPane.ERROR_MESSAGE);
-										}
-								}
+								SpectraMatrix data = Reader.readData(profilePaths, rootPath, binSize, machineName, log.isSelected(), backgroundPath);
 								data.deleteEmptyBins();
 								data.calculateDimensionMeans();
 								PCADataSet pca_data = PCA.performPCA(data, varianceCovered);
@@ -454,7 +440,7 @@ public class NewProfileWindow extends JPanel {
 					 * @return an empty string if all parameters are valid, 
 					 * a string with error messages otherwise
 					 */
-					private String checkParams(String[] profilePaths, String profile, String bin, String variance){
+					private String checkParams(String[] profilePaths, String profile, String bin, String variance, String background){
 						String res = "";
 						
 						boolean check = true;
@@ -486,6 +472,13 @@ public class NewProfileWindow extends JPanel {
 							double tmp = Double.parseDouble(variance);
 							if(tmp<0 || tmp>1.0){
 								res += "Error: The value for the covered variance must be between 0 and 1.0\n";
+							}
+						}
+						if(!("".equals(background))){
+							File bg = new File(background);
+							if(!(bg.exists() && bg.isDirectory())){
+								res += "The path to the background folder is invalid. "
+										+ "The path either does not exist or is not a directory.";
 							}
 						}
 						

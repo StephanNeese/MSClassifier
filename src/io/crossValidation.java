@@ -144,21 +144,7 @@ public class crossValidation {
 			String background,
 			boolean log){
 		try{
-			SpectraMatrix data = Reader.readData(profilePaths, rootPath, binSize, machineName, log);
-			// substract background
-			if(!("".equals(background))){
-				try{
-					String bgPath[] = {background};
-					SpectraMatrix bg = Reader.readData(bgPath, background, binSize, machineName, log);
-					data.substractBackground(bg);
-				}catch(Exception ex){
-					JFrame frame = new JFrame();						
-					JOptionPane.showMessageDialog(frame, 
-						"The path to the background csv files can't be accessed!",
-						"Invalid Input", 
-						JOptionPane.ERROR_MESSAGE);
-					}
-			}
+			SpectraMatrix data = Reader.readData(profilePaths, rootPath, binSize, machineName, log, background);
 			data.deleteEmptyBins();
 			data.calculateDimensionMeans();
 			PCADataSet pca_data = PCA.performPCA(data, varianceCovered);

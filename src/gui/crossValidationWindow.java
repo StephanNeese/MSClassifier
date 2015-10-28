@@ -387,10 +387,10 @@ public class crossValidationWindow extends JPanel {
 						String backgroundPath = background.getText();
 						
 						// check parameters first
-						if(!("".equals(checkParams(profilePaths, crossValidationLocation, binTmp, varianceTmp)))){
+						if(!("".equals(checkParams(profilePaths, crossValidationLocation, binTmp, varianceTmp, backgroundPath)))){
 							JFrame frame = new JFrame();						
 							JOptionPane.showMessageDialog(frame, 
-									checkParams(profilePaths, crossValidationLocation, binTmp, varianceTmp),
+									checkParams(profilePaths, crossValidationLocation, binTmp, varianceTmp, backgroundPath),
 									"Invalid Input", 
 									JOptionPane.ERROR_MESSAGE);
 						}else{
@@ -446,7 +446,7 @@ public class crossValidationWindow extends JPanel {
 					 * @return an empty string if all parameters are valid, 
 					 * a string with error messages otherwise
 					 */
-					private String checkParams(String[] profilePaths, String profile, String bin, String variance){
+					private String checkParams(String[] profilePaths, String profile, String bin, String variance, String background){
 						String res = "";
 						
 						boolean check = true;
@@ -478,6 +478,13 @@ public class crossValidationWindow extends JPanel {
 							double tmp = Double.parseDouble(variance);
 							if(tmp<0 || tmp>1.0){
 								res += "Error: The value for the covered variance must be between 0 and 1.0\n";
+							}
+						}
+						if(!("".equals(background))){
+							File bg = new File(background);
+							if(!(bg.exists() && bg.isDirectory())){
+								res += "The path to the background folder is invalid. "
+										+ "The path either does not exist or is not a directory.";
 							}
 						}
 						

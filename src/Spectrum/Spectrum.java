@@ -18,6 +18,7 @@ public class Spectrum {
 	private String filename;		// filename of csv
 	private String group;			// the group of this sample
 	private int length;				// num dimensions
+	private boolean log;			// log scaling applied
 	
 	
 	/** constructs a spectrum from a file
@@ -29,6 +30,7 @@ public class Spectrum {
 	public Spectrum(String path, String group, double bin, String device, boolean log){
 		readCSV(path, bin, device, log);
 		this.group = group;
+		this.log = log;
 	}
 	
 	/** reads a csv file and initializes the spectrum object (called in constructor)
@@ -232,6 +234,15 @@ public class Spectrum {
 	public void setLength(int length){
 		this.length = length;
 	}
+	
+	/** returns wether the data in this spectraMatrix
+	 * has been log transformed or not
+	 * 
+	 * @return true if log transformed, false if not
+	 */
+	public boolean getLog(){
+		return log;
+	}
 
 	@Override
 	public String toString() {
@@ -269,6 +280,42 @@ public class Spectrum {
 		}else{
 			for(int i=0; i<voltage.length; i++){
 				voltage[i] = voltage[i] - means[i];
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * @param background 
+	 */
+	public void substractBackground(SpectraMatrix background){
+		double[] mzBackground = background.getMz();
+		double[] voltBackground = background.getDimensionsMean();
+		
+		// find beginning of background bins in this matrix
+		int indexMatrixStart = 0;
+		int indexBGStart = 0;
+		if((int)((mz[0] - mzBackground[0])/(mz[1] - mz[0]))>0){
+			// background bins start earlier
+			indexBGStart = (int) ((mz[0] - mzBackground[0])/(mz[1] - mz[0]));
+		}else if((int)((mz[0] - mzBackground[0])/(mz[1] - mz[0]))<0){
+			// background bins start later
+			indexMatrixStart = (int)((mz[0] - mzBackground[0])/(mz[1] - mz[0]));
+		}
+		// find end of background bins in this matrix
+		int EndIndex = 0;
+		if((mzBackground.length + indexBGStart) >= (mz.length + indexMatrixStart)){
+			EndIndex = mz.length-1;
+		}else{
+			EndIndex = mzBackground.length + indexBGStart;
+		}
+		
+		// use found starting and ending points in matrices to substract the background
+		for(int i=0; i<EndIndex; i++){
+			if((voltage[indexMatrixStart + i] -= voltBackground[indexBGStart + i]) > 0){
+				voltage[indexMatrixStart + i] -= voltBackground[indexBGStart + i];
+			}else{
+				voltage[indexMatrixStart + i] = 0.0;
 			}
 		}
 	}

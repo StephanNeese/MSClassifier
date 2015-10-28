@@ -71,6 +71,8 @@ public class ProfileBuilder {
 		writer.println("path:\t" + inputPath + "\n//#");
 		// print variance covered
 		writer.println("variance:\t" + data.getVariance() + "\n//#");
+		// print if logarithmic scaling has been applied to profile data
+		writer.println("log:\t" + originalData.getLog() + "\n//#");
 		// print filenames in same order as data
 		String[] groups = originalData.getGroups();
 		writer.println("groups:");
