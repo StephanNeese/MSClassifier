@@ -384,6 +384,22 @@ public class SpectraMatrix {
 		return log;
 	}
 	
+	/**
+	 * 
+	 * @return 
+	 */
+	public double[] getMzBackground(){
+		return mzBackground;
+	}
+	
+	/**
+	 * 
+	 * @return 
+	 */
+	public double[] getVoltBackground(){
+		return voltBackground;
+	}
+	
 
 	@Override
 	public String toString() {

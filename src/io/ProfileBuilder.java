@@ -73,6 +73,14 @@ public class ProfileBuilder {
 		writer.println("variance:\t" + data.getVariance() + "\n//#");
 		// print if logarithmic scaling has been applied to profile data
 		writer.println("log:\t" + originalData.getLog() + "\n//#");
+		// print the background information from the original spectraMatrix into the profile
+		double[] mzBackground = originalData.getMzBackground();
+		double[] voltBackground = originalData.getVoltBackground();
+		writer.println("background:");
+		for(int i=0; i<mzBackground.length; i++){
+			writer.println(mzBackground[i] + ":" + voltBackground[i]);
+		}
+		writer.println("//#");
 		// print filenames in same order as data
 		String[] groups = originalData.getGroups();
 		writer.println("groups:");

@@ -283,40 +283,4 @@ public class Spectrum {
 			}
 		}
 	}
-	
-	/**
-	 * 
-	 * @param background 
-	 */
-	public void substractBackground(SpectraMatrix background){
-		double[] mzBackground = background.getMz();
-		double[] voltBackground = background.getDimensionsMean();
-		
-		// find beginning of background bins in this matrix
-		int indexMatrixStart = 0;
-		int indexBGStart = 0;
-		if((int)((mz[0] - mzBackground[0])/(mz[1] - mz[0]))>0){
-			// background bins start earlier
-			indexBGStart = (int) ((mz[0] - mzBackground[0])/(mz[1] - mz[0]));
-		}else if((int)((mz[0] - mzBackground[0])/(mz[1] - mz[0]))<0){
-			// background bins start later
-			indexMatrixStart = (int)((mz[0] - mzBackground[0])/(mz[1] - mz[0]));
-		}
-		// find end of background bins in this matrix
-		int EndIndex = 0;
-		if((mzBackground.length + indexBGStart) >= (mz.length + indexMatrixStart)){
-			EndIndex = mz.length-1;
-		}else{
-			EndIndex = mzBackground.length + indexBGStart;
-		}
-		
-		// use found starting and ending points in matrices to substract the background
-		for(int i=0; i<EndIndex; i++){
-			if((voltage[indexMatrixStart + i] -= voltBackground[indexBGStart + i]) > 0){
-				voltage[indexMatrixStart + i] -= voltBackground[indexBGStart + i];
-			}else{
-				voltage[indexMatrixStart + i] = 0.0;
-			}
-		}
-	}
 }

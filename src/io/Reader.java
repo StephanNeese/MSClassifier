@@ -111,7 +111,8 @@ public class Reader {
 		String inputPath = null;
 		double variance = 0.0;
 		boolean log = false;
-		double[] background = null;
+		double[] mzBackground = null;
+		double[] voltBackground = null;
 		String[] sampleGroups = null;
 		double[] originalMeans = null;
 		double originalMean = 0;
@@ -155,9 +156,12 @@ public class Reader {
 				log = Boolean.parseBoolean(content[1]);
 			}else if(tmp.startsWith("background:")){
 				String[] content = segment[i].split("\n");
-				background = new double[content.length-1];
+				mzBackground = new double[content.length - 1];
+				voltBackground = new double[content.length - 1];
 				for(int j=1; j<content.length; j++){
-					background[j-1] = Double.parseDouble(content[j]);
+					String[] lineTmp = content[j].split(":");
+					mzBackground[j-1] = Double.parseDouble(lineTmp[0]);
+					voltBackground[j-1] = Double.parseDouble(lineTmp[1]);
 				}
 			}else if(tmp.startsWith("groups:")){
 				String[] content = segment[i].split("\n");
@@ -248,7 +252,8 @@ public class Reader {
 				inputPath, 
 				variance, 
 				log,
-				background,
+				mzBackground,
+				voltBackground,
 				sampleGroups, 
 				data, 
 				features,
