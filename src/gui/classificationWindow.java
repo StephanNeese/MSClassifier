@@ -3,6 +3,7 @@ package gui;
 import Spectrum.ClassificationResult;
 import Spectrum.Profile;
 import Spectrum.Spectrum;
+import io.ProfileOpeningThread;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -49,6 +50,7 @@ public class classificationWindow extends JPanel {
 	private JLabel profileLabel;
 	private JTextField profile;
 	private JButton profileSearch;
+	private JButton profileInfo;
 	private JLabel distanceLabel;
 	private JComboBox distance;
 	private JLabel saveLabel;
@@ -91,19 +93,6 @@ public class classificationWindow extends JPanel {
 			InstantiationException, 
 			IllegalAccessException, 
 			UnsupportedLookAndFeelException{
-//		setLayout(null);
-//		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-//		setSize(640, 310);
-//		setVisible(true);
-//		setResizable(false);
-//		// positon on screen
-//		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-//		int x = (dim.width-640)/2;
-//		int y = (dim.height-310)/2;
-//		this.setLocation(x, y);
-//		
-//		main = new JPanel();
 		
 		folderLabel = new JLabel("folder with CSV files");
 		folder = new JTextField();
@@ -118,12 +107,15 @@ public class classificationWindow extends JPanel {
 		profileLabel = new JLabel("path to the profile file");
 		profile = new JTextField();
 		profileSearch = new JButton("search");
+		profileInfo = new JButton("Info");
 		profileLabel.setBounds(100, 80, 200, 15);
-		profile.setBounds(100, 100, 310, 30);
-		profileSearch.setBounds(420, 100, 90, 30);
+		profile.setBounds(100, 100, 210, 30);
+		profileSearch.setBounds(320, 100, 90, 30);
+		profileInfo.setBounds(420, 100, 90, 30);
 		this.add(profileLabel);
 		this.add(profile);
 		this.add(profileSearch);
+		this.add(profileInfo);
 		
 		distanceLabel = new JLabel("distance measure");
 		distance = new JComboBox();
@@ -228,6 +220,38 @@ public class classificationWindow extends JPanel {
 							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 						}else if(result != JFileChooser.APPROVE_OPTION){
 							frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+						}
+					}
+				}
+		);
+		
+		profileInfo.addActionListener(
+				new ActionListener(){
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						if("".equals(profile.getText())){
+							JFrame frame = new JFrame();						
+							JOptionPane.showMessageDialog(frame, 
+									"Please select a Profile to load first.",
+									"No Profile", 
+									JOptionPane.ERROR_MESSAGE);
+						}else{
+							try {
+								// display waiting message
+								String path = profile.getText();
+								WaitMessage wait = new WaitMessage("Please wait");
+								// display info
+								ProfileOpeningThread x = new ProfileOpeningThread(path, wait);
+								x.start();
+							} catch (Exception ex) {
+								ex.printStackTrace();
+								JFrame frame2 = new JFrame();
+								JOptionPane.showMessageDialog(frame2, 
+									ex.toString(),
+									"An error occured", 
+									JOptionPane.ERROR_MESSAGE);
+							}
 						}
 					}
 				}

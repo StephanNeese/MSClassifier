@@ -1,6 +1,7 @@
 package gui;
 
 import Spectrum.Profile;
+import io.ProfileOpeningThread;
 import io.Reader;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -12,12 +13,12 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -25,7 +26,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
-import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.math.plot.Plot2DPanel;
@@ -186,13 +186,10 @@ public class TestProfileWindow extends JPanel {
 							try {
 								// display waiting message
 								String path = profile.getText();
-								WaitMessage msg = new WaitMessage();
-								msg.join();
-								// load model
-								data = Reader.readProfile(path);
-								// close message automatically
-								msg.close();
-								
+								WaitMessage wait = new WaitMessage("Please wait");
+								// display info
+								ProfileOpeningThread x = new ProfileOpeningThread(path, wait);
+								x.start();
 							} catch (Exception ex) {
 								ex.printStackTrace();
 								JFrame frame2 = new JFrame();

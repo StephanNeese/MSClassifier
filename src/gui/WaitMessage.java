@@ -1,10 +1,18 @@
 package gui;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.Toolkit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -12,60 +20,42 @@ import javax.swing.UnsupportedLookAndFeelException;
  *
  * @author wens
  */
-public class WaitMessage extends Thread{
+public class WaitMessage{
 	
-	// threading
-	private Thread t;
-	private String threadName;
-	private JFrame frame;
-	private JLabel image;
-	private JLabel text;
-	private JLabel text2;
+	private JDialog wait;
+	private JPanel panel;
+	JLabel waitLabel1;
+	JLabel waitLabel2;
 	
-	public WaitMessage() 
+	public WaitMessage(String title) 
 			throws ClassNotFoundException, 
 			InstantiationException, 
 			IllegalAccessException, 
 			UnsupportedLookAndFeelException{
-		threadName = "loading";
-		frame = new JFrame();
-		frame.setLayout(null);
-		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		frame.setTitle("Please Wait");
-		frame.setSize(500, 100);
-		frame.setVisible(true);
-		frame.setResizable(false);
-		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-		int width = gd.getDisplayMode().getWidth();
-		int height = gd.getDisplayMode().getHeight();
-		frame.setLocation((width-320)/2, (height-100)/2);
-		
-		image= new JLabel(new ImageIcon(this.getClass().getResource("img/time.png")));
-		image.setBounds(5, 5, 48, 48);
-		frame.add(image);
-		
-		text = new JLabel("Please wait while the profile loads.");
-		text2 = new JLabel( "This can take up several minutes depending on the filesize.");
-		text.setFont(text.getFont().deriveFont(12.0f));
-		text2.setFont(text2.getFont().deriveFont(12.0f));
-		text.setBounds(60, 5, 450, 20);
-		text2.setBounds(60, 25, 450, 20);
-		frame.add(text);
-		frame.add(text2);
-	}
-	
-	/** Overwritten method from class Thread. 
-	 * This method starts the thread
-	 * 
-	 */
-	public void start(){
-		if(t==null){
-			t = new Thread(this, threadName);
-			t.start();
-		}
+		wait = new JDialog();
+		panel = new JPanel();
+		panel.setBounds(0, 0, 500, 100);
+		panel.setLayout(null);
+		JLabel image= new JLabel(new ImageIcon(this.getClass().getResource("img/time.png")));
+		image.setBounds(5, 10, 48, 48);
+		panel.add(image);
+		waitLabel1 = new JLabel("Please wait while the profile loads.");
+		waitLabel1.setBounds(60, 15, 400, 20);
+		panel.add(waitLabel1);
+		waitLabel2 = new JLabel("This can take up several minutes depending on the filesize.");
+		panel.add(waitLabel2);
+		waitLabel2.setBounds(60, 35, 400, 20);
+		wait.setTitle(title);
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		int xDim = (dim.width-400)/2;
+		int yDim = (dim.height-150)/2;
+		wait.setBounds(xDim, yDim, 500, 100);
+		wait.setModal(false);
+		wait.add(panel);
+		wait.setVisible(true);
 	}
 	
 	public void close(){
-		frame.setVisible(false);
+		wait.setVisible(false);
 	}
 }
