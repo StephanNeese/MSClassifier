@@ -47,7 +47,6 @@ public class TestProfileWindow extends JPanel {
 	JButton cancel;
 	JButton plot;
 	JButton help;
-	Profile data;
 	
 	/** constructs a new newDatabaseWindow
 	 * 
@@ -79,24 +78,6 @@ public class TestProfileWindow extends JPanel {
 			InstantiationException, 
 			IllegalAccessException, 
 			UnsupportedLookAndFeelException {
-//		setLayout(null);
-//		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-//		setSize(400, 300);
-//		setVisible(true);
-//		setResizable(false);
-//		// positon on screen
-//		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-//		int x = (dim.width-400)/2;
-//		int y = (dim.height-300)/2;
-//		this.setLocation(x, y);
-//		
-//		main = new JPanel();
-//		main.setVisible(true);
-//		main.setLayout(null); 
-//		main.setBounds(0, 0, 400, 300);
-		
-		data = null;
 		
 		profileLabel = new JLabel("path to the profile file");
 		profile = new JTextField();
@@ -215,17 +196,17 @@ public class TestProfileWindow extends JPanel {
 						}
 						
 						try {
-							Profile profile = Reader.readProfile(profilePath);
+							Profile data = Reader.readProfile(profilePath);
 							
-							double[][] data = profile.getData();
-							String[] classes = profile.getClasses();
+							double[][] dataPoints = data.getData();
+							String[] classes = data.getClasses();
 							int[] proportions = new int[classes.length];
-							String[] sampleGroups = profile.getSampleGroups();
+							String[] sampleGroups = data.getSampleGroups();
 							
 							// obtain which group has how many samples to init arrays
 							for(int g=0; g<classes.length; g++){
 								proportions[g] = 0;
-								for(int i=0; i<data[0].length; i++){
+								for(int i=0; i<dataPoints[0].length; i++){
 									if(sampleGroups[i].equals(classes[g])){
 										proportions[g]++;
 									}
@@ -233,19 +214,19 @@ public class TestProfileWindow extends JPanel {
 							}
 							
 							// lookup how many dimensions are in the pca transformed dataset
-							if(data.length>=3){
+							if(dataPoints.length>=3){
 								HashMap<String, double[][]> groups = new HashMap<>();
 								// obtain the subarrays for the classes
 								// containing all samples of a certain class
 								for(int g=0; g<classes.length; g++){
 									double[][] sub = new double[dim][proportions[g]];
 									int cnt = 0;
-									for(int i=0; i<data[0].length; i++){
+									for(int i=0; i<dataPoints[0].length; i++){
 										if(sampleGroups[i].equals(classes[g])){
-											sub[0][cnt] = data[0][i];
-											sub[1][cnt] = data[1][i];
+											sub[0][cnt] = dataPoints[0][i];
+											sub[1][cnt] = dataPoints[1][i];
 											if(dim==3){
-												sub[2][cnt] = data[2][i];
+												sub[2][cnt] = dataPoints[2][i];
 											}
 											cnt++;
 										}
@@ -284,7 +265,7 @@ public class TestProfileWindow extends JPanel {
 									frame.setContentPane(plot);
 									frame.setVisible(true);
 								}
-							}else if(data.length==2){
+							}else if(dataPoints.length==2){
 								
 								HashMap<String, double[][]> groups = new HashMap<>();
 								// obtain the subarrays for the classes
@@ -292,10 +273,10 @@ public class TestProfileWindow extends JPanel {
 								for(int g=0; g<classes.length; g++){
 									double[][] sub = new double[2][proportions[g]];
 									int cnt = 0;
-									for(int i=0; i<data[0].length; i++){
+									for(int i=0; i<dataPoints[0].length; i++){
 										if(sampleGroups[i].equals(classes[g])){
-											sub[0][cnt] = data[0][i];
-											sub[1][cnt] = data[1][i];
+											sub[0][cnt] = dataPoints[0][i];
+											sub[1][cnt] = dataPoints[1][i];
 											cnt++;
 										}
 									}

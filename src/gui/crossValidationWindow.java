@@ -105,22 +105,6 @@ public class crossValidationWindow extends JPanel {
 			InstantiationException, 
 			IllegalAccessException, 
 			UnsupportedLookAndFeelException {
-//		setLayout(null);
-//		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-//		setSize(640, 470);
-//		setVisible(true);
-//		setResizable(false);
-//		// positon on screen
-//		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-//		int x = (dim.width-640)/2;
-//		int y = (dim.height-470)/2;
-//		this.setLocation(x, y);
-//		
-//		main = new JPanel();
-//		main.setVisible(true);
-//		main.setLayout(null); 
-//		main.setBounds(0, 0, 640, 470);
 		
 		databaseLabel = new JLabel("chose the folders containing the csv files");
 		root = new DefaultMutableTreeNode("please choose folder");

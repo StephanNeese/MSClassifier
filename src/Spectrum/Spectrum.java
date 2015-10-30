@@ -275,7 +275,8 @@ public class Spectrum {
 	public void center(double[] means){
 		if(voltage.length!=means.length){
 			throw new IllegalArgumentException("Spectrum and Data in the profile do not have the same M/Z range. "
-			+ "Please adjust the device."
+			+ "Number of dimensions in spectrum: " + voltage.length + ", number of dimensions in untransformed dataset: " + means.length
+			+ ". Please adjust the device."
 			+ " Corrupted file: " + filename);
 		}else{
 			for(int i=0; i<voltage.length; i++){

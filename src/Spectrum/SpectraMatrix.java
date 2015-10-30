@@ -33,9 +33,6 @@ public class SpectraMatrix {
 		numSpectra = spectra.length;
 		groups = new String[numSpectra];
 		log = spectra[0].getLog();
-		// init background as null
-		mzBackground = null;
-		voltBackground = null;
 		
 		// obtain the smallest bin and the biggest bin from all spectra
 		double smallest = spectra[0].getMz()[0];
@@ -87,6 +84,14 @@ public class SpectraMatrix {
 			for(int j=0; j<volt.length; j++){
 				voltage[i][j+diff] = volt[j];
 			}
+		}
+		
+		// init background as empty
+		mzBackground = new double[mz.length];
+		voltBackground = new double[mz.length];
+		for(int i=0; i<mz.length; i++){
+			mzBackground[i] = mz[i];
+			voltBackground[i] = 0.0;
 		}
 		
 		// mean centering

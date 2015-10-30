@@ -55,8 +55,8 @@ public class Main extends JFrame {
 	public Main() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException{
 		setTitle("MS Food classifier");
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		int xDim = (dim.width-1024)/2;
-		int yDim = (dim.height-600)/2;
+		int xDim = (dim.width-820)/2;
+		int yDim = (dim.height-500)/2;
 		this.setLocation(xDim, yDim);
 				
 		// create TabbetPlane for Tabs

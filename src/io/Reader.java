@@ -153,7 +153,7 @@ public class Reader {
 				variance = Double.parseDouble(content[1]);
 			}else if(tmp.startsWith("log:")){
 				String[] content = segment[i].split("\t");
-				log = Boolean.parseBoolean(content[1]);
+				log = Boolean.parseBoolean(content[1].replaceAll("\n", ""));
 			}else if(tmp.startsWith("background:")){
 				String[] content = segment[i].split("\n");
 				mzBackground = new double[content.length - 1];

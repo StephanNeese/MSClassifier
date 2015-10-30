@@ -573,9 +573,11 @@ public class Profile {
 				voltTmp[i] = spectrum.getVoltage(i);
 			}
 			// put empty bins at end
+			int cnt = 1;
 			for(int i=size; i<size+fillBins; i++){
-				mzTmp[i] = spectrum.getMZ(size-1)+(i-(size-1));
+				mzTmp[i] = spectrum.getMZ(size-1)+(cnt*binSize);
 				voltTmp[i] = 0.0;
+				cnt++;
 			}
 			spectrum.setMz(mzTmp);
 			spectrum.setVoltage(voltTmp);
@@ -672,11 +674,7 @@ public class Profile {
 		
 		// use found starting and ending points in matrices to substract the background
 		for(int i=0; i<EndIndex; i++){
-			if((voltage[indexMatrixStart + i] -= voltBackground[indexBGStart + i]) > 0){
-				voltage[indexMatrixStart + i] -= voltBackground[indexBGStart + i];
-			}else{
-				voltage[indexMatrixStart + i] = 0.0;
-			}
+			voltage[indexMatrixStart + i] -= voltBackground[indexBGStart + i];
 		}
 		
 		spectrum.setMz(mz);
