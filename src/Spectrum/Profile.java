@@ -249,6 +249,14 @@ public class Profile {
 	public boolean getLog(){
 		return log;
 	}
+	
+	public double getMzStart(){
+		return mzStart;
+	}
+	
+	public double getMzEnd(){
+		return mzEnd;
+	}
 
 	@Override
 	public String toString() {

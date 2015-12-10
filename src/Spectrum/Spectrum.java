@@ -27,8 +27,8 @@ public class Spectrum {
 	 * @param group assigned group of this spectrum
 	 * @param bin size of a bin
 	 */
-	public Spectrum(String path, String group, double bin, String device, boolean log){
-		readCSV(path, bin, device, log);
+	public Spectrum(String path, String group, double bin, String device, boolean log, double start, double end){
+		readCSV(path, bin, device, log, start, end);
 		this.group = group;
 		this.log = log;
 	}
@@ -40,7 +40,7 @@ public class Spectrum {
 	 * @throws FileNotFoundException
 	 * @throws IOException 
 	 */
-	private void readCSV(String path, double bin, String device, boolean log){
+	private void readCSV(String path, double bin, String device, boolean log, double start, double end){
 		File csv = new File(path);
 		
 		/* continuous loop until file can be opened
@@ -67,8 +67,12 @@ public class Spectrum {
 						}else{
 							lineTmp = text.split("\t");
 						}
-						mzTmp.add(Double.parseDouble(lineTmp[0]));
-						voltageTmp.add(Double.parseDouble(lineTmp[1]));
+						double mzLine = Double.parseDouble(lineTmp[0]);
+						double voltLine = Double.parseDouble(lineTmp[1]);
+						if(mzLine>=start && mzLine<=end){
+							mzTmp.add(mzLine);
+							voltageTmp.add(voltLine);
+						}
 					}
 					// check if we reached the headline of the csv table
 					// check after parse => when headline reached only next line is parsed

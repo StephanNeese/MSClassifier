@@ -192,11 +192,32 @@ public class crossValidation {
 		
 		// classify
 		for(int i=0; i<csv.length; i++){
-			Spectrum spectrum = new Spectrum(csv[i], null, profile.getBinSize(), machine, log);
+			Spectrum spectrum = new Spectrum(
+					csv[i], 
+					null, 
+					profile.getBinSize(), 
+					machine, 
+					log,
+					profile.getMzStart(),
+					profile.getMzEnd() + profile.getBinSize());
 			ClassificationResult res_ed = profile.euclideanDistance(spectrum);
-			spectrum = new Spectrum(csv[i], null, profile.getBinSize(), machine, log);
+			spectrum = new Spectrum(
+					csv[i], 
+					null, 
+					profile.getBinSize(), 
+					machine, 
+					log,
+					profile.getMzStart(),
+					profile.getMzEnd() + profile.getBinSize());
 			ClassificationResult res_md = profile.mahalanobisDistance(spectrum);
-			spectrum = new Spectrum(csv[i], null, profile.getBinSize(), machine, log);
+			spectrum = new Spectrum(
+					csv[i], 
+					null, 
+					profile.getBinSize(), 
+					machine, 
+					log,
+					profile.getMzStart(),
+					profile.getMzEnd() + profile.getBinSize());
 			ClassificationResult res_lda = profile.ldaCoefficient(spectrum);
 			writer.println(spectrum.getFilename() + "\t" 
 					+ res_ed.getAssignedClass() + "\t" 

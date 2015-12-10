@@ -335,7 +335,14 @@ public class classificationWindow extends JPanel {
 									Profile profile = Reader.readProfile(profilePath);
 									// get worst possible score from first result
 									for(int i=0; i<csv.length; i++){
-										Spectrum spectrum = new Spectrum(csv[i], null, profile.getBinSize(), profile.getDevice(), profile.getLog());
+										Spectrum spectrum = new Spectrum(
+												csv[i], 
+												null, 
+												profile.getBinSize(), 
+												profile.getDevice(), 
+												profile.getLog(),
+												profile.getMzStart(),
+												profile.getMzEnd() + profile.getBinSize());
 										ClassificationResult res = profile.euclideanDistance(spectrum);
 										rowData[i][0] = spectrum.getFilename();
 										if(res.getScore()<cutoffValue){
@@ -356,7 +363,14 @@ public class classificationWindow extends JPanel {
 									Profile profile = Reader.readProfile(profilePath);
 									// get worst possible score from first result
 									for(int i=0; i<csv.length; i++){
-										Spectrum spectrum = new Spectrum(csv[i], null, profile.getBinSize(), profile.getDevice(), profile.getLog());
+										Spectrum spectrum = new Spectrum(
+												csv[i], 
+												null, 
+												profile.getBinSize(), 
+												profile.getDevice(), 
+												profile.getLog(),
+												profile.getMzStart(),
+												profile.getMzEnd() + profile.getBinSize());
 										ClassificationResult res = profile.mahalanobisDistance(spectrum);
 										rowData[i][0] = spectrum.getFilename();
 										if(res.getScore()<cutoffValue){
@@ -377,7 +391,14 @@ public class classificationWindow extends JPanel {
 									Profile profile = Reader.readProfile(profilePath);
 									// get worst possible score from first result
 									for(int i=0; i<csv.length; i++){
-										Spectrum spectrum = new Spectrum(csv[i], null, profile.getBinSize(), profile.getDevice(), profile.getLog());
+										Spectrum spectrum = new Spectrum(
+												csv[i], 
+												null, 
+												profile.getBinSize(), 
+												profile.getDevice(), 
+												profile.getLog(),
+												profile.getMzStart(),
+												profile.getMzEnd() + profile.getBinSize());
 										ClassificationResult res = profile.ldaCoefficient(spectrum);
 										rowData[i][0] = spectrum.getFilename();
 										if(res.getScore()<cutoffValue){

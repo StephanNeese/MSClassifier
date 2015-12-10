@@ -16,10 +16,6 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-/**
- *
- * @author wens
- */
 public class WaitMessage{
 	
 	private JDialog wait;

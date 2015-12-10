@@ -73,6 +73,7 @@ public class SpectraMatrix {
 				voltage[i][j] = 0.0;
 			}
 		}
+		
 		// write voltage values
 		for(int i=0; i<numSpectra; i++){
 			// calc the offset of the beginning of the spectrum

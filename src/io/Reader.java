@@ -23,6 +23,19 @@ import java.util.HashMap;
 
 public class Reader {
 	
+	public static void main(String[] args) throws IOException {
+		String group[] = {"/home/wens/exactive/arabica", "/home/wens/exactive/robusta"};
+		
+		SpectraMatrix a = readData(group,
+				"/home/wens/exactive",
+				2,
+				"exactive",
+				false,
+				"");
+		
+		
+	}
+	
 	/** reads in all the csv files in a directory and creates a SpectraMatrix
 	 * 
 	 * @param group all chosen directories in the root directory
@@ -34,12 +47,36 @@ public class Reader {
 	public static SpectraMatrix readData(String[] group, String rootPath, double binSize, String device, boolean log, String backgroundPath) throws IOException{
 		ArrayList<Spectrum> tmp = new ArrayList<>();
 		
+		/** search for the biggest mz value at the start of each spectra
+		 * and the smallest mz value at the end of each spectra
+		 * the binning will only be done between these values to
+		 * prevent unpredictable behaviour because of overlapping bins.
+		 */
+		
+		// read in first and last element from csv file
+		// from first group in the group list
+		String[] csv2 = readFolder(group[0]);
+		csv x = new csv(csv2[0], device);
+		double beginning = x.getFirst();
+		double ending = x.getLast();
+		for(String path : group){
+			String[] csv3 = readFolder(path);
+			csv x2 = new csv(csv3[0], device);
+			// look if one of other groups is smaller/bigger
+			if(x2.getFirst()>beginning){
+				beginning = x2.getFirst();
+			}
+			if(x2.getLast()<ending){
+				ending = x2.getLast();
+			}
+		}
+		
 		for(String path : group){
 			// group name
 			String groupName = path.replace(rootPath+File.separator, "").replaceAll("/", "-").replaceAll("\\\\", "-");
 			String[] csv = readFolder(path);
 			for(int i=0; i<csv.length; i++){
-				tmp.add(new Spectrum(csv[i], groupName, binSize, device, log));
+				tmp.add(new Spectrum(csv[i], groupName, binSize, device, log, beginning, ending));
 			}
 		}
 		
