@@ -306,7 +306,7 @@ public class Profile {
 	public ClassificationResult mahalanobisDistance(Spectrum spectrum){
 		// preprocessing of spectrum to adjust range and delete bins
 		// keep this order even if changes in the method are made
-		adjustRangeOfSpectrum(spectrum);
+//		adjustRangeOfSpectrum(spectrum);
 		substractBackgroundFromSpectrum(spectrum);
 		deleteEmptyBins(spectrum);
 		
@@ -372,7 +372,7 @@ public class Profile {
 	public ClassificationResult euclideanDistance(Spectrum spectrum){
 		// preprocessing of spectrum to adjust range and delete bins
 		// keep this order even if changes in the method are made
-		adjustRangeOfSpectrum(spectrum);
+//		adjustRangeOfSpectrum(spectrum);
 		substractBackgroundFromSpectrum(spectrum);
 		deleteEmptyBins(spectrum);
 		
@@ -422,7 +422,7 @@ public class Profile {
 	public ClassificationResult ldaCoefficient(Spectrum spectrum){
 		// preprocessing of spectrum to adjust range and delete bins
 		// keep this order even if changes in the method are made
-		adjustRangeOfSpectrum(spectrum);
+//		adjustRangeOfSpectrum(spectrum);
 		substractBackgroundFromSpectrum(spectrum);
 		deleteEmptyBins(spectrum);
 		
@@ -504,114 +504,114 @@ public class Profile {
 		);
 	}
 	
-	public void adjustRangeOfSpectrum(Spectrum spectrum){
-		// cut off bins at the beginning or fill empty bins
-		double diff = mzStart - spectrum.getMZ(0);
-		if(diff>0){
-			// find number of bins to cut from spectrum start
-			// parse correctly from double to int and incorporate rounding errors
-			double fillBinsTmp = diff/binSize;
-			int fillBins = 0;
-			if(diff-(fillBinsTmp*binSize)>0){
-				fillBins = (int)fillBinsTmp+1;
-			}else{
-				fillBins = (int)fillBinsTmp;
-			}
-			// now cut off the calculated amount
-			int size = spectrum.getLength();
-			double[] mzTmp = new double[size-fillBins];
-			double[] voltTmp = new double[size-fillBins];
-			for(int i=fillBins; i<size; i++){
-				mzTmp[i-fillBins] = spectrum.getMZ(i);
-				voltTmp[i-fillBins] = spectrum.getVoltage(i);
-			}
-			spectrum.setMz(mzTmp);
-			spectrum.setVoltage(voltTmp);
-			spectrum.setLength(size-fillBins);
-			
-		}else if(diff<0){
-			double fillBinsTmp = diff/binSize*-1;
-			int fillBins = 0;
-			if((diff*-1)-(fillBinsTmp*binSize)>0){
-				fillBins = (int)fillBinsTmp+1;
-			}else{
-				fillBins = (int)fillBinsTmp;
-			}
-			// now fill in the calculated amount
-			int size = spectrum.getLength();
-			double[] mzTmp = new double[size+fillBins];
-			double[] voltTmp = new double[size+fillBins];
-			// put empty bins in front
-			for(int i=0; i<fillBins; i++){
-				mzTmp[i] = spectrum.getMZ(0)-((fillBins-i)*binSize);
-				voltTmp[i] = 0.0;
-			}
-			// put rest of bins after empty bins
-			for(int i=0; i<size; i++){
-				mzTmp[i+fillBins] = spectrum.getMZ(i);
-				voltTmp[i+fillBins] = spectrum.getVoltage(i);
-			}
-			spectrum.setMz(mzTmp);
-			spectrum.setVoltage(voltTmp);
-			spectrum.setLength(size+fillBins);
-		}
-		
-		// cut off bins at the end or fill empty bins
-		double[] mzSpectrum = spectrum.getMz();
-		double diffEnd = mzEnd - mzSpectrum[mzSpectrum.length-1];
-		if(diffEnd>0){
-			// find number of bins to fill into spectrum end
-			// parse correctly from double to int and incorporate rounding errors
-			double fillBinsTmp = diffEnd/binSize;
-			int fillBins = 0;
-			if(diffEnd-(fillBinsTmp*binSize)>0){
-				fillBins = (int)fillBinsTmp+1;
-			}else{
-				fillBins = (int)fillBinsTmp;
-			}
-			
-			// now fill in the calculated amount
-			int size = spectrum.getLength();
-			double[] mzTmp = new double[size+fillBins];
-			double[] voltTmp = new double[size+fillBins];
-			
-			// fill in bins up to prior end
-			for(int i=0; i<size; i++){
-				mzTmp[i] = spectrum.getMZ(i);
-				voltTmp[i] = spectrum.getVoltage(i);
-			}
-			// put empty bins at end
-			int cnt = 1;
-			for(int i=size; i<size+fillBins; i++){
-				mzTmp[i] = spectrum.getMZ(size-1)+(cnt*binSize);
-				voltTmp[i] = 0.0;
-				cnt++;
-			}
-			spectrum.setMz(mzTmp);
-			spectrum.setVoltage(voltTmp);
-			spectrum.setLength(size+fillBins);
-			
-		}else if(diffEnd<0){
-			double fillBinsTmp = diffEnd/binSize*-1;
-			int fillBins = 0;
-			if((diffEnd*-1)-(fillBinsTmp*binSize)>0){
-				fillBins = (int)fillBinsTmp+1;
-			}else{
-				fillBins = (int)fillBinsTmp;
-			}
-			// now cut off the calculated amount
-			int size = spectrum.getLength();
-			double[] mzTmp = new double[size-fillBins];
-			double[] voltTmp = new double[size-fillBins];
-			for(int i=0; i<size-fillBins; i++){
-				mzTmp[i] = spectrum.getMZ(i);
-				voltTmp[i] = spectrum.getVoltage(i);
-			}
-			spectrum.setMz(mzTmp);
-			spectrum.setVoltage(voltTmp);
-			spectrum.setLength(size-fillBins);
-		}
-	}
+//	public void adjustRangeOfSpectrum(Spectrum spectrum){
+//		// cut off bins at the beginning or fill empty bins
+//		double diff = mzStart - spectrum.getMZ(0);
+//		if(diff>0){
+//			// find number of bins to cut from spectrum start
+//			// parse correctly from double to int and incorporate rounding errors
+//			double fillBinsTmp = diff/binSize;
+//			int fillBins = 0;
+//			if(diff-(fillBinsTmp*binSize)>0){
+//				fillBins = (int)fillBinsTmp+1;
+//			}else{
+//				fillBins = (int)fillBinsTmp;
+//			}
+//			// now cut off the calculated amount
+//			int size = spectrum.getLength();
+//			double[] mzTmp = new double[size-fillBins];
+//			double[] voltTmp = new double[size-fillBins];
+//			for(int i=fillBins; i<size; i++){
+//				mzTmp[i-fillBins] = spectrum.getMZ(i);
+//				voltTmp[i-fillBins] = spectrum.getVoltage(i);
+//			}
+//			spectrum.setMz(mzTmp);
+//			spectrum.setVoltage(voltTmp);
+//			spectrum.setLength(size-fillBins);
+//			
+//		}else if(diff<0){
+//			double fillBinsTmp = diff/binSize*-1;
+//			int fillBins = 0;
+//			if((diff*-1)-(fillBinsTmp*binSize)>0){
+//				fillBins = (int)fillBinsTmp+1;
+//			}else{
+//				fillBins = (int)fillBinsTmp;
+//			}
+//			// now fill in the calculated amount
+//			int size = spectrum.getLength();
+//			double[] mzTmp = new double[size+fillBins];
+//			double[] voltTmp = new double[size+fillBins];
+//			// put empty bins in front
+//			for(int i=0; i<fillBins; i++){
+//				mzTmp[i] = spectrum.getMZ(0)-((fillBins-i)*binSize);
+//				voltTmp[i] = 0.0;
+//			}
+//			// put rest of bins after empty bins
+//			for(int i=0; i<size; i++){
+//				mzTmp[i+fillBins] = spectrum.getMZ(i);
+//				voltTmp[i+fillBins] = spectrum.getVoltage(i);
+//			}
+//			spectrum.setMz(mzTmp);
+//			spectrum.setVoltage(voltTmp);
+//			spectrum.setLength(size+fillBins);
+//		}
+//		
+//		// cut off bins at the end or fill empty bins
+//		double[] mzSpectrum = spectrum.getMz();
+//		double diffEnd = mzEnd - mzSpectrum[mzSpectrum.length-1];
+//		if(diffEnd>0){
+//			// find number of bins to fill into spectrum end
+//			// parse correctly from double to int and incorporate rounding errors
+//			double fillBinsTmp = diffEnd/binSize;
+//			int fillBins = 0;
+//			if(diffEnd-(fillBinsTmp*binSize)>0){
+//				fillBins = (int)fillBinsTmp+1;
+//			}else{
+//				fillBins = (int)fillBinsTmp;
+//			}
+//			
+//			// now fill in the calculated amount
+//			int size = spectrum.getLength();
+//			double[] mzTmp = new double[size+fillBins];
+//			double[] voltTmp = new double[size+fillBins];
+//			
+//			// fill in bins up to prior end
+//			for(int i=0; i<size; i++){
+//				mzTmp[i] = spectrum.getMZ(i);
+//				voltTmp[i] = spectrum.getVoltage(i);
+//			}
+//			// put empty bins at end
+//			int cnt = 1;
+//			for(int i=size; i<size+fillBins; i++){
+//				mzTmp[i] = spectrum.getMZ(size-1)+(cnt*binSize);
+//				voltTmp[i] = 0.0;
+//				cnt++;
+//			}
+//			spectrum.setMz(mzTmp);
+//			spectrum.setVoltage(voltTmp);
+//			spectrum.setLength(size+fillBins);
+//			
+//		}else if(diffEnd<0){
+//			double fillBinsTmp = diffEnd/binSize*-1;
+//			int fillBins = 0;
+//			if((diffEnd*-1)-(fillBinsTmp*binSize)>0){
+//				fillBins = (int)fillBinsTmp+1;
+//			}else{
+//				fillBins = (int)fillBinsTmp;
+//			}
+//			// now cut off the calculated amount
+//			int size = spectrum.getLength();
+//			double[] mzTmp = new double[size-fillBins];
+//			double[] voltTmp = new double[size-fillBins];
+//			for(int i=0; i<size-fillBins; i++){
+//				mzTmp[i] = spectrum.getMZ(i);
+//				voltTmp[i] = spectrum.getVoltage(i);
+//			}
+//			spectrum.setMz(mzTmp);
+//			spectrum.setVoltage(voltTmp);
+//			spectrum.setLength(size-fillBins);
+//		}
+//	}
 	
 	/** Deletes all the bins in the spectrum that are not in the
 	 * profile. These bins are missing 
