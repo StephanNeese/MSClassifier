@@ -23,6 +23,14 @@ public class Spectrum {
 	
 	public static void main(String[] args) {
 		// testing here
+		double mz[] = {80.0, 82.0, 84.0, 86.0, 88.0, 90.0, 92.0, 94.0, 96.0, 98.0, 100.0, 102.0};
+		Spectrum x = new Spectrum(
+				"/home/wens/exactive/spectrum_2_III.csv",
+				null,
+				mz,
+				"exactive",
+				false);
+		System.out.println(x);
 	}
 	
 	/** Constructor to create a Spectrum for classification (do not use for Profile creation). 
@@ -35,6 +43,7 @@ public class Spectrum {
 	 */
 	public Spectrum(String path, String group, double[] mz, String device, boolean log){
 		this.mz = mz;
+		voltage = new double[mz.length];
 		this.log = log;
 		this.group = group;
 		readCSVFromRange(path, mz, device, log, mz[1] - mz[0]);
@@ -49,7 +58,6 @@ public class Spectrum {
 	 */
 	private void readCSVFromRange(String path, double[] mz, String device, boolean log, double binSize){
 		File csv = new File(path);
-		List<String> lines = new ArrayList<>();
 		// column splitter symbol
 		String split = "";
 		if(device.equals("Mini 11")){
@@ -65,20 +73,21 @@ public class Spectrum {
 		boolean check = false;
 		while(!check){
 			try{
+				List<String> lines = new ArrayList<>();
 				BufferedReader buff = new BufferedReader(new FileReader(csv));
 		
 				/** read in. **/
 				String text = null;
 				boolean headlineReached = false;
 				while ((text = buff.readLine()) != null) {
-					// check if we reached the headline of the csv table
-					// check after parse => when headline reached only next line is parsed
-					if(text.matches("^(Masse).*") ^ text.matches("^(M/Z,Voltage).*")){
-						headlineReached = true;
-					}
 					// read and push lines
 					if(headlineReached && !(text.isEmpty())){
 						lines.add(text);
+					}
+					// check if we reached the headline of the csv table
+					// check after parse => when headline reached only next line is parsed
+					if(text.matches("^(Masse).*") || text.matches("^(M/Z,Voltage).*")){
+						headlineReached = true;
 					}
 				}
 				
@@ -105,19 +114,21 @@ public class Spectrum {
 				 */
 				lineTmp = lines.get(0).split(split);
 				start = Double.parseDouble(lineTmp[0]);
-				if((start - mz[0] / binSize) >= 1.0){
+				if(((start - mz[0]) / binSize) >= 1.0){
 					lines = fillEmptyBinsAtStart(lines, mz, split);
 				}
 				lineTmp = lines.get(lines.size() - 1).split(split);
 				end = Double.parseDouble(lineTmp[0]);
-				if((mz[mz.length - 1] - end / binSize) >= 1.0){
+				if(((mz[mz.length - 1] + binSize - end) / binSize) >= 1.0){
 					lines = fillEmptyBinsAtEnd(lines, mz, split);
 				}
 				
 				/** finally we can bin the data. **/
 				binning(lines, split);
+				check = true;
 			}catch(Exception ex){
 				// print nothing
+				ex.printStackTrace();
 			}
 		}
 	}
@@ -175,13 +186,11 @@ public class Spectrum {
 		String[] lineTmp = data.get(0).split(split);
 		double start = Double.parseDouble(lineTmp[0]);
 		// first csv mz value - first mz value from profile / binsize = how many bins must be filled up
-		int diff = (int)((Double.parseDouble(data.get(0).split(split)[0]) - mz[0]) - (mz[1] - mz[0]));
+		int diff = (int)((Double.parseDouble(data.get(0).split(split)[0]) - mz[0]) / (mz[1] - mz[0]));
 		
 		// fill bins
-		String[] fill = new String[diff];
 		for(int i=0; i<diff; i++){
 			data.add(i, mz[i] + split + "0.0");
-			
 		}
 		
 		return data;
@@ -197,14 +206,13 @@ public class Spectrum {
 	private List<String> fillEmptyBinsAtEnd(List<String> data, double[] mz, String split){
 		String[] lineTmp = data.get(data.size() - 1).split(split);
 		double end = Double.parseDouble(lineTmp[0]);
+		double binSize = (mz[1] - mz[0]);
 		// last csv mz value - last mz value from profile / binsize = how many bins must be filled up at end
-		int diff = (int)((mz[0] - Double.parseDouble(data.get(data.size() - 1).split(split)[0])) / (mz[1] - mz[0]));
+		int diff = (int)((mz[mz.length-1] + binSize - end) / binSize);
 		
 		// fill bins at end
-		String[] fill = new String[diff];
-		for(int i=0; i<diff; i++){
-			data.add(mz[i] + split + "0.0");
-			
+		for(int i=diff; i>0; i--){
+			data.add(mz[mz.length - i] + split + "0.0");
 		}
 		
 		return data;
