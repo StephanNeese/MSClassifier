@@ -265,11 +265,16 @@ public class Spectrum {
 	}
 	
 	
-	/** constructs a spectrum from a file
+	/** constructs a spectrum from a file using a given binsize
+	 * and within a given mz range.
 	 * 
 	 * @param path path to the csv file containing the spectral data
 	 * @param group assigned group of this spectrum
 	 * @param bin size of a bin
+	 * @param device name of the ms device
+	 * @param log log transformation of data if true
+	 * @param start start of mz range
+	 * @param end end of mz range (upper limit of last bin)
 	 */
 	public Spectrum(String path, String group, double bin, String device, boolean log, double start, double end){
 		readCSV(path, bin, device, log, start, end);

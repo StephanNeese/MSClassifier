@@ -16,9 +16,9 @@ public class SpectraMatrix {
 	
 	private double[] mz;				// mz values (dimensions)
 	private String[] groups;			// the groups of the samples
-	private double[][] voltage;			// [spectrum][mz]
+	private double[][] voltage;			// [spectrum][dimension/bin]
 	private final int numSpectra;		// no of spectras
-	private final int numDimensions;	// no of dimensions (mz bins)
+	private int numDimensions;	// no of dimensions (mz bins)
 	private double mean;				// mean of all values in the matrix
 	private double[] dimensionsMean;	// mean for each dimension
 	private boolean log;				// logarithmic scaling or not
@@ -283,6 +283,12 @@ public class SpectraMatrix {
 				voltage[spec][mzCnt] = voltTmp[spec][mzCnt];
 			}
 		}
+		
+		// new overall mean value
+		calculateMean();
+		
+		// new number of dimensions
+		numDimensions = cnt;
 	}
 	
 	/** returns the mz array
@@ -493,5 +499,26 @@ public class SpectraMatrix {
 				
 			}
 		}
+	}
+	
+	public void printMatrix(){
+		System.out.println("SpectraMatrix:");
+		System.out.println("log transformation: " + log);
+		System.out.println("global mean value: " + mean);
+		System.out.println("number of dimensions: " + numDimensions);
+		System.out.println("number of Spectra: " + numSpectra);
+		System.out.println("Data:");
+		for(int i=0; i<mz.length; i++){
+			System.out.print(mz[i]);
+			for(int j=0; j<voltage.length; j++){
+				System.out.print("\t" + voltage[j][i]);
+			}
+			System.out.println("");
+		}
+		System.out.println("Background:");
+		for(int i=0; i<mzBackground.length; i++){
+			System.out.println(mzBackground[i] + "\t" + voltBackground[i]);
+		}
+		System.out.println("");
 	}
 }

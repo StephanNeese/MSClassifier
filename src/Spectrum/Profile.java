@@ -257,6 +257,10 @@ public class Profile {
 	public double getMzEnd(){
 		return mzEnd;
 	}
+	
+	public double[] getMzBins(){
+		return bins;
+	}
 
 	@Override
 	public String toString() {

@@ -389,8 +389,10 @@ public class NewProfileWindow extends JPanel {
 							double varianceCovered = Double.parseDouble(varianceTmp);
 							try{
 								SpectraMatrix data = Reader.readData(profilePaths, rootPath, binSize, machineName, log.isSelected(), backgroundPath);
+								data.printMatrix();
 								data.deleteEmptyBins();
 								data.calculateDimensionMeans();
+								data.printMatrix();
 								PCADataSet pca_data = PCA.performPCA(data, varianceCovered);
 								LDADataSet lda_data = LDA.performLDA(pca_data, data);
 								// create profile

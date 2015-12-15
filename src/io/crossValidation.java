@@ -195,29 +195,23 @@ public class crossValidation {
 			Spectrum spectrum = new Spectrum(
 					csv[i], 
 					null, 
-					profile.getBinSize(), 
+					profile.getMzBins(), 
 					machine, 
-					log,
-					profile.getMzStart(),
-					profile.getMzEnd() + profile.getBinSize());
+					log);
 			ClassificationResult res_ed = profile.euclideanDistance(spectrum);
 			spectrum = new Spectrum(
 					csv[i], 
 					null, 
-					profile.getBinSize(), 
+					profile.getMzBins(), 
 					machine, 
-					log,
-					profile.getMzStart(),
-					profile.getMzEnd() + profile.getBinSize());
+					log);
 			ClassificationResult res_md = profile.mahalanobisDistance(spectrum);
 			spectrum = new Spectrum(
 					csv[i], 
 					null, 
-					profile.getBinSize(), 
+					profile.getMzBins(), 
 					machine, 
-					log,
-					profile.getMzStart(),
-					profile.getMzEnd() + profile.getBinSize());
+					log);
 			ClassificationResult res_lda = profile.ldaCoefficient(spectrum);
 			writer.println(spectrum.getFilename() + "\t" 
 					+ res_ed.getAssignedClass() + "\t" 
