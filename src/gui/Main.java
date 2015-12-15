@@ -29,6 +29,7 @@ public class Main extends JFrame {
 	JTabbedPane mainPanel;
 	NewProfileWindow create;
 	TestProfileWindow scorePlot;
+	LoadingPlotWindow loadingPlot;
 	crossValidationWindow cross;
 	classificationWindow classify;
 	liveClassificationWindow live;
@@ -65,6 +66,7 @@ public class Main extends JFrame {
 		// create tabs
 		create = new NewProfileWindow();
 		scorePlot = new TestProfileWindow();
+		loadingPlot = new LoadingPlotWindow();
 		cross = new crossValidationWindow();
 		classify = new classificationWindow();
 		live = new liveClassificationWindow();
@@ -78,6 +80,7 @@ public class Main extends JFrame {
 		// add tabs to pane
 		mainPanel.addTab("create profile", createIcon, create);
 		mainPanel.addTab("score plot", scorePlotIcon, scorePlot);
+		mainPanel.addTab("loading plot", scorePlotIcon, loadingPlot);
 		mainPanel.addTab("cross validation", crossIcon, cross);
 		mainPanel.addTab("classification", classIcon, classify);
 		mainPanel.addTab("live classification", classIcon, live);

@@ -389,10 +389,8 @@ public class NewProfileWindow extends JPanel {
 							double varianceCovered = Double.parseDouble(varianceTmp);
 							try{
 								SpectraMatrix data = Reader.readData(profilePaths, rootPath, binSize, machineName, log.isSelected(), backgroundPath);
-								data.printMatrix();
 								data.deleteEmptyBins();
 								data.calculateDimensionMeans();
-								data.printMatrix();
 								PCADataSet pca_data = PCA.performPCA(data, varianceCovered);
 								LDADataSet lda_data = LDA.performLDA(pca_data, data);
 								// create profile
@@ -406,7 +404,7 @@ public class NewProfileWindow extends JPanel {
 										1.0);
 							
 								// show success message
-								JFrame frame = new JFrame();						
+								JFrame frame = new JFrame();
 								JOptionPane.showMessageDialog(frame, 
 										"Profile has been created.", 
 										"Done", 

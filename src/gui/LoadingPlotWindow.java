@@ -4,9 +4,6 @@ import Spectrum.Profile;
 import io.ProfileOpeningThread;
 import io.Reader;
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -18,7 +15,6 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -31,11 +27,12 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.math.plot.Plot2DPanel;
 import org.math.plot.Plot3DPanel;
 
-/**
- *
- * @author wens
+/** This class provides a data structure for
+ * pca transformed data like feature matrix, classnames etc.
+ * 
+ * @author Stephan Neese
  */
-public class TestProfileWindow extends JPanel {
+public class LoadingPlotWindow extends JPanel {
 	
 	JLabel profileLabel;
 	JTextField profile;
@@ -48,14 +45,14 @@ public class TestProfileWindow extends JPanel {
 	JButton plot;
 	JButton help;
 	
-	/** constructs a new testProfileWindow
+	/** constructs a new LoadingPlotWindow
 	 * 
 	 * @throws ClassNotFoundException
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 * @throws UnsupportedLookAndFeelException 
 	 */
-	public TestProfileWindow() 
+	public LoadingPlotWindow() 
 			throws ClassNotFoundException, 
 			InstantiationException, 
 			IllegalAccessException, 
@@ -196,55 +193,17 @@ public class TestProfileWindow extends JPanel {
 						}
 						
 						try {
+							// get plot data
 							Profile data = Reader.readProfile(profilePath);
+							double[][] eigenVectors = data.getFeatures();
 							
-							double[][] dataPoints = data.getData();
-							String[] classes = data.getClasses();
-							int[] proportions = new int[classes.length];
-							String[] sampleGroups = data.getSampleGroups();
-							
-							// obtain which group has how many samples to init arrays
-							for(int g=0; g<classes.length; g++){
-								proportions[g] = 0;
-								for(int i=0; i<dataPoints[0].length; i++){
-									if(sampleGroups[i].equals(classes[g])){
-										proportions[g]++;
-									}
-								}
-							}
-							
-							// lookup how many dimensions are in the pca transformed dataset
-							if(dataPoints.length>=3){
-								HashMap<String, double[][]> groups = new HashMap<>();
-								// obtain the subarrays for the classes
-								// containing all samples of a certain class
-								for(int g=0; g<classes.length; g++){
-									double[][] sub = new double[dim][proportions[g]];
-									int cnt = 0;
-									for(int i=0; i<dataPoints[0].length; i++){
-										if(sampleGroups[i].equals(classes[g])){
-											sub[0][cnt] = dataPoints[0][i];
-											sub[1][cnt] = dataPoints[1][i];
-											if(dim==3){
-												sub[2][cnt] = dataPoints[2][i];
-											}
-											cnt++;
-										}
-									}
-									// push subarray of class to Hash
-									groups.put(classes[g], sub);
-								}
-								
-								// create plot
+							if(eigenVectors.length>=3){
 								if(dim==3){
 									Plot3DPanel plot = new Plot3DPanel("SOUTH");
 									
-									for(int i=0; i<classes.length; i++){
-										double[][] values = groups.get(classes[i]);
-										plot.addScatterPlot(classes[i], values[0], values[1], values[2]);
-									}
+									plot.addScatterPlot("data points", eigenVectors[0], eigenVectors[1], eigenVectors[2]);
 									plot.setAxisLabels("PC1", "PC2", "PC3");
-									
+								
 									// show plot
 									JFrame frame = new JFrame("3D Plot");
 									frame.setSize(600, 600);
@@ -253,59 +212,36 @@ public class TestProfileWindow extends JPanel {
 								}else{
 									Plot2DPanel plot = new Plot2DPanel("SOUTH");
 									
-									for(int i=0; i<classes.length; i++){
-										double[][] values = groups.get(classes[i]);
-										plot.addScatterPlot(classes[i], values[0], values[1]);
-									}
+									plot.addScatterPlot("data points", eigenVectors[0], eigenVectors[1]);
 									plot.setAxisLabels("PC1", "PC2");
 									
 									// show plot
-									JFrame frame = new JFrame("2D Plot");
+									JFrame frame = new JFrame("2D loading plot");
 									frame.setSize(600, 600);
 									frame.setContentPane(plot);
 									frame.setVisible(true);
 								}
-							}else if(dataPoints.length==2){
 								
-								HashMap<String, double[][]> groups = new HashMap<>();
-								// obtain the subarrays for the classes
-								// containing all samples of a certain class
-								for(int g=0; g<classes.length; g++){
-									double[][] sub = new double[2][proportions[g]];
-									int cnt = 0;
-									for(int i=0; i<dataPoints[0].length; i++){
-										if(sampleGroups[i].equals(classes[g])){
-											sub[0][cnt] = dataPoints[0][i];
-											sub[1][cnt] = dataPoints[1][i];
-											cnt++;
-										}
-									}
-									// push subarray of class to Hash
-									groups.put(classes[g], sub);
-								}
-								
-								// create plot
+							}else if(eigenVectors.length==2){
 								Plot2DPanel plot = new Plot2DPanel("SOUTH");
 									
-									for(int i=0; i<classes.length; i++){
-										double[][] values = groups.get(classes[i]);
-										plot.addScatterPlot(classes[i], values[0], values[1]);
-									}
-									plot.setAxisLabels("PC1", "PC2");
+								plot.addScatterPlot("data points", eigenVectors[0], eigenVectors[1]);
+								plot.setAxisLabels("PC1", "PC2");
 									
-									// show plot
-									JFrame frame = new JFrame("2D Plot");
-									frame.setSize(600, 600);
-									frame.setContentPane(plot);
-									frame.setVisible(true);
-									
-									if(dim==3){
-										JFrame frame2 = new JFrame();
-										JOptionPane.showMessageDialog(frame2, 
+								// show plot
+								JFrame frame = new JFrame("2D loading plot");
+								frame.setSize(600, 600);
+								frame.setContentPane(plot);
+								frame.setVisible(true);
+
+								if(dim==3){
+									JFrame frame2 = new JFrame();
+									JOptionPane.showMessageDialog(frame2, 
 											"The dataset only has 2 dimensions to display.", 
 											"Notice", 
 											JOptionPane.INFORMATION_MESSAGE);
-									}
+								}
+								
 							}else{
 								// error message
 								JFrame frame = new JFrame();
