@@ -12,8 +12,10 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 /** This class contains static methods to read in from the file system 
  * and create a SpectraMatrix or a profile. 
@@ -59,6 +61,8 @@ public class Reader {
 		csv x = new csv(csv2[0], device);
 		double beginning = x.getFirst();
 		double ending = x.getLast();
+		// read in first element of all other groups
+		// to check if their ends/starts are sooner or later
 		for(String path : group){
 			String[] csv3 = readFolder(path);
 			csv x2 = new csv(csv3[0], device);
@@ -71,12 +75,29 @@ public class Reader {
 			}
 		}
 		
+		/** create bins for all Spectra to use
+		 * so we dont get different bins in each spectrum.
+		 */
+		
+		// round first and last bin to avoid bins like 91.7234203 etc.
+		double firstBin = Math.floor(beginning);
+		double lastBin = Math.ceil(ending);
+		List<Double> mzTmp = new ArrayList<>();
+		for(double bin=firstBin; bin<=lastBin; bin+=binSize){
+			mzTmp.add(bin);
+		}
+		double[] mz = new double[mzTmp.size()];
+		for(int i=0; i<mzTmp.size(); i++){
+			mz[i] = mzTmp.get(i);
+		}
+		
+		// create all individual spectra using the mz range
 		for(String path : group){
 			// group name
 			String groupName = path.replace(rootPath+File.separator, "").replaceAll("/", "-").replaceAll("\\\\", "-");
 			String[] csv = readFolder(path);
 			for(int i=0; i<csv.length; i++){
-				tmp.add(new Spectrum(csv[i], groupName, binSize, device, log, beginning, ending));
+				tmp.add(new Spectrum(csv[i], groupName, mz, binSize, device, log));
 			}
 		}
 		

@@ -339,6 +339,7 @@ public class classificationWindow extends JPanel {
 												csv[i], 
 												null, 
 												profile.getMzBins(), 
+												profile.getBinSize(),
 												profile.getDevice(), 
 												profile.getLog());
 										ClassificationResult res = profile.euclideanDistance(spectrum);
@@ -365,6 +366,7 @@ public class classificationWindow extends JPanel {
 												csv[i], 
 												null, 
 												profile.getMzBins(), 
+												profile.getBinSize(),
 												profile.getDevice(), 
 												profile.getLog());
 										ClassificationResult res = profile.mahalanobisDistance(spectrum);
@@ -391,6 +393,7 @@ public class classificationWindow extends JPanel {
 												csv[i], 
 												null, 
 												profile.getMzBins(), 
+												profile.getBinSize(),
 												profile.getDevice(), 
 												profile.getLog());
 										ClassificationResult res = profile.ldaCoefficient(spectrum);

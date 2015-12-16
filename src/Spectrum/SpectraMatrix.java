@@ -105,6 +105,8 @@ public class SpectraMatrix {
 	 * and substracts the background data of another matrix
 	 * 
 	 * @param spectra the spectrum array
+	 * @param background the background matrix
+	 * @param bin the binSize of booth matrices
 	 */
 	public SpectraMatrix(Spectrum[] spectra, SpectraMatrix background, double bin){
 		numSpectra = spectra.length;
@@ -201,9 +203,8 @@ public class SpectraMatrix {
 	}
 	
 	/** calculates the mean values for all dimensions
-	 * represented in the spectraMatrix
+	 * represented in the spectraMatrix.
 	 * 
-	 * @return the mean values as double array
 	 */
 	public void calculateDimensionMeans(){
 		dimensionsMean = new double[voltage[0].length];
@@ -228,7 +229,7 @@ public class SpectraMatrix {
 		return sum/num;
 	}
 	
-	/** centers the dataset for PCA processing
+	/** centers the dataset for PCA processing.
 	 * 
 	 */
 	public void center(){
@@ -298,14 +299,6 @@ public class SpectraMatrix {
 	public double[] getMz(){
 		return mz;
 	}
-	
-	/** returns the sample names of the spectra matrix
-	 * 
-	 * @return the sample names as string array
-	 */
-//	public String[] getSamples(){
-//		return samples;
-//	}
 	
 	/** returns the groups for each spectrum of the spectra matrix
 	 * 

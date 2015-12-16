@@ -28,6 +28,7 @@ public class Spectrum {
 				"/home/wens/exactive/spectrum_2_III.csv",
 				null,
 				mz,
+				0.5,
 				"exactive",
 				false);
 		System.out.println(x);
@@ -41,12 +42,13 @@ public class Spectrum {
 	 * @param device mass spec device ( Mini 11 or exactive)
 	 * @param log log transformation if true
 	 */
-	public Spectrum(String path, String group, double[] mz, String device, boolean log){
+	public Spectrum(String path, String group, double[] mz, double binSize, String device, boolean log){
 		this.mz = mz;
 		voltage = new double[mz.length];
+		length = mz.length;
 		this.log = log;
 		this.group = group;
-		readCSVFromRange(path, mz, device, log, mz[1] - mz[0]);
+		readCSVFromRange(path, mz, device, log, binSize);
 	}
 	
 	/** reads the content of a csv file for a given mz range.
@@ -57,6 +59,14 @@ public class Spectrum {
 	 * @param log log transformation if true
 	 */
 	private void readCSVFromRange(String path, double[] mz, String device, boolean log, double binSize){
+		if(System.getProperty("os.name").startsWith("Windows")){
+			String[] pathTmp = path.split("\\\\");
+			filename = pathTmp[pathTmp.length-1];
+		}else{
+			String[] pathTmp = path.split("/");
+			filename = pathTmp[pathTmp.length-1];
+		}
+		
 		File csv = new File(path);
 		// column splitter symbol
 		String split = "";
@@ -115,16 +125,16 @@ public class Spectrum {
 				lineTmp = lines.get(0).split(split);
 				start = Double.parseDouble(lineTmp[0]);
 				if(((start - mz[0]) / binSize) >= 1.0){
-					lines = fillEmptyBinsAtStart(lines, mz, split);
+					lines = fillEmptyBinsAtStart(lines, mz, binSize, split);
 				}
 				lineTmp = lines.get(lines.size() - 1).split(split);
 				end = Double.parseDouble(lineTmp[0]);
 				if(((mz[mz.length - 1] + binSize - end) / binSize) >= 1.0){
-					lines = fillEmptyBinsAtEnd(lines, mz, split);
+					lines = fillEmptyBinsAtEnd(lines, mz, binSize, split);
 				}
 				
 				/** finally we can bin the data. **/
-				binning(lines, split);
+				binning(lines, binSize, split);
 				check = true;
 			}catch(Exception ex){
 				// print nothing
@@ -138,14 +148,7 @@ public class Spectrum {
 	 * @param data
 	 * @param split 
 	 */
-	private void binning(List<String> data, String split){
-		// new mz array including the upper boundry of the last bin
-		double[] mz2 = new double[mz.length + 1];
-		for(int i=0; i<mz.length; i++){
-			mz2[i] = mz[i];
-		}
-		mz2[mz2.length - 1] = mz[mz.length - 1] + (mz[1] - mz[0]);
-		
+	private void binning(List<String> data, double binSize, String split){
 		// make temp lists to load data into
 		double[] mzData = new double[data.size()];
 		double[] voltageData = new double[data.size()];
@@ -157,19 +160,25 @@ public class Spectrum {
 
 		int low = -1;
 		int cnt = -1;
-		for(int i=1; i<mz2.length-1; i++){
+		for(int i=0; i<mz.length; i++){
 			low = cnt+1;
-			// increase upper limit if value is still below bin border
-			while((cnt+1)<mzData.length && mzData[cnt+1]<mz2[i]){
+			// increase upper limit if value is still below bin border mz[i]+binsize
+			while((cnt+1)<mzData.length && mzData[cnt+1]<(mz[i]+binSize)){
 				cnt++;
 			}
 			// sum up all values that lie in the mz range of the bin
-			if(cnt>-1){
-				double sum = 0.0;
-				for(int x=low; x<=cnt; x++){
-					sum += voltageData[x];
+			double sum = 0.0;
+			for(int x=low; x<=cnt; x++){
+				sum += voltageData[x];
+			}
+			if(log){
+				if(sum > 0){
+					voltage[i] = Math.log(sum);
+				}else{
+					voltage[i] = 0.0;
 				}
-				voltage[i-1] = sum;
+			}else{
+				voltage[i] = sum;
 			}
 		}
 		
@@ -182,11 +191,11 @@ public class Spectrum {
 	 * @param split
 	 * @return 
 	 */
-	private List<String> fillEmptyBinsAtStart(List<String> data, double[] mz, String split){
+	private List<String> fillEmptyBinsAtStart(List<String> data, double[] mz, double binSize, String split){
 		String[] lineTmp = data.get(0).split(split);
 		double start = Double.parseDouble(lineTmp[0]);
 		// first csv mz value - first mz value from profile / binsize = how many bins must be filled up
-		int diff = (int)((Double.parseDouble(data.get(0).split(split)[0]) - mz[0]) / (mz[1] - mz[0]));
+		int diff = (int)((Double.parseDouble(data.get(0).split(split)[0]) - mz[0]) / binSize);
 		
 		// fill bins
 		for(int i=0; i<diff; i++){
@@ -203,10 +212,9 @@ public class Spectrum {
 	 * @param split
 	 * @return 
 	 */
-	private List<String> fillEmptyBinsAtEnd(List<String> data, double[] mz, String split){
+	private List<String> fillEmptyBinsAtEnd(List<String> data, double[] mz, double binSize, String split){
 		String[] lineTmp = data.get(data.size() - 1).split(split);
 		double end = Double.parseDouble(lineTmp[0]);
-		double binSize = (mz[1] - mz[0]);
 		// last csv mz value - last mz value from profile / binsize = how many bins must be filled up at end
 		int diff = (int)((mz[mz.length-1] + binSize - end) / binSize);
 		
@@ -262,147 +270,6 @@ public class Spectrum {
 		}
 		
 		return res;
-	}
-	
-	
-	/** constructs a spectrum from a file using a given binsize
-	 * and within a given mz range.
-	 * 
-	 * @param path path to the csv file containing the spectral data
-	 * @param group assigned group of this spectrum
-	 * @param bin size of a bin
-	 * @param device name of the ms device
-	 * @param log log transformation of data if true
-	 * @param start start of mz range
-	 * @param end end of mz range (upper limit of last bin)
-	 */
-	public Spectrum(String path, String group, double bin, String device, boolean log, double start, double end){
-		readCSV(path, bin, device, log, start, end);
-		this.group = group;
-		this.log = log;
-	}
-	
-	/** reads a csv file and initializes the spectrum object (called in constructor)
-	 * 
-	 * @param path the complete path to the csv file
-	 * @param bin size of a bin
-	 * @throws FileNotFoundException
-	 * @throws IOException 
-	 */
-	private void readCSV(String path, double bin, String device, boolean log, double start, double end){
-		File csv = new File(path);
-		
-		/** continuous loop until file can be opened
-		* files cant be read when an output stream 
-		* of another program is still open.
-		*/
-		boolean check = false;
-		while(!check){
-			try{
-				BufferedReader buff = new BufferedReader(new FileReader(csv));
-		
-				/** read in **/
-				String text = null;
-				boolean headlineReached = false;
-				ArrayList<Double> mzTmp = new ArrayList<>();
-				ArrayList<Double> voltageTmp = new ArrayList<>();
-				while ((text = buff.readLine()) != null) {
-					// parse values to hashmap
-					if(headlineReached && !(text.isEmpty())){
-						String[] lineTmp = null;
-						// different separators for different machines
-						if(device.equals("Mini 11")){
-							lineTmp = text.split(",");
-						}else{
-							lineTmp = text.split("\t");
-						}
-						double mzLine = Double.parseDouble(lineTmp[0]);
-						double voltLine = Double.parseDouble(lineTmp[1]);
-						if(mzLine>=start && mzLine<=end){
-							mzTmp.add(mzLine);
-							voltageTmp.add(voltLine);
-						}
-					}
-					// check if we reached the headline of the csv table
-					// check after parse => when headline reached only next line is parsed
-					if(text.matches("^(Masse).*") ^ text.matches("^(M/Z,Voltage).*")){
-						headlineReached = true;
-					}
-				}
-			
-				/** create bins **/
-				ArrayList<Double> mzTmp2 = new ArrayList<>();
-				ArrayList<Double> voltageTmp2 = new ArrayList<>();
-				// first bin
-				double from = mzTmp.get(0).intValue();
-				double to = from + bin;
-				// init all bins until the end of our mz temp list
-				while(from<=mzTmp.get(mzTmp.size()-1)){
-					mzTmp2.add(from);
-					voltageTmp2.add(0.0);
-					from = to;
-					to = from + bin;
-				}
-				
-				// loop through the created bins
-				// and bin the voltage values
-				int low = -1;
-				int cnt = -1;
-				for(int i=1; i<mzTmp2.size(); i++){
-					low = cnt+1;
-					// increase upper limit if value is still below bin border
-					while((cnt+1)<mzTmp.size() && mzTmp.get(cnt+1)<mzTmp2.get(i)){
-						cnt++;
-					}
-					// sum up all values that lie in the mz range of the bin
-					if(cnt>-1){
-						double sum = 0.0;
-						for(int x=low; x<=cnt; x++){
-							sum += voltageTmp.get(x);
-					    }
-						voltageTmp2.set(i-1, sum);
-					}
-				}
-				// last bin should also be filled
-				if(cnt<(voltageTmp.size()-1)){
-					double sum = 0.0;
-					for(int i=cnt+1; i<=voltageTmp.size()-1; i++){
-						sum += voltageTmp.get(i);
-					}
-					voltageTmp2.set(mzTmp2.size()-1, sum);
-				}
-		
-				/** parse from ArrayList to arrays **/
-				mz = new double[mzTmp2.size()];
-				voltage = new double[voltageTmp2.size()];
-				for(int i=0; i<mzTmp2.size(); i++){
-					mz[i] = mzTmp2.get(i);
-					// check for log transformation
-					if(log){
-						if(voltageTmp2.get(i) > 0){
-							voltage[i] = Math.log(voltageTmp2.get(i));
-						}else{
-							voltage[i] = 0.0;
-						}
-					}else{
-						voltage[i] = voltageTmp2.get(i);
-					}
-				}
-		
-				if(System.getProperty("os.name").startsWith("Windows")){
-					String[] pathTmp = path.split("\\\\");
-					filename = pathTmp[pathTmp.length-1];
-				}else{
-					String[] pathTmp = path.split("/");
-					filename = pathTmp[pathTmp.length-1];
-				}
-		
-				length = mzTmp2.size();
-				check = true;
-			}catch(Exception ex){
-				// print nothing
-			}
-		}
 	}
 
 	/** returns the mz values

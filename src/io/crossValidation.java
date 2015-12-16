@@ -196,6 +196,7 @@ public class crossValidation {
 					csv[i], 
 					null, 
 					profile.getMzBins(), 
+					profile.getBinSize(),
 					machine, 
 					log);
 			ClassificationResult res_ed = profile.euclideanDistance(spectrum);
@@ -203,6 +204,7 @@ public class crossValidation {
 					csv[i], 
 					null, 
 					profile.getMzBins(), 
+					profile.getBinSize(),
 					machine, 
 					log);
 			ClassificationResult res_md = profile.mahalanobisDistance(spectrum);
@@ -210,6 +212,7 @@ public class crossValidation {
 					csv[i], 
 					null, 
 					profile.getMzBins(), 
+					profile.getBinSize(),
 					machine, 
 					log);
 			ClassificationResult res_lda = profile.ldaCoefficient(spectrum);
