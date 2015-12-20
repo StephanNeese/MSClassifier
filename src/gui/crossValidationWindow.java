@@ -44,6 +44,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import org.apache.commons.io.FileDeleteStrategy;
 import org.apache.commons.io.FileUtils;
 import preprocessing.LDA;
 import preprocessing.LDADataSet;
@@ -381,12 +382,11 @@ public class crossValidationWindow extends JPanel {
 							// make cross validation folder
 							File cvDir = new File(crossValidationLocation + File.separator + "crossValidation");
 							if(cvDir.exists() && cvDir.isDirectory()){
-								try {
-									FileUtils.deleteDirectory(cvDir);
-									cvDir.mkdir();
-								} catch (IOException ex) {
-									Logger.getLogger(crossValidationWindow.class.getName()).log(Level.SEVERE, null, ex);
+								while(!FileDeleteStrategy.FORCE.deleteQuietly(cvDir)){
+									System.gc();
+									System.out.println("failed to delete cross validation Dir");
 								}
+								cvDir.mkdir();
 							}else{
 								cvDir.mkdir();
 							}

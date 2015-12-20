@@ -108,7 +108,7 @@ public class Reader {
 		
 		// call garbage collector 
 		// this is nessessary in windows to be able to remove files
-		System.gc();
+//		System.gc();
 		
 		// if backgroundPath contains a path then get backgrounddata 
 		// and init background substracted matrix by calling constructor
