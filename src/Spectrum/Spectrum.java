@@ -141,6 +141,10 @@ public class Spectrum {
 				ex.printStackTrace();
 			}
 		}
+		
+		// remove reference for garbage collection later
+		// nessessary to remove files in windows
+		csv = null;
 	}
 	
 	/**

@@ -128,6 +128,13 @@ public class crossValidation {
 					results,
 					machineName,
 					log);
+			
+			// remove references for garbage collector
+			profileDir = null;
+			classDir = null;
+			// call garbage collector to remove old references from memory
+			// this is nessessary to remove files in windows
+			System.gc();
 		}
 		
 		// evaluate everything

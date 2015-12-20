@@ -106,6 +106,10 @@ public class Reader {
 			spectra[i] = tmp.get(i);
 		}
 		
+		// call garbage collector 
+		// this is nessessary in windows to be able to remove files
+		System.gc();
+		
 		// if backgroundPath contains a path then get backgrounddata 
 		// and init background substracted matrix by calling constructor
 		// SpectraMatrix(Spectrum[] spectra, SpectraMatrix background, double binSize)
@@ -133,6 +137,10 @@ public class Reader {
 				tmp.add(filePath);
 			}
 		}
+		// remove reference to folder and call garbage collector 
+		// this is nessessary in windows to be able to remove files
+		folder = null;
+		System.gc();
 		
 		String[] res = new String[tmp.size()];
 		for(int i=0; i<tmp.size(); i++){
