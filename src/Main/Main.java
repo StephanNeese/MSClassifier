@@ -20,6 +20,8 @@ import preprocessing.LDA;
 import preprocessing.LDADataSet;
 import java.util.ArrayList;
 import java.util.Date;
+import preprocessing.EigenVector;
+import weka.core.matrix.Matrix;
 
 public class Main {
 	
@@ -37,12 +39,22 @@ public class Main {
 		args[6] = output file for results
 		*/
 //		
-//		String[] profilePath = readProfilePaths("/home/wens/mini_all");
-////		
-//		SpectraMatrix data = Reader.readData(profilePath, "/home/wens/mini_all", 2.0, "Mini 11", true);
-//		data.deleteEmptyBins();
-//		data.calculateDimensionMeans();
+		String[] profilePath = readProfilePaths("/home/wens/mini_all");
+//		
+		SpectraMatrix data = Reader.readData(profilePath, "/home/wens/mini_all", 2.0, "Mini 11", true, "");
+		data.deleteEmptyBins();
+		data.calculateDimensionMeans();
+		
+		
+		
 //		data.center();
+//		Matrix matrixData = new Matrix(data.getData());
+//		
+//		EigenVector[] eig = PCA.nipals(matrixData, 60);
+//		for(EigenVector e : eig){
+//			e.print();
+//		}
+		
 //		PCADataSet pca_data = PCA.performPCA(data, Double.parseDouble(args[2]));
 //		LDADataSet lda_data = LDA.performLDA(pca_data, data);
 //
@@ -113,7 +125,7 @@ public class Main {
 //		writer.close();
 	}
 	
-	private static String[] readProfilePaths(String root){
+	public static String[] readProfilePaths(String root){
 		File dir = new File(root);
 		
 		// get all the files from a directory

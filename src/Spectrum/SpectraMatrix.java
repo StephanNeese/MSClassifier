@@ -18,7 +18,7 @@ public class SpectraMatrix {
 	private String[] groups;			// the groups of the samples
 	private double[][] voltage;			// [spectrum][dimension/bin]
 	private final int numSpectra;		// no of spectras
-	private int numDimensions;	// no of dimensions (mz bins)
+	private int numDimensions;			// no of dimensions (mz bins)
 	private double mean;				// mean of all values in the matrix
 	private double[] dimensionsMean;	// mean for each dimension
 	private boolean log;				// logarithmic scaling or not

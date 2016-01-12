@@ -37,23 +37,15 @@ import preprocessing.PCADataSet;
 public class crossValidation {
 	
 	public static void validate(
-			String[] paths, 
-			String rootPath, 
-			double binSize,
-			double varianceCovered,
-			String machineName,
-			String cvDir,
-			String resultsDir,
-			String background, 
-			boolean log) throws IOException, 
+			CrossValidationParameterSet params) throws IOException, 
 			FileNotFoundException, 
 			ParseException{
 		HashMap<String, String[]> files = new HashMap<>();
 		
 		// load files into hash
-		for(String path : paths){
+		for(String path : params.paths){
 			// group names as identifiers
-			String groupName = path.replace(rootPath+File.separator, "").replaceAll("/", "-").replaceAll("\\\\", "-");
+			String groupName = path.replace(params.rootPath+File.separator, "").replaceAll("/", "-").replaceAll("\\\\", "-");
 			files.put(groupName, Reader.readFolder(path));
 		}
 		
@@ -62,8 +54,8 @@ public class crossValidation {
 		// repeat until everything has been used for profile creation and classification
 		for(int i=0; i<10; i++){
 			// create folders for profile csv files and classification csv files
-			File profileDir = new File(cvDir + File.separator + "profile");
-			File classDir = new File(cvDir + File.separator + "data");
+			File profileDir = new File(params.cvDir + File.separator + "profile");
+			File classDir = new File(params.cvDir + File.separator + "data");
 			if(profileDir.exists()){
 				while(!FileDeleteStrategy.FORCE.deleteQuietly(profileDir)){
 					System.gc();
@@ -119,22 +111,27 @@ public class crossValidation {
 			}
 			
 			// now make profile and classify
-			String profileName = cvDir
+			String profileName = params.cvDir
 					+ File.separator 
 					+ "profiles" 
 					+ File.separator 
 					+ "profile" 
 					+ i 
 					+ ".profile";
-			makeProfile(paths, rootPath, binSize, varianceCovered, machineName, profileName, background, log);
+			if(params.algorithm==CrossValidationParameterSet.Algorithm.QR){
+				makeProfileQR(params.paths, params.rootPath, params.binSize, params.variance, params.machine, profileName, params.background, params.log);
+			}else{
+				makeProfileNIPALS(params.paths, params.rootPath, params.binSize, params.dimensions, params.machine, profileName, params.background, params.log);
+			}
+			
 			// classify
-			String results = resultsDir + File.separator + "results" + i + ".csv";
+			String results = params.resultsDir + File.separator + "results" + i + ".csv";
 			classify(
 					profileName, 
 					classDir.getAbsolutePath(),
 					results,
-					machineName,
-					log);
+					params.machine,
+					params.log);
 			
 			// remove references for garbage collector
 			profileDir = null;
@@ -145,10 +142,10 @@ public class crossValidation {
 		}
 		
 		// evaluate everything
-		evaluate(resultsDir);
+		evaluate(params.resultsDir);
 	}
 	
-	private static void makeProfile(
+	private static void makeProfileQR(
 			String[] profilePaths,
 			String rootPath,
 			double binSize,
@@ -161,7 +158,36 @@ public class crossValidation {
 			SpectraMatrix data = Reader.readData(profilePaths, rootPath, binSize, machineName, log, background);
 			data.deleteEmptyBins();
 			data.calculateDimensionMeans();
-			PCADataSet pca_data = PCA.performPCA(data, varianceCovered);
+			PCADataSet pca_data = PCA.performPCAusingQR(data, varianceCovered);
+			LDADataSet lda_data = LDA.performLDA(pca_data, data);
+			// create profile
+			ProfileBuilder.build(
+				pca_data, 
+				lda_data,
+				data, 
+				machineName, 
+				rootPath, 
+				profileName, 
+				1.0);
+		}catch (Exception ex) {
+			Logger.getLogger(NewProfileWindow.class.getName()).log(Level.SEVERE, null, ex);
+		}
+	}
+	
+	private static void makeProfileNIPALS(
+			String[] profilePaths,
+			String rootPath,
+			double binSize,
+			int dimensions,
+			String machineName,
+			String profileName,
+			String background,
+			boolean log){
+		try{
+			SpectraMatrix data = Reader.readData(profilePaths, rootPath, binSize, machineName, log, background);
+			data.deleteEmptyBins();
+			data.calculateDimensionMeans();
+			PCADataSet pca_data = PCA.performPCAusingNIPALS(data, dimensions);
 			LDADataSet lda_data = LDA.performLDA(pca_data, data);
 			// create profile
 			ProfileBuilder.build(

@@ -137,21 +137,21 @@ public class liveClassificationWindow extends JPanel {
 		this.add(cutoff);
 		
 		sep = new JSeparator();
-		sep.setBounds(10, 405, 620, 10);
+		sep.setBounds(10, 475, 620, 10);
 		this.add(sep);
 		
 		cancel = new JButton("cancel");
-		cancel.setBounds(420, 420, 100, 35);
+		cancel.setBounds(420, 490, 100, 35);
 		cancel.setIcon(new ImageIcon(this.getClass().getResource("img/exit.png")));
 		this.add(cancel);
 		
 		classify = new JButton("classify");
-		classify.setBounds(530, 420, 100, 35);
+		classify.setBounds(530, 490, 100, 35);
 		classify.setIcon(new ImageIcon(this.getClass().getResource("img/go.png")));
 		this.add(classify);
 		
 		help = new JButton("help");
-		help.setBounds(10, 420, 100, 35);
+		help.setBounds(10, 490, 100, 35);
 		help.setIcon(new ImageIcon(this.getClass().getResource("img/help.png")));
 		this.add(help);
 	}

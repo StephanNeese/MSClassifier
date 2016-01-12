@@ -26,6 +26,7 @@ import preprocessing.PCADataSet;
 import io.ProfileBuilder;
 import io.Reader;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,8 +71,12 @@ public class NewProfileWindow extends JPanel {
 	JComboBox machine;
 	JLabel binLabel;
 	JTextField bin;
+	JLabel algorithmLabel;
+	JComboBox algorithm;
 	JLabel varianceLabel;
 	JTextField variance;
+	JLabel dimensionsLabel;
+	JTextField dimensions;
 	JLabel backgroundLabel;
 	JTextField background;
 	JButton backgroundSearch;
@@ -120,10 +125,10 @@ public class NewProfileWindow extends JPanel {
 		databasePane = new JScrollPane(tree, 
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, 
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		databasePane.setBounds(10, 30, 300, 310);
+		databasePane.setBounds(10, 30, 300, 380);
 		databaseLabel.setBounds(10, 10, 280, 15);
 		databaseButton = new JButton("choose root folder");
-		databaseButton.setBounds(10, 350, 150, 30);
+		databaseButton.setBounds(10, 420, 150, 30);
 		this.add(databaseLabel);
 		this.add(databasePane);
 		this.add(databaseButton);
@@ -144,19 +149,37 @@ public class NewProfileWindow extends JPanel {
 		this.add(binLabel);
 		this.add(bin);
 		
+		algorithmLabel = new JLabel("choose PCA Method");
+		algorithm = new JComboBox();
+		algorithm.addItem("QR Algorithm");
+		algorithm.addItem("NIPALS");
+		algorithmLabel.setBounds(330, 150, 200, 15);
+		algorithm.setBounds(330, 170, 300, 30);
+		this.add(algorithmLabel);
+		this.add(algorithm);
+		
 		varianceLabel = new JLabel("variance covered");
 		variance = new JTextField();
-		varianceLabel.setBounds(330, 150, 200, 15);
-		variance.setBounds(330, 170, 300, 30);
+		varianceLabel.setBounds(330, 220, 145, 15);
+		variance.setBounds(330, 240, 145, 30);
 		this.add(varianceLabel);
 		this.add(variance);
+		
+		dimensionsLabel = new JLabel("number of dimensions");
+		dimensions = new JTextField();
+		dimensionsLabel.setForeground(new Color(120,120,120));
+		dimensionsLabel.setBounds(485, 220, 145, 15);
+		dimensions.setBounds(485, 240, 145, 30);
+		dimensions.setEditable(false);
+		this.add(dimensionsLabel);
+		this.add(dimensions);
 		
 		profileLabel = new JLabel("Name and path of the profile");
 		profile = new JTextField();
 		profileSearch = new JButton("search");
-		profileLabel.setBounds(330, 220, 250, 15);
-		profile.setBounds(330, 240, 200, 30);
-		profileSearch.setBounds(540, 240, 90, 30);
+		profileLabel.setBounds(330, 290, 250, 15);
+		profile.setBounds(330, 310, 200, 30);
+		profileSearch.setBounds(540, 310, 90, 30);
 		this.add(profileLabel);
 		this.add(profile);
 		this.add(profileSearch);
@@ -164,36 +187,36 @@ public class NewProfileWindow extends JPanel {
 		backgroundLabel = new JLabel("Path to background spectra");
 		background = new JTextField();
 		backgroundSearch = new JButton("search");
-		backgroundLabel.setBounds(330, 290, 250, 15);
-		background.setBounds(330, 310, 200, 30);
-		backgroundSearch.setBounds(540, 310, 90, 30);
+		backgroundLabel.setBounds(330, 360, 250, 15);
+		background.setBounds(330, 380, 200, 30);
+		backgroundSearch.setBounds(540, 380, 90, 30);
 		this.add(backgroundLabel);
 		this.add(background);
 		this.add(backgroundSearch);
 		
 		logLabel = new JLabel("log transformation");
-		logLabel.setBounds(360, 357, 200, 15);
+		logLabel.setBounds(360, 427, 200, 15);
 		this.add(logLabel);
 		log = new JCheckBox();
-		log.setBounds(330, 350, 30, 30);
+		log.setBounds(330, 420, 30, 30);
 		this.add(log);
 		
 		sep = new JSeparator();
-		sep.setBounds(10, 405, 620, 10);
+		sep.setBounds(10, 475, 620, 10);
 		this.add(sep);
 		
 		cancel = new JButton("cancel");
-		cancel.setBounds(420, 420, 100, 35);
+		cancel.setBounds(420, 490, 100, 35);
 		cancel.setIcon(new ImageIcon(this.getClass().getResource("img/exit.png")));
 		this.add(cancel);
 		
 		create = new JButton("create");
-		create.setBounds(530, 420, 100, 35);
+		create.setBounds(530, 490, 100, 35);
 		create.setIcon(new ImageIcon(this.getClass().getResource("img/go.png")));
 		this.add(create);
 		
 		help = new JButton("help");
-		help.setBounds(10, 420, 100, 35);
+		help.setBounds(10, 490, 100, 35);
 		help.setIcon(new ImageIcon(this.getClass().getResource("img/help.png")));
 		this.add(help);
 	}
@@ -251,6 +274,26 @@ public class NewProfileWindow extends JPanel {
 								root.add(folder);
 								listFolders(f.getAbsolutePath(), folder);
 							}
+						}
+					}
+				}
+		);
+		
+		algorithm.addActionListener(
+				new ActionListener(){
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						String selection = (String)algorithm.getSelectedItem();
+						if(selection.equals("NIPALS")){
+							varianceLabel.setForeground(new Color(120,120,120));
+							variance.setEditable(false);
+							dimensionsLabel.setForeground(new Color(0,0,0));
+							dimensions.setEditable(true);
+						}else{
+							dimensionsLabel.setForeground(new Color(120,120,120));
+							dimensions.setEditable(false);
+							varianceLabel.setForeground(new Color(0,0,0));
+							variance.setEditable(true);
 						}
 					}
 				}
@@ -374,24 +417,38 @@ public class NewProfileWindow extends JPanel {
 						String machineName = (String)machine.getSelectedItem();
 						String profileName = profile.getText();
 						String binTmp = bin.getText();
+						String algorithmSelected = (String)algorithm.getSelectedItem();
 						String varianceTmp = variance.getText();
+						String dimensionsTmp = dimensions.getText();
 						String backgroundPath = background.getText();
 						
 						// check parameters first
-						if(!("".equals(checkParams(profilePaths, profileName, binTmp, varianceTmp, backgroundPath)))){
+						if(!("".equals(checkParams(profilePaths, profileName, binTmp, varianceTmp, dimensionsTmp, backgroundPath, algorithmSelected)))){
 							JFrame frame = new JFrame();						
 							JOptionPane.showMessageDialog(frame, 
-									checkParams(profilePaths, profileName, binTmp, varianceTmp, backgroundPath),
+									checkParams(profilePaths, profileName, binTmp, varianceTmp, dimensionsTmp, backgroundPath, algorithmSelected),
 									"Invalid Input", 
 									JOptionPane.ERROR_MESSAGE);
 						}else{
 							double binSize = Double.parseDouble(binTmp);
-							double varianceCovered = Double.parseDouble(varianceTmp);
+							
 							try{
 								SpectraMatrix data = Reader.readData(profilePaths, rootPath, binSize, machineName, log.isSelected(), backgroundPath);
 								data.deleteEmptyBins();
 								data.calculateDimensionMeans();
-								PCADataSet pca_data = PCA.performPCA(data, varianceCovered);
+								// init empty PCADataSet and choose which transformation method
+								// should be used depending on the value of algorithmSelected
+								PCADataSet pca_data = new PCADataSet();
+								if(algorithmSelected.equals("NIPALS")){
+									// we use NIPALS for PCA
+									int dimensionsUsed = Integer.parseInt(dimensionsTmp);
+									pca_data = PCA.performPCAusingNIPALS(data, dimensionsUsed);
+								}else{
+									// we use QR Algorithm for PCA
+									double varianceCovered = Double.parseDouble(varianceTmp);
+									pca_data = PCA.performPCAusingQR(data, varianceCovered);
+								}
+								
 								LDADataSet lda_data = LDA.performLDA(pca_data, data);
 								// create profile
 								ProfileBuilder.build(
@@ -420,11 +477,12 @@ public class NewProfileWindow extends JPanel {
 					 * @param path path to the csv file folder
 					 * @param profile path and name to the profile file
 					 * @param bin size of a ms bin
-					 * @param variance the variance covered
+					 * @param variance the variance covered by PCA when using QR Algorithm
+					 * @param dimensions the max number of dimensions to be transformed when using NIPALS for PCA
 					 * @return an empty string if all parameters are valid, 
 					 * a string with error messages otherwise
 					 */
-					private String checkParams(String[] profilePaths, String profile, String bin, String variance, String background){
+					private String checkParams(String[] profilePaths, String profile, String bin, String variance, String dimensions, String background, String algorithm){
 						String res = "";
 						
 						boolean check = true;
@@ -450,14 +508,29 @@ public class NewProfileWindow extends JPanel {
 						if(!(parseDouble(bin))){
 							res += "Error: The value for the bin size is not a valid number\n";
 						}
-						if(!(parseDouble(variance))){
-							res += "Error: The value for the covered variance is not a valid number\n";
+						
+						// check input depending on which algorithm is selected
+						if(algorithm.equals("NIPALS")){
+							if(!(parseInt(dimensions))){
+								res += "Error: The value for the number of dimensions is not a valid number\n";
+							}else{
+								int tmp = Integer.parseInt(dimensions);
+								if(tmp<1 || tmp>60){
+									res += "Error: The number of transformed dimensions must be at least 1 and not greater than 60.\n";
+								}
+							}
 						}else{
-							double tmp = Double.parseDouble(variance);
-							if(tmp<0 || tmp>1.0){
-								res += "Error: The value for the covered variance must be between 0 and 1.0\n";
+							if(!(parseDouble(variance))){
+								res += "Error: The value for the covered variance is not a valid number\n";
+							}else{
+								double tmp = Double.parseDouble(variance);
+								if(tmp<0 || tmp>1.0){
+									res += "Error: The value for the covered variance must be between 0 and 1.0\n";
+								}
 							}
 						}
+						
+						
 						if(!("".equals(background))){
 							File bg = new File(background);
 							if(!(bg.exists() && bg.isDirectory())){
@@ -467,6 +540,20 @@ public class NewProfileWindow extends JPanel {
 						}
 						
 						return res;
+					}
+					
+					/** checks if a String can be parsed to int
+					 * 
+					 * @param x the String containing a number (or something else)
+					 * @return true if string can  parsed to int false otherwise
+					 */
+					private boolean parseInt(String x){
+						try{
+							int tmp = Integer.parseInt(x);
+							return true;
+						}catch(Exception e){
+							return false;
+						}
 					}
 				
 					/** checks if a String can be parsed to double

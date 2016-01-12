@@ -12,6 +12,13 @@ public class PCADataSet {
 	private double[][] transformedFeatureMatrix;	// [vectors][dimensions]
 	private final double variance;					// covered variance by pca
 
+	public PCADataSet(){
+		this.data = null;
+		this.classes = null;
+		this.transformedFeatureMatrix = null;
+		this.variance = 0.0;
+	}
+	
 	/** constructs a PCADataSet from given parameters
 	 * 
 	 * @param data the PCA transformed data 

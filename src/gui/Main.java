@@ -230,7 +230,7 @@ public class Main extends JFrame {
 		
 		// make all visible
 		this.setVisible(true);
-		this.setMinimumSize(new Dimension(820, 500));
+		this.setMinimumSize(new Dimension(820, 570));
 		this.setResizable(false);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}

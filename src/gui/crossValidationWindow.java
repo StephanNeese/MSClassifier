@@ -2,10 +2,12 @@ package gui;
 
 import Spectrum.SpectraMatrix;
 import com.jidesoft.swing.CheckBoxTree;
+import io.CrossValidationParameterSet;
 import io.ProfileBuilder;
 import io.Reader;
 import io.crossValidation;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -45,11 +47,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import org.apache.commons.io.FileDeleteStrategy;
-import org.apache.commons.io.FileUtils;
-import preprocessing.LDA;
-import preprocessing.LDADataSet;
-import preprocessing.PCA;
-import preprocessing.PCADataSet;
 
 public class crossValidationWindow extends JPanel {
 	
@@ -69,8 +66,12 @@ public class crossValidationWindow extends JPanel {
 	JComboBox machine;
 	JLabel binLabel;
 	JTextField bin;
+	JLabel algorithmLabel;
+	JComboBox algorithm;
 	JLabel varianceLabel;
 	JTextField variance;
+	JLabel dimensionsLabel;
+	JTextField dimensions;
 	JLabel backgroundLabel;
 	JTextField background;
 	JButton backgroundSearch;
@@ -114,10 +115,10 @@ public class crossValidationWindow extends JPanel {
 		databasePane = new JScrollPane(tree, 
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, 
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		databasePane.setBounds(10, 30, 300, 310);
+		databasePane.setBounds(10, 30, 300, 380);
 		databaseLabel.setBounds(10, 10, 280, 15);
 		databaseButton = new JButton("choose root folder");
-		databaseButton.setBounds(10, 350, 150, 30);
+		databaseButton.setBounds(10, 420, 150, 30);
 		this.add(databaseLabel);
 		this.add(databasePane);
 		this.add(databaseButton);
@@ -138,19 +139,37 @@ public class crossValidationWindow extends JPanel {
 		this.add(binLabel);
 		this.add(bin);
 		
+		algorithmLabel = new JLabel("choose PCA Method");
+		algorithm = new JComboBox();
+		algorithm.addItem("QR Algorithm");
+		algorithm.addItem("NIPALS");
+		algorithmLabel.setBounds(330, 150, 200, 15);
+		algorithm.setBounds(330, 170, 300, 30);
+		this.add(algorithmLabel);
+		this.add(algorithm);
+		
 		varianceLabel = new JLabel("variance covered");
 		variance = new JTextField();
-		varianceLabel.setBounds(330, 150, 200, 15);
-		variance.setBounds(330, 170, 300, 30);
+		varianceLabel.setBounds(330, 220, 145, 15);
+		variance.setBounds(330, 240, 145, 30);
 		this.add(varianceLabel);
 		this.add(variance);
+		
+		dimensionsLabel = new JLabel("number of dimensions");
+		dimensions = new JTextField();
+		dimensionsLabel.setForeground(new Color(120,120,120));
+		dimensionsLabel.setBounds(485, 220, 145, 15);
+		dimensions.setBounds(485, 240, 145, 30);
+		dimensions.setEditable(false);
+		this.add(dimensionsLabel);
+		this.add(dimensions);
 		
 		crossValidationFolderLabel = new JLabel("where to store the cross validation data");
 		crossValidationFolder = new JTextField();
 		crossValidationFolderSearch = new JButton("search");
-		crossValidationFolderLabel.setBounds(330, 220, 300, 15);
-		crossValidationFolder.setBounds(330, 240, 200, 30);
-		crossValidationFolderSearch.setBounds(540, 240, 90, 30);
+		crossValidationFolderLabel.setBounds(330, 290, 300, 15);
+		crossValidationFolder.setBounds(330, 310, 200, 30);
+		crossValidationFolderSearch.setBounds(540, 310, 90, 30);
 		this.add(crossValidationFolderLabel);
 		this.add(crossValidationFolder);
 		this.add(crossValidationFolderSearch);
@@ -158,36 +177,36 @@ public class crossValidationWindow extends JPanel {
 		backgroundLabel = new JLabel("Path to background spectra");
 		background = new JTextField();
 		backgroundSearch = new JButton("search");
-		backgroundLabel.setBounds(330, 290, 250, 15);
-		background.setBounds(330, 310, 200, 30);
-		backgroundSearch.setBounds(540, 310, 90, 30);
+		backgroundLabel.setBounds(330, 360, 250, 15);
+		background.setBounds(330, 380, 200, 30);
+		backgroundSearch.setBounds(540, 380, 90, 30);
 		this.add(backgroundLabel);
 		this.add(background);
 		this.add(backgroundSearch);
 		
 		logLabel = new JLabel("log transformation");
-		logLabel.setBounds(360, 357, 200, 15);
+		logLabel.setBounds(360, 427, 200, 15);
 		this.add(logLabel);
 		log = new JCheckBox();
-		log.setBounds(330, 350, 30, 30);
+		log.setBounds(330, 420, 30, 30);
 		this.add(log);
 		
 		sep = new JSeparator();
-		sep.setBounds(10, 405, 620, 10);
+		sep.setBounds(10, 475, 620, 10);
 		this.add(sep);
 		
 		cancel = new JButton("cancel");
-		cancel.setBounds(420, 420, 100, 35);
+		cancel.setBounds(420, 490, 100, 35);
 		cancel.setIcon(new ImageIcon(this.getClass().getResource("img/exit.png")));
 		this.add(cancel);
 		
 		go = new JButton("go");
-		go.setBounds(530, 420, 100, 35);
+		go.setBounds(530, 490, 100, 35);
 		go.setIcon(new ImageIcon(this.getClass().getResource("img/go.png")));
 		this.add(go);
 		
 		help = new JButton("help");
-		help.setBounds(10, 420, 100, 35);
+		help.setBounds(10, 490, 100, 35);
 		help.setIcon(new ImageIcon(this.getClass().getResource("img/help.png")));
 		this.add(help);
 	}
@@ -207,6 +226,7 @@ public class crossValidationWindow extends JPanel {
 					 * 
 					 * @param e ActionEvent that occurs when you press the button
 					 */
+					@Override
 					public void actionPerformed(ActionEvent e){
 						JFileChooser fileChooser = new JFileChooser();
 						// set only directories and disable "all files" option
@@ -245,6 +265,26 @@ public class crossValidationWindow extends JPanel {
 								root.add(folder);
 								listFolders(f.getAbsolutePath(), folder);
 							}
+						}
+					}
+				}
+		);
+		
+		algorithm.addActionListener(
+				new ActionListener(){
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						String selection = (String)algorithm.getSelectedItem();
+						if(selection.equals("NIPALS")){
+							varianceLabel.setForeground(new Color(120,120,120));
+							variance.setEditable(false);
+							dimensionsLabel.setForeground(new Color(0,0,0));
+							dimensions.setEditable(true);
+						}else{
+							dimensionsLabel.setForeground(new Color(120,120,120));
+							dimensions.setEditable(false);
+							varianceLabel.setForeground(new Color(0,0,0));
+							variance.setEditable(true);
 						}
 					}
 				}
@@ -368,14 +408,16 @@ public class crossValidationWindow extends JPanel {
 						String machineName = (String)machine.getSelectedItem();
 						String crossValidationLocation = crossValidationFolder.getText();
 						String binTmp = bin.getText();
+						String algorithmSelected = (String)algorithm.getSelectedItem();
 						String varianceTmp = variance.getText();
+						String dimensionsTmp = dimensions.getText();
 						String backgroundPath = background.getText();
 						
 						// check parameters first
-						if(!("".equals(checkParams(profilePaths, crossValidationLocation, binTmp, varianceTmp, backgroundPath)))){
+						if(!("".equals(checkParams(profilePaths, crossValidationLocation, binTmp, varianceTmp, dimensionsTmp, backgroundPath, algorithmSelected)))){
 							JFrame frame = new JFrame();						
 							JOptionPane.showMessageDialog(frame, 
-									checkParams(profilePaths, crossValidationLocation, binTmp, varianceTmp, backgroundPath),
+									checkParams(profilePaths, crossValidationLocation, binTmp, varianceTmp, dimensionsTmp, backgroundPath, algorithmSelected),
 									"Invalid Input", 
 									JOptionPane.ERROR_MESSAGE);
 						}else{
@@ -399,17 +441,27 @@ public class crossValidationWindow extends JPanel {
 							results.mkdir();
 							try {
 								try {
-									// carry out cross validation
-									crossValidation.validate(
+									// set the Algorithm choosen using an Enum type
+									CrossValidationParameterSet.Algorithm alg = CrossValidationParameterSet.Algorithm.QR;
+									if(algorithmSelected.equals("NIPALS")){
+										alg = CrossValidationParameterSet.Algorithm.NIPALS;
+									}
+									// create parameter object
+									CrossValidationParameterSet params = new CrossValidationParameterSet(
+											alg,
 											profilePaths,
 											rootPath,
-											Double.parseDouble(binTmp),
-											Double.parseDouble(varianceTmp),
+											backgroundPath,
 											machineName,
 											cvDir.getAbsolutePath(),
 											results.getAbsolutePath(),
-											backgroundPath,
-											log.isSelected());
+											binTmp,
+											varianceTmp,
+											dimensionsTmp,
+											log.isSelected()
+									);
+									// carry out cross validation
+									crossValidation.validate(params);
 								} catch (FileNotFoundException ex) {
 									Logger.getLogger(crossValidationWindow.class.getName()).log(Level.SEVERE, null, ex);
 								} catch (ParseException ex) {
@@ -430,7 +482,7 @@ public class crossValidationWindow extends JPanel {
 					 * @return an empty string if all parameters are valid, 
 					 * a string with error messages otherwise
 					 */
-					private String checkParams(String[] profilePaths, String profile, String bin, String variance, String background){
+					private String checkParams(String[] profilePaths, String profile, String bin, String variance, String dimensions, String background, String algorithm){
 						String res = "";
 						
 						boolean check = true;
@@ -456,14 +508,29 @@ public class crossValidationWindow extends JPanel {
 						if(!(parseDouble(bin))){
 							res += "Error: The value for the bin size is not a valid number\n";
 						}
-						if(!(parseDouble(variance))){
-							res += "Error: The value for the covered variance is not a valid number\n";
+						
+						// check input depending on which algorithm is selected
+						if(algorithm.equals("NIPALS")){
+							if(!(parseInt(dimensions))){
+								res += "Error: The value for the number of dimensions is not a valid number\n";
+							}else{
+								int tmp = Integer.parseInt(dimensions);
+								if(tmp<1 || tmp>60){
+									res += "Error: The number of transformed dimensions must be at least 1 and not greater than 60.\n";
+								}
+							}
 						}else{
-							double tmp = Double.parseDouble(variance);
-							if(tmp<0 || tmp>1.0){
-								res += "Error: The value for the covered variance must be between 0 and 1.0\n";
+							if(!(parseDouble(variance))){
+								res += "Error: The value for the covered variance is not a valid number\n";
+							}else{
+								double tmp = Double.parseDouble(variance);
+								if(tmp<0 || tmp>1.0){
+									res += "Error: The value for the covered variance must be between 0 and 1.0\n";
+								}
 							}
 						}
+						
+						
 						if(!("".equals(background))){
 							File bg = new File(background);
 							if(!(bg.exists() && bg.isDirectory())){
@@ -473,6 +540,20 @@ public class crossValidationWindow extends JPanel {
 						}
 						
 						return res;
+					}
+					
+					/** checks if a String can be parsed to int
+					 * 
+					 * @param x the String containing a number (or something else)
+					 * @return true if string can  parsed to int false otherwise
+					 */
+					private boolean parseInt(String x){
+						try{
+							int tmp = Integer.parseInt(x);
+							return true;
+						}catch(Exception e){
+							return false;
+						}
 					}
 				
 					/** checks if a String can be parsed to double

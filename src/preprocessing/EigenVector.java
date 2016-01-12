@@ -67,4 +67,12 @@ public class EigenVector implements Comparable<EigenVector> {
 		
 		return res;
 	}
+	
+	public void print(){
+		System.out.println(eigenValue + "\nValues:");
+		for(double d : data){
+			System.out.print("\t" + d);
+		}
+		System.out.println("");
+	}
 }
