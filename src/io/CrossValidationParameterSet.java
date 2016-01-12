@@ -18,6 +18,7 @@ public class CrossValidationParameterSet {
 	public final double variance;
 	public final int dimensions;
 	public final boolean log;
+	public final String separator;
 
 	public CrossValidationParameterSet(
 			Algorithm algorithm, 
@@ -30,7 +31,8 @@ public class CrossValidationParameterSet {
 			String binSize, 
 			String variance, 
 			String dimensions, 
-			boolean log) {
+			boolean log,
+			String separator) {
 		this.algorithm = algorithm;
 		this.paths = paths;
 		this.rootPath = rootPath;
@@ -39,6 +41,7 @@ public class CrossValidationParameterSet {
 		this.cvDir = cvDir;
 		this.resultsDir = resultsDir;
 		this.binSize = Double.parseDouble(binSize);
+		// what algorithm is used
 		if(algorithm==Algorithm.QR){
 			this.variance = Double.parseDouble(variance);
 			this.dimensions = 0;
@@ -47,7 +50,13 @@ public class CrossValidationParameterSet {
 			this.variance = 0.0;
 		}
 		this.log = log;
+		// what separator is used for data
+		if(separator.equals(",")){
+			this.separator = ",";
+		}else if(separator.equals(";")){
+			this.separator = ";";
+		}else{
+			this.separator = "\t";
+		}
 	}
-	
-	
 }

@@ -23,6 +23,7 @@ public class ProfileInfoDialog extends JFrame {
 	
 	private JPanel main;
 	private JLabel created;
+	private JLabel device;
 	private JLabel dimensions;
 	private JLabel variance;
 	private JLabel log;
@@ -47,9 +48,12 @@ public class ProfileInfoDialog extends JFrame {
 		created = new JLabel("Profile created on: " + profile.getDatetime().toString());
 		created.setBounds(10, 10, 350, 30);
 		main.add(created);
+		device = new JLabel("Profile created for device: " + profile.getDevice());
+		device.setBounds(10, 30, 350, 30);
+		main.add(device);
 		double[][] dims = profile.getLdaCovarianceMatrix();
 		dimensions = new JLabel(dims.length + " Dimensions in Profile data");
-		dimensions.setBounds(10, 40, 350, 30);
+		dimensions.setBounds(10, 50, 350, 30);
 		main.add(dimensions);
 		variance = new JLabel("covered variance: " + profile.getVariance());
 		variance.setBounds(10, 70, 350, 30);
@@ -59,7 +63,7 @@ public class ProfileInfoDialog extends JFrame {
 		}else{
 			log = new JLabel("Data in profile is not log scaled");
 		}
-		log.setBounds(10, 100, 350, 30);
+		log.setBounds(10, 90, 350, 30);
 		main.add(log);
 		
 		this.add(main);

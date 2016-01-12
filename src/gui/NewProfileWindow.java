@@ -69,6 +69,8 @@ public class NewProfileWindow extends JPanel {
 	JButton profileSearch;
 	JLabel machineLabel;
 	JComboBox machine;
+	JLabel separatorLabel;
+	JComboBox separator;
 	JLabel binLabel;
 	JTextField bin;
 	JLabel algorithmLabel;
@@ -141,6 +143,16 @@ public class NewProfileWindow extends JPanel {
 		machine.setBounds(330, 30, 300, 30);
 		this.add(machineLabel);
 		this.add(machine);
+		
+		separatorLabel = new JLabel("csv column separator");
+		separator = new JComboBox();
+		separator.addItem(",");
+		separator.addItem(";");
+		separator.addItem("TAB");
+		separatorLabel.setBounds(485, 10, 145, 15);
+		separator.setBounds(485, 30, 145, 30);
+		this.add(separatorLabel);
+		this.add(separator);
 		
 		binLabel = new JLabel("Size of a bin");
 		bin = new JTextField();
@@ -421,6 +433,14 @@ public class NewProfileWindow extends JPanel {
 						String varianceTmp = variance.getText();
 						String dimensionsTmp = dimensions.getText();
 						String backgroundPath = background.getText();
+						String separatorString = "";
+						if(((String)separator.getSelectedItem()).equals(",")){
+							separatorString = ",";
+						}else if(((String)separator.getSelectedItem()).equals(";")){
+							separatorString = ";";
+						}else{
+							separatorString = "\t";
+						}
 						
 						// check parameters first
 						if(!("".equals(checkParams(profilePaths, profileName, binTmp, varianceTmp, dimensionsTmp, backgroundPath, algorithmSelected)))){
@@ -433,7 +453,7 @@ public class NewProfileWindow extends JPanel {
 							double binSize = Double.parseDouble(binTmp);
 							
 							try{
-								SpectraMatrix data = Reader.readData(profilePaths, rootPath, binSize, machineName, log.isSelected(), backgroundPath);
+								SpectraMatrix data = Reader.readData(profilePaths, rootPath, binSize, machineName, log.isSelected(), backgroundPath, separatorString);
 								data.deleteEmptyBins();
 								data.calculateDimensionMeans();
 								// init empty PCADataSet and choose which transformation method
@@ -456,6 +476,7 @@ public class NewProfileWindow extends JPanel {
 										lda_data,
 										data, 
 										machineName, 
+										separatorString,
 										rootPath, 
 										profileName, 
 										1.0);

@@ -64,6 +64,8 @@ public class crossValidationWindow extends JPanel {
 	JButton crossValidationFolderSearch;
 	JLabel machineLabel;
 	JComboBox machine;
+	JLabel separatorLabel;
+	JComboBox separator;
 	JLabel binLabel;
 	JTextField bin;
 	JLabel algorithmLabel;
@@ -127,10 +129,20 @@ public class crossValidationWindow extends JPanel {
 		machine = new JComboBox();
 		machine.addItem("Mini 11");
 		machine.addItem("Exactive");
-		machineLabel.setBounds(330, 10, 200, 15);
-		machine.setBounds(330, 30, 300, 30);
+		machineLabel.setBounds(330, 10, 145, 15);
+		machine.setBounds(330, 30, 145, 30);
 		this.add(machineLabel);
 		this.add(machine);
+		
+		separatorLabel = new JLabel("csv column separator");
+		separator = new JComboBox();
+		separator.addItem(",");
+		separator.addItem(";");
+		separator.addItem("TAB");
+		separatorLabel.setBounds(485, 10, 145, 15);
+		separator.setBounds(485, 30, 145, 30);
+		this.add(separatorLabel);
+		this.add(separator);
 		
 		binLabel = new JLabel("Size of a bin");
 		bin = new JTextField();
@@ -458,7 +470,8 @@ public class crossValidationWindow extends JPanel {
 											binTmp,
 											varianceTmp,
 											dimensionsTmp,
-											log.isSelected()
+											log.isSelected(),
+											(String)separator.getSelectedItem()
 									);
 									// carry out cross validation
 									crossValidation.validate(params);

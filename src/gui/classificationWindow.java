@@ -341,7 +341,8 @@ public class classificationWindow extends JPanel {
 												profile.getMzBins(), 
 												profile.getBinSize(),
 												profile.getDevice(), 
-												profile.getLog());
+												profile.getLog(),
+												profile.getSeparator());
 										ClassificationResult res = profile.euclideanDistance(spectrum);
 										rowData[i][0] = spectrum.getFilename();
 										if(res.getScore()<cutoffValue){
@@ -368,7 +369,8 @@ public class classificationWindow extends JPanel {
 												profile.getMzBins(), 
 												profile.getBinSize(),
 												profile.getDevice(), 
-												profile.getLog());
+												profile.getLog(),
+												profile.getSeparator());
 										ClassificationResult res = profile.mahalanobisDistance(spectrum);
 										rowData[i][0] = spectrum.getFilename();
 										if(res.getScore()<cutoffValue){
@@ -395,7 +397,8 @@ public class classificationWindow extends JPanel {
 												profile.getMzBins(), 
 												profile.getBinSize(),
 												profile.getDevice(), 
-												profile.getLog());
+												profile.getLog(),
+												profile.getSeparator());
 										ClassificationResult res = profile.ldaCoefficient(spectrum);
 										rowData[i][0] = spectrum.getFilename();
 										if(res.getScore()<cutoffValue){

@@ -42,6 +42,7 @@ public class ProfileBuilder {
 			LDADataSet lda,
 			SpectraMatrix originalData, 
 			String device, 
+			String separator,
 			String inputPath, 
 			String path,
 			double adjustment) throws FileNotFoundException, UnsupportedEncodingException, ParseException{
@@ -67,6 +68,8 @@ public class ProfileBuilder {
 		writer.println("date:\t" + date + "\n//#");
 		// print devicename
 		writer.println("device:\t" + device + "\n//#");
+		// print separator
+		writer.println("separator:\t" + separator + "\n//#");
 		// print input path
 		writer.println("path:\t" + inputPath + "\n//#");
 		// print variance covered

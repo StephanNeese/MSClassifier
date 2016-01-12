@@ -25,18 +25,18 @@ import java.util.List;
 
 public class Reader {
 	
-	public static void main(String[] args) throws IOException {
-		String group[] = {"/home/wens/exactive/arabica", "/home/wens/exactive/robusta"};
-		
-		SpectraMatrix a = readData(group,
-				"/home/wens/exactive",
-				2,
-				"exactive",
-				false,
-				"");
-		
-		
-	}
+//	public static void main(String[] args) throws IOException {
+//		String group[] = {"/home/wens/exactive/arabica", "/home/wens/exactive/robusta"};
+//		
+//		SpectraMatrix a = readData(group,
+//				"/home/wens/exactive",
+//				2,
+//				"exactive",
+//				false,
+//				"");
+//		
+//		
+//	}
 	
 	/** reads in all the csv files in a directory and creates a SpectraMatrix
 	 * 
@@ -46,7 +46,7 @@ public class Reader {
 	 * @return a SpectraMatrix Object created from all the csv files in the directory
 	 * @throws IOException 
 	 */
-	public static SpectraMatrix readData(String[] group, String rootPath, double binSize, String device, boolean log, String backgroundPath) throws IOException{
+	public static SpectraMatrix readData(String[] group, String rootPath, double binSize, String device, boolean log, String backgroundPath, String separator) throws IOException{
 		ArrayList<Spectrum> tmp = new ArrayList<>();
 		
 		/** search for the biggest mz value at the start of each spectra
@@ -97,7 +97,7 @@ public class Reader {
 			String groupName = path.replace(rootPath+File.separator, "").replaceAll("/", "-").replaceAll("\\\\", "-");
 			String[] csv = readFolder(path);
 			for(int i=0; i<csv.length; i++){
-				tmp.add(new Spectrum(csv[i], groupName, mz, binSize, device, log));
+				tmp.add(new Spectrum(csv[i], groupName, mz, binSize, device, log, separator));
 			}
 		}
 		
@@ -114,7 +114,7 @@ public class Reader {
 		// and init background substracted matrix by calling constructor
 		// SpectraMatrix(Spectrum[] spectra, SpectraMatrix background, double binSize)
 		if(!("".equals(backgroundPath))){
-			SpectraMatrix background = Reader.readData(group, backgroundPath, binSize, device, log, "");
+			SpectraMatrix background = Reader.readData(group, backgroundPath, binSize, device, log, "", separator);
 			return new SpectraMatrix(spectra, background, binSize);
 		}else{
 			return new SpectraMatrix(spectra, binSize);
@@ -174,6 +174,7 @@ public class Reader {
 		String[] classes = null;
 		Date date = null;
 		String device = null;
+		String separator = null;
 		String inputPath = null;
 		double variance = 0.0;
 		boolean log = false;
@@ -211,6 +212,9 @@ public class Reader {
 			}else if(tmp.startsWith("device:")){
 				String[] content = segment[i].split("\t");
 				device = content[1].replaceAll("\n", "");
+			}else if(tmp.startsWith("separator:")){
+				String[] content = segment[i].split("\t");
+				separator = content[1].replaceAll("\n", "");
 			}else if(tmp.startsWith("path:")){
 				String[] content = segment[i].split("\t");
 				inputPath = content[1].replaceAll("\n", "");
@@ -333,7 +337,8 @@ public class Reader {
 				binSize,
 				ldaCovarianceMatrix,
 				globalMean,
-				fractions
+				fractions,
+				separator
 		);
 	}
 	

@@ -119,9 +119,9 @@ public class crossValidation {
 					+ i 
 					+ ".profile";
 			if(params.algorithm==CrossValidationParameterSet.Algorithm.QR){
-				makeProfileQR(params.paths, params.rootPath, params.binSize, params.variance, params.machine, profileName, params.background, params.log);
+				makeProfileQR(params.paths, params.rootPath, params.binSize, params.variance, params.machine, profileName, params.background, params.log, params.separator);
 			}else{
-				makeProfileNIPALS(params.paths, params.rootPath, params.binSize, params.dimensions, params.machine, profileName, params.background, params.log);
+				makeProfileNIPALS(params.paths, params.rootPath, params.binSize, params.dimensions, params.machine, profileName, params.background, params.log, params.separator);
 			}
 			
 			// classify
@@ -131,7 +131,8 @@ public class crossValidation {
 					classDir.getAbsolutePath(),
 					results,
 					params.machine,
-					params.log);
+					params.log,
+					params.separator);
 			
 			// remove references for garbage collector
 			profileDir = null;
@@ -153,9 +154,10 @@ public class crossValidation {
 			String machineName,
 			String profileName,
 			String background,
-			boolean log){
+			boolean log,
+			String separator){
 		try{
-			SpectraMatrix data = Reader.readData(profilePaths, rootPath, binSize, machineName, log, background);
+			SpectraMatrix data = Reader.readData(profilePaths, rootPath, binSize, machineName, log, background, separator);
 			data.deleteEmptyBins();
 			data.calculateDimensionMeans();
 			PCADataSet pca_data = PCA.performPCAusingQR(data, varianceCovered);
@@ -166,6 +168,7 @@ public class crossValidation {
 				lda_data,
 				data, 
 				machineName, 
+				separator,
 				rootPath, 
 				profileName, 
 				1.0);
@@ -182,9 +185,10 @@ public class crossValidation {
 			String machineName,
 			String profileName,
 			String background,
-			boolean log){
+			boolean log,
+			String separator){
 		try{
-			SpectraMatrix data = Reader.readData(profilePaths, rootPath, binSize, machineName, log, background);
+			SpectraMatrix data = Reader.readData(profilePaths, rootPath, binSize, machineName, log, background, separator);
 			data.deleteEmptyBins();
 			data.calculateDimensionMeans();
 			PCADataSet pca_data = PCA.performPCAusingNIPALS(data, dimensions);
@@ -195,6 +199,7 @@ public class crossValidation {
 				lda_data,
 				data, 
 				machineName, 
+				separator,
 				rootPath, 
 				profileName, 
 				1.0);
@@ -208,7 +213,8 @@ public class crossValidation {
 			String classDir, 
 			String results,
 			String machine,
-			boolean log)
+			boolean log,
+			String separator)
 			throws IOException, 
 			FileNotFoundException, 
 			ParseException{
@@ -238,7 +244,8 @@ public class crossValidation {
 					profile.getMzBins(), 
 					profile.getBinSize(),
 					machine, 
-					log);
+					log,
+					separator);
 			ClassificationResult res_ed = profile.euclideanDistance(spectrum);
 			spectrum = new Spectrum(
 					csv[i], 
@@ -246,7 +253,8 @@ public class crossValidation {
 					profile.getMzBins(), 
 					profile.getBinSize(),
 					machine, 
-					log);
+					log,
+					separator);
 			ClassificationResult res_md = profile.mahalanobisDistance(spectrum);
 			spectrum = new Spectrum(
 					csv[i], 
@@ -254,7 +262,8 @@ public class crossValidation {
 					profile.getMzBins(), 
 					profile.getBinSize(),
 					machine, 
-					log);
+					log,
+					separator);
 			ClassificationResult res_lda = profile.ldaCoefficient(spectrum);
 			writer.println(spectrum.getFilename() + "\t" 
 					+ res_ed.getAssignedClass() + "\t" 

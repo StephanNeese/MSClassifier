@@ -38,14 +38,6 @@ public class Main {
 		args[5] = folder containing csv files to classify
 		args[6] = output file for results
 		*/
-//		
-		String[] profilePath = readProfilePaths("/home/wens/mini_all");
-//		
-		SpectraMatrix data = Reader.readData(profilePath, "/home/wens/mini_all", 2.0, "Mini 11", true, "");
-		data.deleteEmptyBins();
-		data.calculateDimensionMeans();
-		
-		
 		
 //		data.center();
 //		Matrix matrixData = new Matrix(data.getData());

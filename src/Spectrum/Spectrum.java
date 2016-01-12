@@ -21,18 +21,6 @@ public class Spectrum {
 	private int length;				// num dimensions
 	private boolean log;			// log scaling applied
 	
-	public static void main(String[] args) {
-		// testing here
-		double mz[] = {80.0, 82.0, 84.0, 86.0, 88.0, 90.0, 92.0, 94.0, 96.0, 98.0, 100.0, 102.0};
-		Spectrum x = new Spectrum(
-				"/home/wens/exactive/spectrum_2_III.csv",
-				null,
-				mz,
-				0.5,
-				"exactive",
-				false);
-		System.out.println(x);
-	}
 	
 	/** Constructor to create a Spectrum for classification (do not use for Profile creation). 
 	 * 
@@ -41,14 +29,15 @@ public class Spectrum {
 	 * @param mz mz range of the profile
 	 * @param device mass spec device ( Mini 11 or exactive)
 	 * @param log log transformation if true
+	 * @param separator 
 	 */
-	public Spectrum(String path, String group, double[] mz, double binSize, String device, boolean log){
+	public Spectrum(String path, String group, double[] mz, double binSize, String device, boolean log, String separator){
 		this.mz = mz;
 		voltage = new double[mz.length];
 		length = mz.length;
 		this.log = log;
 		this.group = group;
-		readCSVFromRange(path, mz, device, log, binSize);
+		readCSVFromRange(path, mz, device, log, binSize, separator);
 	}
 	
 	/** reads the content of a csv file for a given mz range.
@@ -58,7 +47,7 @@ public class Spectrum {
 	 * @param device mass spec device ( Mini 11 or exactive)
 	 * @param log log transformation if true
 	 */
-	private void readCSVFromRange(String path, double[] mz, String device, boolean log, double binSize){
+	private void readCSVFromRange(String path, double[] mz, String device, boolean log, double binSize, String separator){
 		if(System.getProperty("os.name").startsWith("Windows")){
 			String[] pathTmp = path.split("\\\\");
 			filename = pathTmp[pathTmp.length-1];
@@ -68,13 +57,6 @@ public class Spectrum {
 		}
 		
 		File csv = new File(path);
-		// column splitter symbol
-		String split = "";
-		if(device.equals("Mini 11")){
-			split = ",";
-		}else{
-			split = "\t";
-		}
 		
 		/** continuous loop until file can be opened
 		* files cant be read when an output stream 
@@ -107,34 +89,34 @@ public class Spectrum {
 				
 				// check if data in csv starts earlier than our given mz range
 				String[] lineTmp;
-				lineTmp = lines.get(0).split(split);
+				lineTmp = lines.get(0).split(separator);
 				double start = Double.parseDouble(lineTmp[0]);
 				if(start<mz[0]){
-					lines = cutOffStart(lines, mz[0], split);
+					lines = cutOffStart(lines, mz[0], separator);
 				}
 				// check if data in csv ends later than our given mz range
-				lineTmp = lines.get(lines.size()-1).split(split);
+				lineTmp = lines.get(lines.size()-1).split(separator);
 				double end = Double.parseDouble(lineTmp[0]);
 				if(end>mz[mz.length-1]+binSize){
-					lines = cutOffEnd(lines, mz[mz.length-1]+binSize, split);
+					lines = cutOffEnd(lines, mz[mz.length-1]+binSize, separator);
 				}
 				
 				/** if our csv has a smaller mz range than our profile
 				 * we need to fill it up with empty values. 
 				 */
-				lineTmp = lines.get(0).split(split);
+				lineTmp = lines.get(0).split(separator);
 				start = Double.parseDouble(lineTmp[0]);
 				if(((start - mz[0]) / binSize) >= 1.0){
-					lines = fillEmptyBinsAtStart(lines, mz, binSize, split);
+					lines = fillEmptyBinsAtStart(lines, mz, binSize, separator);
 				}
-				lineTmp = lines.get(lines.size() - 1).split(split);
+				lineTmp = lines.get(lines.size() - 1).split(separator);
 				end = Double.parseDouble(lineTmp[0]);
 				if(((mz[mz.length - 1] + binSize - end) / binSize) >= 1.0){
-					lines = fillEmptyBinsAtEnd(lines, mz, binSize, split);
+					lines = fillEmptyBinsAtEnd(lines, mz, binSize, separator);
 				}
 				
 				/** finally we can bin the data. **/
-				binning(lines, binSize, split);
+				binning(lines, binSize, separator);
 				check = true;
 			}catch(Exception ex){
 				// print nothing
@@ -150,14 +132,14 @@ public class Spectrum {
 	/**
 	 * 
 	 * @param data
-	 * @param split 
+	 * @param separator 
 	 */
-	private void binning(List<String> data, double binSize, String split){
+	private void binning(List<String> data, double binSize, String separator){
 		// make temp lists to load data into
 		double[] mzData = new double[data.size()];
 		double[] voltageData = new double[data.size()];
 		for(int i=0; i<data.size(); i++){
-			String[] tmp = data.get(i).split(split);
+			String[] tmp = data.get(i).split(separator);
 			mzData[i] = Double.parseDouble(tmp[0]);
 			voltageData[i] = Double.parseDouble(tmp[1].replaceAll("\n", ""));
 		}
@@ -192,18 +174,18 @@ public class Spectrum {
 	 * 
 	 * @param data
 	 * @param mz
-	 * @param split
+	 * @param separator
 	 * @return 
 	 */
-	private List<String> fillEmptyBinsAtStart(List<String> data, double[] mz, double binSize, String split){
-		String[] lineTmp = data.get(0).split(split);
+	private List<String> fillEmptyBinsAtStart(List<String> data, double[] mz, double binSize, String separator){
+		String[] lineTmp = data.get(0).split(separator);
 		double start = Double.parseDouble(lineTmp[0]);
 		// first csv mz value - first mz value from profile / binsize = how many bins must be filled up
-		int diff = (int)((Double.parseDouble(data.get(0).split(split)[0]) - mz[0]) / binSize);
+		int diff = (int)((Double.parseDouble(data.get(0).split(separator)[0]) - mz[0]) / binSize);
 		
 		// fill bins
 		for(int i=0; i<diff; i++){
-			data.add(i, mz[i] + split + "0.0");
+			data.add(i, mz[i] + separator + "0.0");
 		}
 		
 		return data;
@@ -213,18 +195,18 @@ public class Spectrum {
 	 * 
 	 * @param data
 	 * @param mz
-	 * @param split
+	 * @param separator
 	 * @return 
 	 */
-	private List<String> fillEmptyBinsAtEnd(List<String> data, double[] mz, double binSize, String split){
-		String[] lineTmp = data.get(data.size() - 1).split(split);
+	private List<String> fillEmptyBinsAtEnd(List<String> data, double[] mz, double binSize, String separator){
+		String[] lineTmp = data.get(data.size() - 1).split(separator);
 		double end = Double.parseDouble(lineTmp[0]);
 		// last csv mz value - last mz value from profile / binsize = how many bins must be filled up at end
 		int diff = (int)((mz[mz.length-1] + binSize - end) / binSize);
 		
 		// fill bins at end
 		for(int i=diff; i>0; i--){
-			data.add(mz[mz.length - i] + split + "0.0");
+			data.add(mz[mz.length - i] + separator + "0.0");
 		}
 		
 		return data;
@@ -234,13 +216,13 @@ public class Spectrum {
 	 * 
 	 * @param data
 	 * @param mz
-	 * @param split
+	 * @param separator
 	 * @return 
 	 */
-	private List<String> cutOffStart(List<String> data, double mz, String split){
+	private List<String> cutOffStart(List<String> data, double mz, String separator){
 		// find first index equal or bigger than first mz bin
 		int cnt = 0;
-		while(Double.parseDouble(data.get(cnt).split(split)[0])<mz){
+		while(Double.parseDouble(data.get(cnt).split(separator)[0])<mz){
 			cnt++;
 		}
 		
@@ -257,13 +239,13 @@ public class Spectrum {
 	 * 
 	 * @param data
 	 * @param mz
-	 * @param split
+	 * @param separator
 	 * @return 
 	 */
-	private List<String> cutOffEnd(List<String> data, double mz, String split){
+	private List<String> cutOffEnd(List<String> data, double mz, String separator){
 		// find last element that is smaller or equal to given mz value
 		int cnt = data.size()-1;
-		while(Double.parseDouble(data.get(cnt).split(split)[0])>mz){
+		while(Double.parseDouble(data.get(cnt).split(separator)[0])>mz){
 			cnt--;
 		}
 		

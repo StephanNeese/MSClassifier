@@ -42,6 +42,8 @@ public class Profile {
 	private final double[] globalMean;				// means of pca dimensions - used for centering sample
 	private final double[] fractions;				// amount of samples of all samples that belong
 													// a single group
+	
+	private final String separator;
 
 	/** constructs a Profile Object
 	 * 
@@ -83,7 +85,8 @@ public class Profile {
 			double binSize,
 			double[][] ldaCovarianceMatrix,
 			double[] globalMean,
-			double[] fractions) {
+			double[] fractions,
+			String separator) {
 		this.classes = classes;
 		this.datetime = datetime;
 		this.device = device;
@@ -106,6 +109,7 @@ public class Profile {
 		this.ldaCovarianceMatrix = ldaCovarianceMatrix;
 		this.globalMean = globalMean;
 		this.fractions = fractions;
+		this.separator = separator;
 	}
 
 	/** returns the classes
@@ -260,6 +264,10 @@ public class Profile {
 	
 	public double[] getMzBins(){
 		return bins;
+	}
+	
+	public String getSeparator(){
+		return separator;
 	}
 
 	@Override
