@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.apache.commons.io.FileDeleteStrategy;
-import org.apache.commons.io.FileUtils;
 import preprocessing.LDA;
 import preprocessing.LDADataSet;
 import preprocessing.PCA;
@@ -59,7 +58,7 @@ public class crossValidation {
 			if(profileDir.exists()){
 				while(!FileDeleteStrategy.FORCE.deleteQuietly(profileDir)){
 					System.gc();
-					System.out.println("failed to delete pofileDir");
+					System.out.println("failed to delete pofileDir. Retry.");
 				}
 				profileDir.mkdir();
 			}else{
@@ -68,7 +67,7 @@ public class crossValidation {
 			if(classDir.exists()){
 				while(!FileDeleteStrategy.FORCE.deleteQuietly(classDir)){
 					System.gc();
-					System.out.println("failed to delete classDir");
+					System.out.println("failed to delete classDir. Retry.");
 				}
 				classDir.mkdir();
 			}else{
