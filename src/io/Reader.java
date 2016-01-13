@@ -194,6 +194,7 @@ public class Reader {
 		double[][] ldaCovarianceMatrix = null;
 		double[] globalMean = null;
 		double[] fractions = null;
+		String algorithm = null;
 		
 		for(int i=0; i<segment.length; i++){
 			String tmp = segment[i].toLowerCase();
@@ -215,6 +216,9 @@ public class Reader {
 			}else if(tmp.startsWith("separator:")){
 				String[] content = segment[i].split("\t");
 				separator = content[1].replaceAll("\n", "");
+			}else if(tmp.startsWith("algorithm:")){
+				String[] content = segment[i].split("\t");
+				algorithm = content[1].replaceAll("\n", "");
 			}else if(tmp.startsWith("path:")){
 				String[] content = segment[i].split("\t");
 				inputPath = content[1].replaceAll("\n", "");
@@ -338,7 +342,8 @@ public class Reader {
 				ldaCovarianceMatrix,
 				globalMean,
 				fractions,
-				separator
+				separator,
+				algorithm
 		);
 	}
 	

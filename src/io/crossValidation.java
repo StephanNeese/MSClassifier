@@ -118,10 +118,31 @@ public class crossValidation {
 					+ "profile" 
 					+ i 
 					+ ".profile";
+			String algorithm = params.algorithm==CrossValidationParameterSet.Algorithm.QR ? "QR algorithm" : "NIPALS";
 			if(params.algorithm==CrossValidationParameterSet.Algorithm.QR){
-				makeProfileQR(params.paths, params.rootPath, params.binSize, params.variance, params.machine, profileName, params.background, params.log, params.separator);
+				makeProfileQR(
+						params.paths, 
+						params.rootPath, 
+						params.binSize, 
+						params.variance, 
+						params.machine, 
+						profileName, 
+						params.background, 
+						params.log, 
+						params.separator, 
+						algorithm);
 			}else{
-				makeProfileNIPALS(params.paths, params.rootPath, params.binSize, params.dimensions, params.machine, profileName, params.background, params.log, params.separator);
+				makeProfileNIPALS(
+						params.paths, 
+						params.rootPath, 
+						params.binSize, 
+						params.dimensions, 
+						params.machine, 
+						profileName, 
+						params.background, 
+						params.log, 
+						params.separator, 
+						algorithm);
 			}
 			
 			// classify
@@ -155,7 +176,8 @@ public class crossValidation {
 			String profileName,
 			String background,
 			boolean log,
-			String separator){
+			String separator,
+			String algorithm){
 		try{
 			SpectraMatrix data = Reader.readData(profilePaths, rootPath, binSize, machineName, log, background, separator);
 			data.deleteEmptyBins();
@@ -169,6 +191,7 @@ public class crossValidation {
 				data, 
 				machineName, 
 				separator,
+				algorithm,
 				rootPath, 
 				profileName, 
 				1.0);
@@ -186,7 +209,8 @@ public class crossValidation {
 			String profileName,
 			String background,
 			boolean log,
-			String separator){
+			String separator,
+			String algorithm){
 		try{
 			SpectraMatrix data = Reader.readData(profilePaths, rootPath, binSize, machineName, log, background, separator);
 			data.deleteEmptyBins();
@@ -200,6 +224,7 @@ public class crossValidation {
 				data, 
 				machineName, 
 				separator,
+				algorithm,
 				rootPath, 
 				profileName, 
 				1.0);

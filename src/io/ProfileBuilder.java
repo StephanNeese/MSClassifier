@@ -43,6 +43,7 @@ public class ProfileBuilder {
 			SpectraMatrix originalData, 
 			String device, 
 			String separator,
+			String algorithm,
 			String inputPath, 
 			String path,
 			double adjustment) throws FileNotFoundException, UnsupportedEncodingException, ParseException{
@@ -70,6 +71,8 @@ public class ProfileBuilder {
 		writer.println("device:\t" + device + "\n//#");
 		// print separator
 		writer.println("separator:\t" + separator + "\n//#");
+		// print algorithm used in pca
+		writer.println("algorithm:\t" + algorithm + "\n//#");
 		// print input path
 		writer.println("path:\t" + inputPath + "\n//#");
 		// print variance covered

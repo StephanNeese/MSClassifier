@@ -44,6 +44,7 @@ public class Profile {
 													// a single group
 	
 	private final String separator;
+	private final String algorithm;
 
 	/** constructs a Profile Object
 	 * 
@@ -86,7 +87,8 @@ public class Profile {
 			double[][] ldaCovarianceMatrix,
 			double[] globalMean,
 			double[] fractions,
-			String separator) {
+			String separator,
+			String algorithm) {
 		this.classes = classes;
 		this.datetime = datetime;
 		this.device = device;
@@ -110,6 +112,7 @@ public class Profile {
 		this.globalMean = globalMean;
 		this.fractions = fractions;
 		this.separator = separator;
+		this.algorithm = algorithm;
 	}
 
 	/** returns the classes
@@ -268,6 +271,10 @@ public class Profile {
 	
 	public String getSeparator(){
 		return separator;
+	}
+	
+	public String getAlgorithm(){
+		return algorithm;
 	}
 
 	@Override

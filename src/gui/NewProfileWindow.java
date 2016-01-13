@@ -139,8 +139,8 @@ public class NewProfileWindow extends JPanel {
 		machine = new JComboBox();
 		machine.addItem("Mini 11");
 		machine.addItem("Exactive");
-		machineLabel.setBounds(330, 10, 200, 15);
-		machine.setBounds(330, 30, 300, 30);
+		machineLabel.setBounds(330, 10, 145, 15);
+		machine.setBounds(330, 30, 145, 30);
 		this.add(machineLabel);
 		this.add(machine);
 		
@@ -477,6 +477,7 @@ public class NewProfileWindow extends JPanel {
 										data, 
 										machineName, 
 										separatorString,
+										algorithmSelected,
 										rootPath, 
 										profileName, 
 										1.0);

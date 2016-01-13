@@ -26,6 +26,7 @@ public class ProfileInfoDialog extends JFrame {
 	private JLabel device;
 	private JLabel dimensions;
 	private JLabel variance;
+	private JLabel algorithm;
 	private JLabel log;
 	
 	public ProfileInfoDialog(Profile profile) 
@@ -37,7 +38,7 @@ public class ProfileInfoDialog extends JFrame {
 		setTitle("Profile Information");
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		int xDim = (dim.width-400)/2;
-		int yDim = (dim.height-150)/2;
+		int yDim = (dim.height-170)/2;
 		this.setLocation(xDim, yDim);
 		
 		main = new JPanel();
@@ -58,19 +59,22 @@ public class ProfileInfoDialog extends JFrame {
 		variance = new JLabel("covered variance: " + profile.getVariance());
 		variance.setBounds(10, 70, 350, 30);
 		main.add(variance);
+		algorithm = new JLabel("PCA algorithm used: " + profile.getAlgorithm());
+		algorithm.setBounds(10, 90, 350, 30);
+		main.add(algorithm);
 		if(profile.getLog()){
 			log = new JLabel("Data in profile is log scaled");
 		}else{
 			log = new JLabel("Data in profile is not log scaled");
 		}
-		log.setBounds(10, 90, 350, 30);
+		log.setBounds(10, 110, 350, 30);
 		main.add(log);
 		
 		this.add(main);
 		
 		// make all visible
 		this.setVisible(true);
-		this.setMinimumSize(new Dimension(400, 160));
+		this.setMinimumSize(new Dimension(400, 170));
 		this.setResizable(false);
 	}
 }
