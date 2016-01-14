@@ -39,6 +39,7 @@ public class crossValidation {
 			CrossValidationParameterSet params) throws IOException, 
 			FileNotFoundException, 
 			ParseException{
+		// groupname linked to an array with all filepaths to the group
 		HashMap<String, String[]> files = new HashMap<>();
 		
 		// load files into hash

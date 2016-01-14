@@ -62,41 +62,40 @@ public class PCA {
 		Matrix E = data.copy();
 		for(int i=0; i<count; i++){
 			Matrix t = getMatrixColumn(E, count);
+			Matrix t_old = t.copy();
 			Matrix p = new Matrix(E.getColumnDimension(), t.getColumnDimension());
-			double tau = 1;
-			double tau_old = 0;
 			int cnt = 0;
-			while(difference(tau, tau_old) > 0.000001 && cnt < E.getRowDimension()){
-				tau_old = tau;
-				p = E.transpose().times(t).times(1.0 / (t.transpose().times(t)).get(0, 0));
+			while(difference(t, t_old, 0.00000001, cnt) && cnt < E.getRowDimension()){
+				p = ((E.transpose()).times(t)).times(1.0 / ((t.transpose()).times(t)).get(0, 0));
 				p= norm(p);
+				t_old = t.copy();
 				t = (E.times(p)).times(1.0 / (p.transpose().times(p)).get(0, 0));
-				tau = (t.transpose()).times(t).get(0, 0);
-				E = E.minus(t.times(p.transpose()));
 				cnt++;
 			}
-			System.out.println("iterations: " + cnt);
+			E = E.minus(t.times(p.transpose()));
 			eigenvector[i] = new EigenVector(
 				p.getColumnPackedCopy(),
-				tau);
+				t.transpose().times(t).get(0, 0));
 		}
 		
 		
 		return eigenvector;
 	}
 	
-	/** calculate the difference between two eigenvalues
-	 * from two iterations.
-	 * 
-	 * @param tau current eigenvalue
-	 * @param tau_old eigenvalue from prior iteration
-	 * @return the difference as a positive double value
-	 */
-	private static double difference(double tau, double tau_old){
-		if(tau>tau_old){
-			return tau-tau_old;
+	private static boolean difference(Matrix t, Matrix t_old, double threshold, int count){
+		// ignore during first iteration because booth values are started the same
+		if(count==0){
+			return true;
+		}
+		// check if the difference is below a certain threshold
+		double diff = (t.transpose()).times(t).get(0, 0) - (t_old.transpose()).times(t_old).get(0, 0);
+		if(diff < 0.0){
+			diff *= -1;
+		}
+		if(diff > threshold*(t.transpose()).times(t).get(0, 0)){
+			return true;
 		}else{
-			return tau_old-tau;
+			return false;
 		}
 	}
 	
