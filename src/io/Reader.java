@@ -215,7 +215,12 @@ public class Reader {
 				device = content[1].replaceAll("\n", "");
 			}else if(tmp.startsWith("separator:")){
 				String[] content = segment[i].split("\t");
-				separator = content[1].replaceAll("\n", "");
+				String sepTmp = content[1].replaceAll("\n", "");
+				if(sepTmp.equals(",") || sepTmp.equals(";")){
+					separator = sepTmp;
+				}else{
+					separator = "\t";
+				}
 			}else if(tmp.startsWith("algorithm:")){
 				String[] content = segment[i].split("\t");
 				algorithm = content[1].replaceAll("\n", "");

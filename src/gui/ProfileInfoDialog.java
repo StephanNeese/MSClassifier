@@ -28,6 +28,7 @@ public class ProfileInfoDialog extends JFrame {
 	private JLabel variance;
 	private JLabel algorithm;
 	private JLabel log;
+	private JLabel separator;
 	
 	public ProfileInfoDialog(Profile profile) 
 			throws ClassNotFoundException, 
@@ -38,11 +39,11 @@ public class ProfileInfoDialog extends JFrame {
 		setTitle("Profile Information");
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		int xDim = (dim.width-400)/2;
-		int yDim = (dim.height-170)/2;
+		int yDim = (dim.height-190)/2;
 		this.setLocation(xDim, yDim);
 		
 		main = new JPanel();
-		main.setBounds(0, 0, 400, 160);
+		main.setBounds(0, 0, 400, 180);
 		main.setVisible(true);
 		main.setLayout(null); 
 		
@@ -69,12 +70,15 @@ public class ProfileInfoDialog extends JFrame {
 		}
 		log.setBounds(10, 110, 350, 30);
 		main.add(log);
+		separator = new JLabel("csv column separator: " + profile.getSeparator());
+		separator.setBounds(10, 130, 350, 30);
+		main.add(separator);
 		
 		this.add(main);
 		
 		// make all visible
 		this.setVisible(true);
-		this.setMinimumSize(new Dimension(400, 170));
+		this.setMinimumSize(new Dimension(400, 190));
 		this.setResizable(false);
 	}
 }

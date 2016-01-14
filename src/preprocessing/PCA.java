@@ -63,25 +63,41 @@ public class PCA {
 		for(int i=0; i<count; i++){
 			Matrix t = getMatrixColumn(E, count);
 			Matrix p = new Matrix(E.getColumnDimension(), t.getColumnDimension());
-			double diff = 1;
+			double tau = 1;
+			double tau_old = 0;
 			int cnt = 0;
-			while(diff > 0.0000000001 && cnt < E.getRowDimension()){
+			while(difference(tau, tau_old) > 0.000001 && cnt < E.getRowDimension()){
+				tau_old = tau;
 				p = E.transpose().times(t).times(1.0 / (t.transpose().times(t)).get(0, 0));
 				p= norm(p);
-				Matrix u_old = t.copy();
 				t = (E.times(p)).times(1.0 / (p.transpose().times(p)).get(0, 0));
-				Matrix d = u_old.minus(t);
-				diff = d.normF();
+				tau = (t.transpose()).times(t).get(0, 0);
 				E = E.minus(t.times(p.transpose()));
 				cnt++;
 			}
+			System.out.println("iterations: " + cnt);
 			eigenvector[i] = new EigenVector(
 				p.getColumnPackedCopy(),
-				t.transpose().times(t).get(0, 0));
+				tau);
 		}
 		
 		
 		return eigenvector;
+	}
+	
+	/** calculate the difference between two eigenvalues
+	 * from two iterations.
+	 * 
+	 * @param tau current eigenvalue
+	 * @param tau_old eigenvalue from prior iteration
+	 * @return the difference as a positive double value
+	 */
+	private static double difference(double tau, double tau_old){
+		if(tau>tau_old){
+			return tau-tau_old;
+		}else{
+			return tau_old-tau;
+		}
 	}
 	
 	

@@ -70,7 +70,11 @@ public class ProfileBuilder {
 		// print devicename
 		writer.println("device:\t" + device + "\n//#");
 		// print separator
-		writer.println("separator:\t" + separator + "\n//#");
+		if(separator.equals(",") || separator.equals(";")){
+			writer.println("separator:\t" + separator + "\n//#");
+		}else{
+			writer.println("separator:\t" + "TAB" + "\n//#");
+		}
 		// print algorithm used in pca
 		writer.println("algorithm:\t" + algorithm + "\n//#");
 		// print input path
