@@ -79,6 +79,8 @@ public class NewProfileWindow extends JPanel {
 	JTextField variance;
 	JLabel dimensionsLabel;
 	JTextField dimensions;
+	JLabel commentLabel;
+	JTextField comment;
 	JLabel backgroundLabel;
 	JTextField background;
 	JButton backgroundSearch;
@@ -156,8 +158,8 @@ public class NewProfileWindow extends JPanel {
 		
 		binLabel = new JLabel("Size of a bin");
 		bin = new JTextField();
-		binLabel.setBounds(330, 80, 200, 15);
-		bin.setBounds(330, 100, 300, 30);
+		binLabel.setBounds(330, 80, 145, 15);
+		bin.setBounds(330, 100, 145, 30);
 		this.add(binLabel);
 		this.add(bin);
 		
@@ -165,26 +167,33 @@ public class NewProfileWindow extends JPanel {
 		algorithm = new JComboBox();
 		algorithm.addItem("QR Algorithm");
 		algorithm.addItem("NIPALS");
-		algorithmLabel.setBounds(330, 150, 200, 15);
-		algorithm.setBounds(330, 170, 300, 30);
+		algorithmLabel.setBounds(485, 80, 145, 15);
+		algorithm.setBounds(485, 100, 145, 30);
 		this.add(algorithmLabel);
 		this.add(algorithm);
 		
 		varianceLabel = new JLabel("variance covered");
 		variance = new JTextField();
-		varianceLabel.setBounds(330, 220, 145, 15);
-		variance.setBounds(330, 240, 145, 30);
+		varianceLabel.setBounds(330, 150, 145, 15);
+		variance.setBounds(330, 170, 145, 30);
 		this.add(varianceLabel);
 		this.add(variance);
 		
 		dimensionsLabel = new JLabel("number of dimensions");
 		dimensions = new JTextField();
 		dimensionsLabel.setForeground(new Color(120,120,120));
-		dimensionsLabel.setBounds(485, 220, 145, 15);
-		dimensions.setBounds(485, 240, 145, 30);
+		dimensionsLabel.setBounds(485, 150, 145, 15);
+		dimensions.setBounds(485, 170, 145, 30);
 		dimensions.setEditable(false);
 		this.add(dimensionsLabel);
 		this.add(dimensions);
+		
+		commentLabel = new JLabel("comments");
+		comment = new JTextField();
+		commentLabel.setBounds(330, 220, 200, 15);
+		comment.setBounds(330, 240, 300, 30);
+		this.add(commentLabel);
+		this.add(comment);
 		
 		profileLabel = new JLabel("Name and path of the profile");
 		profile = new JTextField();
@@ -385,7 +394,7 @@ public class NewProfileWindow extends JPanel {
 						JFrame frame = new JFrame();
 						
 						JOptionPane.showMessageDialog(frame, 
-									"Help Dialog goes here!", 
+									Help.NEW_PROFILE_HELP, 
 									"Help", 
 									JOptionPane.QUESTION_MESSAGE);
 					}
@@ -441,6 +450,7 @@ public class NewProfileWindow extends JPanel {
 						}else{
 							separatorString = "\t";
 						}
+						String commentString = comment.getText().replaceAll("\t", " ");
 						
 						// check parameters first
 						if(!("".equals(checkParams(profilePaths, profileName, binTmp, varianceTmp, dimensionsTmp, backgroundPath, algorithmSelected)))){
@@ -480,7 +490,8 @@ public class NewProfileWindow extends JPanel {
 										algorithmSelected,
 										rootPath, 
 										profileName, 
-										1.0);
+										1.0,
+										commentString);
 							
 								// show success message
 								JFrame frame = new JFrame();

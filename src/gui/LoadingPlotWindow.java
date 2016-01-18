@@ -253,9 +253,9 @@ public class LoadingPlotWindow extends JPanel {
 							}
 							
 						} catch (IOException ex) {
-							Logger.getLogger(TestProfileWindow.class.getName()).log(Level.SEVERE, null, ex);
+							Logger.getLogger(ScorePlotWindow.class.getName()).log(Level.SEVERE, null, ex);
 						} catch (ParseException ex) {
-							Logger.getLogger(TestProfileWindow.class.getName()).log(Level.SEVERE, null, ex);
+							Logger.getLogger(ScorePlotWindow.class.getName()).log(Level.SEVERE, null, ex);
 						}
 					}
 				}
@@ -272,7 +272,7 @@ public class LoadingPlotWindow extends JPanel {
 						JFrame frame = new JFrame();
 						
 						JOptionPane.showMessageDialog(frame, 
-									"Help Dialog goes here!", 
+									Help.LOADING_PLOT_HELP, 
 									"Help", 
 									JOptionPane.QUESTION_MESSAGE);
 					}

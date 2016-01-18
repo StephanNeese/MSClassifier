@@ -9,9 +9,13 @@ package gui;
 import Spectrum.Profile;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.image.ImageObserver;
+import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -29,6 +33,9 @@ public class ProfileInfoDialog extends JFrame {
 	private JLabel algorithm;
 	private JLabel log;
 	private JLabel separator;
+	private JLabel commentLabel;
+	private JScrollPane commentPane;
+	private JTextArea comment;
 	
 	public ProfileInfoDialog(Profile profile) 
 			throws ClassNotFoundException, 
@@ -73,12 +80,24 @@ public class ProfileInfoDialog extends JFrame {
 		separator = new JLabel("csv column separator: " + profile.getSeparator());
 		separator.setBounds(10, 130, 350, 30);
 		main.add(separator);
+		// format the comment string
+		commentLabel = new JLabel("comments:");
+		commentLabel.setBounds(10, 150, 350, 40);
+		main.add(commentLabel);
+		comment = new JTextArea();
+		comment.setText(profile.getComment());
+		comment.setLineWrap(true);
+        comment.setWrapStyleWord(true);
+		comment.setEditable(false);
+		commentPane = new JScrollPane(comment, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		commentPane.setBounds(10, 180, 370, 60);
+		main.add(commentPane);
 		
 		this.add(main);
 		
 		// make all visible
 		this.setVisible(true);
-		this.setMinimumSize(new Dimension(400, 190));
+		this.setMinimumSize(new Dimension(400, 280));
 		this.setResizable(false);
 	}
 }

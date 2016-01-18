@@ -285,7 +285,7 @@ public class classificationWindow extends JPanel {
 		help.addActionListener(
 				new ActionListener(){
 					
-					/** Display a Help dialog
+					/** Display a help dialog
 					 * 
 					 * @param e ActionEvent that occurs when you press the button
 					 */
@@ -293,7 +293,7 @@ public class classificationWindow extends JPanel {
 						JFrame frame = new JFrame();
 						
 						JOptionPane.showMessageDialog(frame, 
-									"Help Dialog goes here!", 
+									Help.CLASSIFICATION_HELP, 
 									"Help", 
 									JOptionPane.QUESTION_MESSAGE);
 					}

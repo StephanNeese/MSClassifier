@@ -376,7 +376,7 @@ public class crossValidationWindow extends JPanel {
 						JFrame frame = new JFrame();
 						
 						JOptionPane.showMessageDialog(frame, 
-									"Help Dialog goes here!", 
+									Help.CROSS_VALIDATION_HELP, 
 									"Help", 
 									JOptionPane.QUESTION_MESSAGE);
 					}

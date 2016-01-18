@@ -46,7 +46,8 @@ public class ProfileBuilder {
 			String algorithm,
 			String inputPath, 
 			String path,
-			double adjustment) throws FileNotFoundException, UnsupportedEncodingException, ParseException{
+			double adjustment,
+			String comment) throws FileNotFoundException, UnsupportedEncodingException, ParseException{
 		if(adjustment>1.0 || adjustment<0){
 			throw new IllegalArgumentException("You cannot use more than 100 % "
 					+ "of the samples to calculate the groups center."
@@ -75,6 +76,8 @@ public class ProfileBuilder {
 		}else{
 			writer.println("separator:\t" + "TAB" + "\n//#");
 		}
+		// print comments
+		writer.println("comment:\t" + comment + "\n//#");
 		// print algorithm used in pca
 		writer.println("algorithm:\t" + algorithm + "\n//#");
 		// print input path

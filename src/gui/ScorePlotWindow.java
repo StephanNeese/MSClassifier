@@ -35,7 +35,7 @@ import org.math.plot.Plot3DPanel;
  *
  * @author wens
  */
-public class TestProfileWindow extends JPanel {
+public class ScorePlotWindow extends JPanel {
 	
 	JLabel profileLabel;
 	JTextField profile;
@@ -55,7 +55,7 @@ public class TestProfileWindow extends JPanel {
 	 * @throws IllegalAccessException
 	 * @throws UnsupportedLookAndFeelException 
 	 */
-	public TestProfileWindow() 
+	public ScorePlotWindow() 
 			throws ClassNotFoundException, 
 			InstantiationException, 
 			IllegalAccessException, 
@@ -184,8 +184,7 @@ public class TestProfileWindow extends JPanel {
 				}
 		);
 		
-		plot.addActionListener(
-				new ActionListener(){
+		plot.addActionListener(new ActionListener(){
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -317,9 +316,9 @@ public class TestProfileWindow extends JPanel {
 							}
 							
 						} catch (IOException ex) {
-							Logger.getLogger(TestProfileWindow.class.getName()).log(Level.SEVERE, null, ex);
+							Logger.getLogger(ScorePlotWindow.class.getName()).log(Level.SEVERE, null, ex);
 						} catch (ParseException ex) {
-							Logger.getLogger(TestProfileWindow.class.getName()).log(Level.SEVERE, null, ex);
+							Logger.getLogger(ScorePlotWindow.class.getName()).log(Level.SEVERE, null, ex);
 						}
 					}
 				}
@@ -336,7 +335,7 @@ public class TestProfileWindow extends JPanel {
 						JFrame frame = new JFrame();
 						
 						JOptionPane.showMessageDialog(frame, 
-									"Help Dialog goes here!", 
+									Help.SCORE_PLOT_HELP, 
 									"Help", 
 									JOptionPane.QUESTION_MESSAGE);
 					}

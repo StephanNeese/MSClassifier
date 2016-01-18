@@ -195,6 +195,7 @@ public class Reader {
 		double[] globalMean = null;
 		double[] fractions = null;
 		String algorithm = null;
+		String comment = null;
 		
 		for(int i=0; i<segment.length; i++){
 			String tmp = segment[i].toLowerCase();
@@ -221,6 +222,9 @@ public class Reader {
 				}else{
 					separator = "\t";
 				}
+			}else if(tmp.startsWith("comment:")){
+				String[] content = segment[i].split("\t");
+				comment = content[1];
 			}else if(tmp.startsWith("algorithm:")){
 				String[] content = segment[i].split("\t");
 				algorithm = content[1].replaceAll("\n", "");
@@ -348,7 +352,8 @@ public class Reader {
 				globalMean,
 				fractions,
 				separator,
-				algorithm
+				algorithm,
+				comment
 		);
 	}
 	

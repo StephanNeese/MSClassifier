@@ -45,6 +45,7 @@ public class Profile {
 	
 	private final String separator;
 	private final String algorithm;
+	private final String comment;
 
 	/** constructs a Profile Object
 	 * 
@@ -53,16 +54,26 @@ public class Profile {
 	 * @param device the name of the device
 	 * @param path the path to the csv files the profile has been constructed from
 	 * @param variance the amount of covered variance by the PCA
-	 * @param filenames the sampleGroups of the csv files
+	 * @param log
+	 * @param mzBackground
+	 * @param voltBackground
+	 * @param sampleGroups
 	 * @param data pca transformed data
 	 * @param features the feature matrix
+	 * @param mzStart
+	 * @param mzEnd
+	 * @param bins
 	 * @param invertedCovarianceMatrices the inverted covariance matrices of the pca data classes
 	 * @param mean the mean values (centroids) of the pca data
 	 * @param originalMeans mean values of the dimensions of the original data
 	 * @param originalMean mean value of the mean dataset (all dimensions)
 	 * @param binSize size of a bin in u
 	 * @param ldaCovarianceMatrix
+	 * @param globalMean
 	 * @param fractions
+	 * @param separator
+	 * @param algorithm
+	 * @param comment
 	 */
 	public Profile(
 			String[] classes, 
@@ -88,7 +99,8 @@ public class Profile {
 			double[] globalMean,
 			double[] fractions,
 			String separator,
-			String algorithm) {
+			String algorithm,
+			String comment) {
 		this.classes = classes;
 		this.datetime = datetime;
 		this.device = device;
@@ -113,6 +125,7 @@ public class Profile {
 		this.fractions = fractions;
 		this.separator = separator;
 		this.algorithm = algorithm;
+		this.comment = comment;
 	}
 
 	/** returns the classes
@@ -275,6 +288,10 @@ public class Profile {
 	
 	public String getAlgorithm(){
 		return algorithm;
+	}
+	
+	public String getComment(){
+		return comment;
 	}
 
 	@Override

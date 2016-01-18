@@ -28,7 +28,7 @@ public class Main extends JFrame {
 	
 	JTabbedPane mainPanel;
 	NewProfileWindow create;
-	TestProfileWindow scorePlot;
+	ScorePlotWindow scorePlot;
 	LoadingPlotWindow loadingPlot;
 	crossValidationWindow cross;
 	classificationWindow classify;
@@ -65,7 +65,7 @@ public class Main extends JFrame {
 		
 		// create tabs
 		create = new NewProfileWindow();
-		scorePlot = new TestProfileWindow();
+		scorePlot = new ScorePlotWindow();
 		loadingPlot = new LoadingPlotWindow();
 		cross = new crossValidationWindow();
 		classify = new classificationWindow();

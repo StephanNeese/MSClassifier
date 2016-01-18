@@ -194,7 +194,8 @@ public class crossValidation {
 				algorithm,
 				rootPath, 
 				profileName, 
-				1.0);
+				1.0,
+				"");
 		}catch (Exception ex) {
 			Logger.getLogger(NewProfileWindow.class.getName()).log(Level.SEVERE, null, ex);
 		}
@@ -227,7 +228,8 @@ public class crossValidation {
 				algorithm,
 				rootPath, 
 				profileName, 
-				1.0);
+				1.0,
+				"");
 		}catch (Exception ex) {
 			Logger.getLogger(NewProfileWindow.class.getName()).log(Level.SEVERE, null, ex);
 		}
