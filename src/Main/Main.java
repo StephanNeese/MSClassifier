@@ -23,6 +23,11 @@ import java.util.Date;
 import preprocessing.EigenVector;
 import weka.core.matrix.Matrix;
 
+/** This is a test class for methods and other classes.
+ * 
+ * @author Stephan Neese
+ */
+
 public class Main {
 	
 	public static void main(String[] args) throws IOException, Exception {

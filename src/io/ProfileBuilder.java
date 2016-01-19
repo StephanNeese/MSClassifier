@@ -8,8 +8,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import preprocessing.LDADataSet;
 import preprocessing.PCADataSet;
 import weka.core.matrix.Matrix;
@@ -28,11 +26,14 @@ public class ProfileBuilder {
 	 * @param lda the result of the LDA
 	 * @param originalData the original dataset before PCA
 	 * @param device the name of the MS device
+	 * @param separator csv column separator
+	 * @param algorithm name of the algorithm used to calculate eigenvectors
 	 * @param inputPath path to the original csv files of the spectras
 	 * @param path output path for the profile
 	 * @param adjustment variable that determines 
 	 * amount of PCA transformed datapoints 
 	 * to take into calculation of the mean of the groups
+	 * @param comment the comments written in the comment text field
 	 * @throws FileNotFoundException
 	 * @throws UnsupportedEncodingException
 	 * @throws ParseException 
@@ -149,6 +150,7 @@ public class ProfileBuilder {
 		
 		writer.println("//#");
 		// print the inverse covariance matrices for each group
+		// used for LDA
 		writer.println("covariances:");
 		for(String s : classes){
 			double[][] cov = calcCovarianceMatrix(dataValues, groups, s);

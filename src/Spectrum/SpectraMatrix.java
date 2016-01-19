@@ -28,6 +28,7 @@ public class SpectraMatrix {
 	/** constructs a SpectraMatrix from a Spectrum array
 	 * 
 	 * @param spectra the spectrum array
+	 * @param bin the size of a bin
 	 */
 	public SpectraMatrix(Spectrum[] spectra, double bin){
 		numSpectra = spectra.length;
@@ -171,6 +172,7 @@ public class SpectraMatrix {
 		// mean centering
 		mean = calculateMean();
 		this.normalizationDivideByMean();
+		// substract the background from all the values
 		substractBackground(background);
 	}
 	
@@ -389,17 +391,17 @@ public class SpectraMatrix {
 		return log;
 	}
 	
-	/**
+	/** getter for the mz bins of the background data
 	 * 
-	 * @return 
+	 * @return the mz bin array
 	 */
 	public double[] getMzBackground(){
 		return mzBackground;
 	}
 	
-	/**
+	/** getter for the intensities of the background data
 	 * 
-	 * @return 
+	 * @return the intensity array
 	 */
 	public double[] getVoltBackground(){
 		return voltBackground;
@@ -432,8 +434,6 @@ public class SpectraMatrix {
 	 * @throws UnsupportedEncodingException 
 	 */
 	public void toCSV(String path) throws FileNotFoundException, UnsupportedEncodingException{
-		String res = "";
-		
 		PrintWriter writer = new PrintWriter(path, "UTF-8");
 		// header with mz bins
 		for(int i=0; i<mz.length; i++){
@@ -454,9 +454,9 @@ public class SpectraMatrix {
 	}
 	
 	
-	/**
+	/** substracts the given background matrix from this spectraMatrix object
 	 * 
-	 * @param path 
+	 * @param background the background matrix to substract 
 	 */
 	private void substractBackground(SpectraMatrix background){
 		mzBackground = background.getMz();
@@ -494,6 +494,11 @@ public class SpectraMatrix {
 		}
 	}
 	
+	/** prints the values of this matrix to the console.
+	 * This method was used for testing purposes
+	 * as it is faster on a huge matrix than calling toString().
+	 * 
+	 */
 	public void printMatrix(){
 		System.out.println("SpectraMatrix:");
 		System.out.println("log transformation: " + log);

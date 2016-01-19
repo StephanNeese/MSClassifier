@@ -12,7 +12,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -25,24 +24,15 @@ import java.util.List;
 
 public class Reader {
 	
-//	public static void main(String[] args) throws IOException {
-//		String group[] = {"/home/wens/exactive/arabica", "/home/wens/exactive/robusta"};
-//		
-//		SpectraMatrix a = readData(group,
-//				"/home/wens/exactive",
-//				2,
-//				"exactive",
-//				false,
-//				"");
-//		
-//		
-//	}
-	
 	/** reads in all the csv files in a directory and creates a SpectraMatrix
 	 * 
 	 * @param group all chosen directories in the root directory
 	 * @param rootPath path to the directory containing the csv files
 	 * @param binSize size of a bin in u
+	 * @param device the name of the MS device used
+	 * @param log will the input data be log tranformed (true if yes)
+	 * @param backgroundPath the path to the folder containing the background spectra
+	 * @param separator the csv column separator
 	 * @return a SpectraMatrix Object created from all the csv files in the directory
 	 * @throws IOException 
 	 */
@@ -58,14 +48,14 @@ public class Reader {
 		// read in first and last element from csv file
 		// from first group in the group list
 		String[] csv2 = readFolder(group[0]);
-		csv x = new csv(csv2[0], device);
+		csv x = new csv(csv2[0], separator);
 		double beginning = x.getFirst();
 		double ending = x.getLast();
 		// read in first element of all other groups
 		// to check if their ends/starts are sooner or later
 		for(String path : group){
 			String[] csv3 = readFolder(path);
-			csv x2 = new csv(csv3[0], device);
+			csv x2 = new csv(csv3[0], separator);
 			// look if one of other groups is smaller/bigger
 			if(x2.getFirst()>beginning){
 				beginning = x2.getFirst();

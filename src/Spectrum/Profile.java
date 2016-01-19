@@ -40,12 +40,12 @@ public class Profile {
 	// lda data
 	private final double[][] ldaCovarianceMatrix;	// pooled cov. matrix
 	private final double[] globalMean;				// means of pca dimensions - used for centering sample
-	private final double[] fractions;				// amount of samples of all samples that belong
+	private final double[] fractions;				// fraction of samples of all samples that belong to this dataset
 													// a single group
 	
-	private final String separator;
-	private final String algorithm;
-	private final String comment;
+	private final String separator;					// colum separator for csv files
+	private final String algorithm;					// name of the used algorithm to find eigenvectors
+	private final String comment;					// a comment string - write in it whatever you want
 
 	/** constructs a Profile Object
 	 * 
@@ -54,26 +54,26 @@ public class Profile {
 	 * @param device the name of the device
 	 * @param path the path to the csv files the profile has been constructed from
 	 * @param variance the amount of covered variance by the PCA
-	 * @param log
-	 * @param mzBackground
-	 * @param voltBackground
-	 * @param sampleGroups
+	 * @param log boolean value to indicate if original data is log transformed (true if yes)
+	 * @param mzBackground the mz bins of the background data
+	 * @param voltBackground the intensities of the background data
+	 * @param sampleGroups the groups of each input spectra - same order as samples in data matrix
 	 * @param data pca transformed data
 	 * @param features the feature matrix
-	 * @param mzStart
-	 * @param mzEnd
-	 * @param bins
+	 * @param mzStart the value of the first mz bin
+	 * @param mzEnd the value of the last mz bin
+	 * @param bins all mz bins in an array
 	 * @param invertedCovarianceMatrices the inverted covariance matrices of the pca data classes
 	 * @param mean the mean values (centroids) of the pca data
 	 * @param originalMeans mean values of the dimensions of the original data
 	 * @param originalMean mean value of the mean dataset (all dimensions)
 	 * @param binSize size of a bin in u
-	 * @param ldaCovarianceMatrix
-	 * @param globalMean
-	 * @param fractions
-	 * @param separator
-	 * @param algorithm
-	 * @param comment
+	 * @param ldaCovarianceMatrix the covariance matrix for the linear discriminant analysis
+	 * @param globalMean means of pca dimensions - used for centering sample
+	 * @param fractions fraction of samples of all samples that belong to this dataset
+	 * @param separator colum separator for csv files
+	 * @param algorithm name of the used algorithm to find eigenvectors
+	 * @param comment a comment string - write in it whatever you want
 	 */
 	public Profile(
 			String[] classes, 
@@ -270,26 +270,51 @@ public class Profile {
 		return log;
 	}
 	
+	/** getter for the first mz bin
+	 * 
+	 * @return the value of the first mz bin
+	 */
 	public double getMzStart(){
 		return mzStart;
 	}
 	
+	/** getter for the last mz bin
+	 * 
+	 * @return the value of the last mz bin
+	 */
 	public double getMzEnd(){
 		return mzEnd;
 	}
 	
+	/** getter for the mz bin array
+	 * 
+	 * @return all mz bins as array
+	 */
 	public double[] getMzBins(){
 		return bins;
 	}
 	
+	/** getter for the csv column separator
+	 * 
+	 * @return the column separator
+	 */
 	public String getSeparator(){
 		return separator;
 	}
 	
+	/** getter for the name of the algorithm used to find the eigenvector
+	 * for PCA.
+	 * 
+	 * @return the name of the algorithm
+	 */
 	public String getAlgorithm(){
 		return algorithm;
 	}
 	
+	/** getter for the comment string of the profile
+	 * 
+	 * @return the comment string
+	 */
 	public String getComment(){
 		return comment;
 	}
@@ -540,114 +565,6 @@ public class Profile {
 		);
 	}
 	
-//	public void adjustRangeOfSpectrum(Spectrum spectrum){
-//		// cut off bins at the beginning or fill empty bins
-//		double diff = mzStart - spectrum.getMZ(0);
-//		if(diff>0){
-//			// find number of bins to cut from spectrum start
-//			// parse correctly from double to int and incorporate rounding errors
-//			double fillBinsTmp = diff/binSize;
-//			int fillBins = 0;
-//			if(diff-(fillBinsTmp*binSize)>0){
-//				fillBins = (int)fillBinsTmp+1;
-//			}else{
-//				fillBins = (int)fillBinsTmp;
-//			}
-//			// now cut off the calculated amount
-//			int size = spectrum.getLength();
-//			double[] mzTmp = new double[size-fillBins];
-//			double[] voltTmp = new double[size-fillBins];
-//			for(int i=fillBins; i<size; i++){
-//				mzTmp[i-fillBins] = spectrum.getMZ(i);
-//				voltTmp[i-fillBins] = spectrum.getVoltage(i);
-//			}
-//			spectrum.setMz(mzTmp);
-//			spectrum.setVoltage(voltTmp);
-//			spectrum.setLength(size-fillBins);
-//			
-//		}else if(diff<0){
-//			double fillBinsTmp = diff/binSize*-1;
-//			int fillBins = 0;
-//			if((diff*-1)-(fillBinsTmp*binSize)>0){
-//				fillBins = (int)fillBinsTmp+1;
-//			}else{
-//				fillBins = (int)fillBinsTmp;
-//			}
-//			// now fill in the calculated amount
-//			int size = spectrum.getLength();
-//			double[] mzTmp = new double[size+fillBins];
-//			double[] voltTmp = new double[size+fillBins];
-//			// put empty bins in front
-//			for(int i=0; i<fillBins; i++){
-//				mzTmp[i] = spectrum.getMZ(0)-((fillBins-i)*binSize);
-//				voltTmp[i] = 0.0;
-//			}
-//			// put rest of bins after empty bins
-//			for(int i=0; i<size; i++){
-//				mzTmp[i+fillBins] = spectrum.getMZ(i);
-//				voltTmp[i+fillBins] = spectrum.getVoltage(i);
-//			}
-//			spectrum.setMz(mzTmp);
-//			spectrum.setVoltage(voltTmp);
-//			spectrum.setLength(size+fillBins);
-//		}
-//		
-//		// cut off bins at the end or fill empty bins
-//		double[] mzSpectrum = spectrum.getMz();
-//		double diffEnd = mzEnd - mzSpectrum[mzSpectrum.length-1];
-//		if(diffEnd>0){
-//			// find number of bins to fill into spectrum end
-//			// parse correctly from double to int and incorporate rounding errors
-//			double fillBinsTmp = diffEnd/binSize;
-//			int fillBins = 0;
-//			if(diffEnd-(fillBinsTmp*binSize)>0){
-//				fillBins = (int)fillBinsTmp+1;
-//			}else{
-//				fillBins = (int)fillBinsTmp;
-//			}
-//			
-//			// now fill in the calculated amount
-//			int size = spectrum.getLength();
-//			double[] mzTmp = new double[size+fillBins];
-//			double[] voltTmp = new double[size+fillBins];
-//			
-//			// fill in bins up to prior end
-//			for(int i=0; i<size; i++){
-//				mzTmp[i] = spectrum.getMZ(i);
-//				voltTmp[i] = spectrum.getVoltage(i);
-//			}
-//			// put empty bins at end
-//			int cnt = 1;
-//			for(int i=size; i<size+fillBins; i++){
-//				mzTmp[i] = spectrum.getMZ(size-1)+(cnt*binSize);
-//				voltTmp[i] = 0.0;
-//				cnt++;
-//			}
-//			spectrum.setMz(mzTmp);
-//			spectrum.setVoltage(voltTmp);
-//			spectrum.setLength(size+fillBins);
-//			
-//		}else if(diffEnd<0){
-//			double fillBinsTmp = diffEnd/binSize*-1;
-//			int fillBins = 0;
-//			if((diffEnd*-1)-(fillBinsTmp*binSize)>0){
-//				fillBins = (int)fillBinsTmp+1;
-//			}else{
-//				fillBins = (int)fillBinsTmp;
-//			}
-//			// now cut off the calculated amount
-//			int size = spectrum.getLength();
-//			double[] mzTmp = new double[size-fillBins];
-//			double[] voltTmp = new double[size-fillBins];
-//			for(int i=0; i<size-fillBins; i++){
-//				mzTmp[i] = spectrum.getMZ(i);
-//				voltTmp[i] = spectrum.getVoltage(i);
-//			}
-//			spectrum.setMz(mzTmp);
-//			spectrum.setVoltage(voltTmp);
-//			spectrum.setLength(size-fillBins);
-//		}
-//	}
 	
 	/** Deletes all the bins in the spectrum that are not in the
 	 * profile. These bins are missing 
@@ -690,9 +607,9 @@ public class Profile {
 		spectrum.setVoltage(voltFinal);
 	}
 	
-	/**
+	/** substracts the background data from a given spectrum.
 	 * 
-	 * @param spectrum 
+	 * @param spectrum the spectrum to process
 	 */
 	private void substractBackgroundFromSpectrum(Spectrum spectrum){
 		double[] mz = spectrum.getMz();

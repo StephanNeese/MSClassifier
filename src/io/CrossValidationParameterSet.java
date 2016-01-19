@@ -1,8 +1,10 @@
 package io;
 
-/**
+/** This class is a data container for
+ * cross validation input parameters
+ * from the crossValidationWindow.
  *
- * @author wens
+ * @author Stephan Neese
  */
 public class CrossValidationParameterSet {
 	
@@ -20,6 +22,21 @@ public class CrossValidationParameterSet {
 	public final boolean log;
 	public final String separator;
 
+	/** construct a crossValidationParameterSet
+	 * 
+	 * @param algorithm the algorithm used to find the eigenvectors
+	 * @param paths the paths to the groups of foods
+	 * @param rootPath the rootpath to the folder containing the food groups
+	 * @param background the path to the folder containing the background spectra
+	 * @param machine the name of the MS device used
+	 * @param cvDir the folder to store the cross validation data in
+	 * @param resultsDir the folder for the result files of the cross validation
+	 * @param binSize the size of an mz bin
+	 * @param variance the covered variance by the PCA (using QR algorithm)
+	 * @param dimensions the number of dimensions to transform by PCA (using NIPALS)
+	 * @param log will the input data be log tranformed (true if yes)
+	 * @param separator the csv column separator
+	 */
 	public CrossValidationParameterSet(
 			Algorithm algorithm, 
 			String[] paths, 

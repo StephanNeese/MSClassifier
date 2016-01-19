@@ -26,7 +26,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import io.Reader;
@@ -165,7 +164,7 @@ public class classificationWindow extends JPanel {
 	}
 	
 	/** initializes all the ActionListeners 
-	 * for the GUI elements
+	 * for the GUI elements.
 	 */
 	public void runProgram(){
 		folderSearch.addActionListener(

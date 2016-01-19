@@ -27,9 +27,10 @@ public class Spectrum {
 	 * @param path path to csv file
 	 * @param group which group this spectrum belongs to (can be null if not known)
 	 * @param mz mz range of the profile
+	 * @param binSize the size of an mz bin
 	 * @param device mass spec device ( Mini 11 or exactive)
 	 * @param log log transformation if true
-	 * @param separator 
+	 * @param separator the csv column separator for this spectrums file
 	 */
 	public Spectrum(String path, String group, double[] mz, double binSize, String device, boolean log, String separator){
 		this.mz = mz;
@@ -37,17 +38,17 @@ public class Spectrum {
 		length = mz.length;
 		this.log = log;
 		this.group = group;
-		readCSVFromRange(path, mz, device, log, binSize, separator);
+		readCSVFromRange(path, mz, binSize, separator);
 	}
 	
 	/** reads the content of a csv file for a given mz range.
 	 * 
 	 * @param path path to csv file
 	 * @param mz mz range to be read in. Non existing bins in this csv will be 0.
-	 * @param device mass spec device ( Mini 11 or exactive)
-	 * @param log log transformation if true
+	 * @param binSize the size of an mz bin
+	 * @param separator the csv column separator for this spectrums file
 	 */
-	private void readCSVFromRange(String path, double[] mz, String device, boolean log, double binSize, String separator){
+	private void readCSVFromRange(String path, double[] mz, double binSize, String separator){
 		if(System.getProperty("os.name").startsWith("Windows")){
 			String[] pathTmp = path.split("\\\\");
 			filename = pathTmp[pathTmp.length-1];
@@ -129,10 +130,12 @@ public class Spectrum {
 		csv = null;
 	}
 	
-	/**
+	/** bins the intensity values according to the given mz bins 
+	 * in the constructor.
 	 * 
-	 * @param data
-	 * @param separator 
+	 * @param data the data from the csv file as string list - each string is a mz-intensity pair
+	 * @param binSize the size of a bin when done
+	 * @param separator the separator to part the data string into mz and intensity
 	 */
 	private void binning(List<String> data, double binSize, String separator){
 		// make temp lists to load data into
@@ -170,12 +173,15 @@ public class Spectrum {
 		
 	}
 	
-	/**
+	/** creates additional bins at the start and converts them 
+	 * to strings and adds them to the data array so given mz 
+	 * range and mz values from the csv file (string list 'data')
+	 * are equal at the start.
 	 * 
-	 * @param data
-	 * @param mz
-	 * @param separator
-	 * @return 
+	 * @param data the data from the csv file as string list
+	 * @param mz the given mz range
+	 * @param separator the column separator 
+	 * @return the updated string list (data) with additional bins at start
 	 */
 	private List<String> fillEmptyBinsAtStart(List<String> data, double[] mz, double binSize, String separator){
 		String[] lineTmp = data.get(0).split(separator);
@@ -191,12 +197,15 @@ public class Spectrum {
 		return data;
 	}
 	
-	/**
+	/** creates additional bins at the end and converts them 
+	 * to strings and adds them to the data array so given mz 
+	 * range and mz values from the csv file (string list 'data')
+	 * are equal at the end.
 	 * 
-	 * @param data
-	 * @param mz
-	 * @param separator
-	 * @return 
+	 * @param data the data from the csv file as string list
+	 * @param mz the given mz range
+	 * @param separator the column separator 
+	 * @return the updated string list (data) with additional bins at end
 	 */
 	private List<String> fillEmptyBinsAtEnd(List<String> data, double[] mz, double binSize, String separator){
 		String[] lineTmp = data.get(data.size() - 1).split(separator);
@@ -212,12 +221,14 @@ public class Spectrum {
 		return data;
 	}
 	
-	/**
+	/** cuts off mz values at the start of the string list
+	 * so string list 'data' and the given mz range
+	 * start the same and there is no overhang in the string list.
 	 * 
-	 * @param data
-	 * @param mz
-	 * @param separator
-	 * @return 
+	 * @param data the data from the csv file as string list
+	 * @param mz the given mz range
+	 * @param separator the column separator 
+	 * @return the updated string list (data) some deleted elements at start
 	 */
 	private List<String> cutOffStart(List<String> data, double mz, String separator){
 		// find first index equal or bigger than first mz bin
@@ -235,12 +246,14 @@ public class Spectrum {
 		return res;
 	}
 	
-	/**
+	/** cuts off mz values at the end of the string list
+	 * so string list 'data' and the given mz range
+	 * end the same and there is no overhang in the string list.
 	 * 
-	 * @param data
-	 * @param mz
-	 * @param separator
-	 * @return 
+	 * @param data the data from the csv file as string list
+	 * @param mz the given mz range
+	 * @param separator the column separator 
+	 * @return the updated string list (data) some deleted elements at end
 	 */
 	private List<String> cutOffEnd(List<String> data, double mz, String separator){
 		// find last element that is smaller or equal to given mz value

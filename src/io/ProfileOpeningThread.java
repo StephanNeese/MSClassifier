@@ -7,12 +7,13 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JDialog;
 import javax.swing.UnsupportedLookAndFeelException;
 
-/**
+/** This class starts a new Thread 
+ * that opens a profile in the background
+ * while displaying a waiting message
  *
- * @author wens
+ * @author Stephan Neese
  */
 public class ProfileOpeningThread extends Thread {
 	
@@ -20,11 +21,20 @@ public class ProfileOpeningThread extends Thread {
 	private Profile profile;
 	private WaitMessage wait;
 	
+	/** construct a ProfileOpeningThread
+	 * 
+	 * @param path path to the profile
+	 * @param wait the WaitMessage to be displayed
+	 */
 	public ProfileOpeningThread(String path, WaitMessage wait){
 		this.path = path;
 		this.wait = wait;
 	}
 	
+	/** overwritten method from class Thread.
+	 * 
+	 */
+	@Override
 	public void run(){
 		try {
 			profile = Reader.readProfile(path);

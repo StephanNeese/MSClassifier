@@ -12,7 +12,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -33,8 +32,20 @@ import preprocessing.LDADataSet;
 import preprocessing.PCA;
 import preprocessing.PCADataSet;
 
+/** This class contains static methods
+ * to carry out a cross validation.
+ * 
+ * @author Stephan Neese
+ */
 public class crossValidation {
 	
+	/** carry out a leave-10%-out cross validation
+	 * 
+	 * @param params the set of paramters typed in in the GUI
+	 * @throws IOException
+	 * @throws FileNotFoundException
+	 * @throws ParseException 
+	 */
 	public static void validate(
 			CrossValidationParameterSet params) throws IOException, 
 			FileNotFoundException, 
@@ -167,6 +178,20 @@ public class crossValidation {
 		evaluate(params.resultsDir);
 	}
 	
+	/** create a profile for one of the 10 runs
+	 * using the QR algorithm for PCA.
+	 * 
+	 * @param profilePaths  the paths to the groups of foods
+	 * @param rootPath the rootpath to the folder containing the food groups
+	 * @param binSize the size of an mz bin
+	 * @param varianceCovered the covered variance by the PCA
+	 * @param machineName the name of the MS device used
+	 * @param profileName the complete path and name of the profile
+	 * @param background the path to the folder containing the background spectra
+	 * @param log will the input data be log tranformed (true if yes)
+	 * @param separator the csv column separator
+	 * @param algorithm the algorithm used to find the eigenvectors
+	 */
 	private static void makeProfileQR(
 			String[] profilePaths,
 			String rootPath,
@@ -201,6 +226,20 @@ public class crossValidation {
 		}
 	}
 	
+	/** create a profile for one of the 10 runs
+	 * using the NIPALS algorithm for PCA.
+	 * 
+	 * @param profilePaths  the paths to the groups of foods
+	 * @param rootPath the rootpath to the folder containing the food groups
+	 * @param binSize the size of an mz bin
+	 * @param dimensions the number of dimensions to transform by PCA
+	 * @param machineName the name of the MS device used
+	 * @param profileName the complete path and name of the profile
+	 * @param background the path to the folder containing the background spectra
+	 * @param log will the input data be log tranformed (true if yes)
+	 * @param separator the csv column separator
+	 * @param algorithm the algorithm used to find the eigenvectors
+	 */
 	private static void makeProfileNIPALS(
 			String[] profilePaths,
 			String rootPath,
@@ -235,6 +274,19 @@ public class crossValidation {
 		}
 	}
 	
+	/** after building a profile during each of the 10 cross validation runs
+	 * this method classifies the 10% of the spectra left out of the profile.
+	 * 
+	 * @param profileName the complete path and name of the profile
+	 * @param classDir the path to the folder containing the known spectra to validate
+	 * @param results the path and name of the results file to write
+	 * @param machine the name of the MS device used
+	  @param log will the input data be log tranformed (true if yes)
+	 * @param separator the csv column separator
+	 * @throws IOException
+	 * @throws FileNotFoundException
+	 * @throws ParseException 
+	 */
 	private static void classify(
 			String profileName, 
 			String classDir, 
@@ -307,6 +359,13 @@ public class crossValidation {
 		writer.close();
 	}
 	
+	/** after the 10 cross validation runs this method
+	 * evaluates the results and displays a message dialog on screen.
+	 * 
+	 * @param resultsDir path to the folder containing the results files
+	 * @throws FileNotFoundException
+	 * @throws IOException 
+	 */
 	public static void evaluate(String resultsDir) 
 			throws FileNotFoundException, IOException{
 		// read all result csv files from folder
@@ -354,6 +413,7 @@ public class crossValidation {
 				+ "LDA coefficient: " + new DecimalFormat("##.##").format((double)LDAcnt/table.size()*100) + "%"
 				+ " which are " + LDAcnt + " out of " + table.size() + "\n";
 		
+		// show results in message dialog
 		JFrame frame = new JFrame();
 		JOptionPane.showMessageDialog(frame, 
 			msg, 

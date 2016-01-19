@@ -12,11 +12,12 @@ import weka.core.matrix.Matrix;
  */
 public class LDA {
 	
-	/**
+	/** calculates the data needed to calculate 
+	 * an LDA coefficient when classifying.
 	 * 
-	 * @param data
-	 * @param original
-	 * @return 
+	 * @param data the pca transformed dataset
+	 * @param original the untransformed original dataset
+	 * @return an LDADataSet containing all information to carry out LDA
 	 */
 	public static LDADataSet performLDA(PCADataSet data, SpectraMatrix original){
 		// transpose to have [samples][dimensions]
@@ -117,10 +118,12 @@ public class LDA {
 		return mean;
 	}
 	
-	/**
+	/** centers data, if already centered then no change to the
+	 * data is done
 	 * 
-	 * @param data
-	 * @return 
+	 * @param data dataset to center
+	 * @param mean the means of the dataset dimensions
+	 * @return the mean centered dataset
 	 */
 	public static double[][] center(double[][] data, double[] mean){
 		double[][] res = new double[data.length][data[0].length];
@@ -135,12 +138,14 @@ public class LDA {
 		return res;
 	}
 	
-	/**
+	/** calculates the pooled covariance matrix for a dataset.
+	 * The pooled cov. matrix can be seen as a mean covariance matrix
+	 * of the cov. matrices of all individual groups.
 	 * 
-	 * @param data
-	 * @param samples
-	 * @param classes
-	 * @return 
+	 * @param data the dataset to calculate a pooled cov. matrix for
+	 * @param samples the groups of all samples in the dataset (same order)
+	 * @param classes the names of the individual groups in the dataset
+	 * @return the pooled cov. matrix as 2d double array
 	 */
 	private static double[][] calcCovarianceMatrix(double[][] data, String[] groups, String[] classes){
 		double[][] res = new double[data[0].length][data[0].length];
@@ -168,12 +173,12 @@ public class LDA {
 		return res;
 	}
 	
-	/**
+	/** returns a data matrix only for all samples of a certain group
 	 * 
-	 * @param dataValues
-	 * @param sampleFiles
-	 * @param cls
-	 * @return 
+	 * @param dataValues the original data (all groups included)
+	 * @param groups the groups of all samples in the dataset (same order)
+	 * @param cls the specific group for which to filter the data into the matrix
+	 * @return a double matrix consisting only of the groups samples data
 	 */
 	private static double[][] getGroupMatrix(double[][] dataValues, String[] groups, String cls){
 		ArrayList<double[]> picked = new ArrayList<>();
@@ -241,11 +246,13 @@ public class LDA {
 		return covariance;
 	}
 	
-	/**
+	/** calculates how much the samples of each class amount
+	 * to the overall of samples.
 	 * 
-	 * @param samples
-	 * @param classes
-	 * @return 
+	 * @param groups the groups of all files in the dataset
+	 * @param classes the groupnames
+	 * @return the fraction every group adds to the whole dataset 
+	 * (same order as classes array)
 	 */
 	private static double[] calcFractions(String[] groups, String[] classes){
 		double[] res = new double[classes.length];

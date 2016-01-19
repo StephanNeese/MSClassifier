@@ -24,8 +24,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -68,12 +66,14 @@ public class liveWindow extends Thread {
 	 * @param profilePath path to the profile file
 	 * @param output path and name of the output log file
 	 * @param distanceMeasure string for type of distance measurement
+	 * @param cutoff the minimum score value for a classification
 	 * @throws java.lang.ClassNotFoundException 
 	 * @throws java.lang.InstantiationException 
 	 * @throws java.lang.IllegalAccessException 
 	 * @throws javax.swing.UnsupportedLookAndFeelException 
 	 * @throws java.io.FileNotFoundException 
 	 * @throws java.io.UnsupportedEncodingException 
+	 * @throws java.text.ParseException 
 	 */
 	public liveWindow(
 			String threadName, 

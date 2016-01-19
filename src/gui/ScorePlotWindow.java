@@ -4,9 +4,6 @@ import Spectrum.Profile;
 import io.ProfileOpeningThread;
 import io.Reader;
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -18,7 +15,6 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -31,9 +27,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.math.plot.Plot2DPanel;
 import org.math.plot.Plot3DPanel;
 
-/**
+/** This class constructs and displays the
+ * panel to create score plots.
  *
- * @author wens
+ * @author Stephan Neese
  */
 public class ScorePlotWindow extends JPanel {
 	
@@ -48,7 +45,7 @@ public class ScorePlotWindow extends JPanel {
 	JButton plot;
 	JButton help;
 	
-	/** constructs a new testProfileWindow
+	/** constructs a new ScorePlotWindow
 	 * 
 	 * @throws ClassNotFoundException
 	 * @throws InstantiationException
@@ -121,6 +118,9 @@ public class ScorePlotWindow extends JPanel {
 		this.add(help);
 	}
 	
+	/** initializes all the ActionListeners 
+	 * for the GUI elements.
+	 */
 	public void runProgram(){
 		profileSearch.addActionListener(
 				new ActionListener(){

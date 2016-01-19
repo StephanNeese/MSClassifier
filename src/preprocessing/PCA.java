@@ -82,6 +82,15 @@ public class PCA {
 		return eigenvector;
 	}
 	
+	/** calculates if the difference in the eigenvalues of two iterations
+	 * is greater than a certain threshold value.
+	 * 
+	 * @param t the new eigenvalue
+	 * @param t_old the old eigenvalue
+	 * @param threshold the threshold (gets multiplied with t for scaling)
+	 * @param count number of current NIPALS iteration
+	 * @return true if difference is still greater than threshold, false otherwise
+	 */
 	private static boolean difference(Matrix t, Matrix t_old, double threshold, int count){
 		// ignore during first iteration because booth values are started the same
 		if(count==0){

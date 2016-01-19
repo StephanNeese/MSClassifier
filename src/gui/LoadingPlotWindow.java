@@ -27,8 +27,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.math.plot.Plot2DPanel;
 import org.math.plot.Plot3DPanel;
 
-/** This class provides a data structure for
- * pca transformed data like feature matrix, classnames etc.
+/** This class is the GUI panel for creating 
+ * loading plots in the main Window.
  * 
  * @author Stephan Neese
  */
@@ -118,6 +118,10 @@ public class LoadingPlotWindow extends JPanel {
 		this.add(help);
 	}
 	
+	/** This method constructs and adds 
+	 * all the actionListeners to the elements.
+	 * 
+	 */
 	public void runProgram(){
 		profileSearch.addActionListener(
 				new ActionListener(){
@@ -126,6 +130,7 @@ public class LoadingPlotWindow extends JPanel {
 					 * 
 					 * @param e ActionEvent that occurs when you press the button
 					 */
+					@Override
 					public void actionPerformed(ActionEvent e){
 						JFileChooser fileChooser = new JFileChooser();
 						// set only directories and disable "all files" option

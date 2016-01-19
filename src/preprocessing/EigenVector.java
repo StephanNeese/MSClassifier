@@ -68,6 +68,11 @@ public class EigenVector implements Comparable<EigenVector> {
 		return res;
 	}
 	
+	/** print the eigenvector object to the console.
+	 * This method is used for testing purposes
+	 * because its faster to print directly to console
+	 * than using toString() on huge dataset.
+	 */
 	public void print(){
 		System.out.println(eigenValue + "\nValues:");
 		for(double d : data){

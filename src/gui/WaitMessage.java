@@ -1,21 +1,18 @@
 package gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+/** This class constructs and displays a
+ * wait message while a profile loads into memory.
+ * 
+ * @author Stephan Neese
+ */
 public class WaitMessage{
 	
 	private JDialog wait;
@@ -23,6 +20,14 @@ public class WaitMessage{
 	JLabel waitLabel1;
 	JLabel waitLabel2;
 	
+	/** construct a waitMessage using a given title
+	 * 
+	 * @param title title of the dialog window for the message
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws UnsupportedLookAndFeelException 
+	 */
 	public WaitMessage(String title) 
 			throws ClassNotFoundException, 
 			InstantiationException, 

@@ -1,15 +1,10 @@
 package gui;
 
-import Spectrum.SpectraMatrix;
 import com.jidesoft.swing.CheckBoxTree;
 import io.CrossValidationParameterSet;
-import io.ProfileBuilder;
-import io.Reader;
 import io.crossValidation;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -39,7 +34,6 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -48,6 +42,11 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import org.apache.commons.io.FileDeleteStrategy;
 
+/** This class constructs and displays the
+ * cross validation panel on the main window.
+ * 
+ * @author Stephan Neese
+ */
 public class crossValidationWindow extends JPanel {
 	
 	JLabel databaseLabel;
@@ -84,7 +83,13 @@ public class crossValidationWindow extends JPanel {
 	JButton go;
 	JButton help;
 
-	
+	/** init a crossValidationWindow
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws UnsupportedLookAndFeelException 
+	 */
 	public crossValidationWindow() 
 			throws ClassNotFoundException, 
 			InstantiationException, 
@@ -224,7 +229,7 @@ public class crossValidationWindow extends JPanel {
 	}
 	
 	/** initializes all the ActionListeners 
-	 * for the GUI elements
+	 * for the GUI elements.
 	 */
 	public void runProgram(){
 		/** adds a Listener to the button for searching
@@ -644,6 +649,12 @@ public class crossValidationWindow extends JPanel {
 						}
 					}
 					
+					/** returns all the selected paths
+					 * from the pane to choose your groups.
+					 * 
+					 * @param x the ListModel of the selection pane
+					 * @return all paths to the groups as string array
+					 */
 					private String[] getSelected(ListModel x){
 						ArrayList<String> tmp = new ArrayList<>();
 						int listSize = x.getSize();

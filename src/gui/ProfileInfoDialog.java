@@ -9,8 +9,6 @@ package gui;
 import Spectrum.Profile;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.awt.image.ImageObserver;
-import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -19,9 +17,10 @@ import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-/**
+/** This class creates and displays an info dialog
+ * to show some of the properties of a given profile.
  *
- * @author wens
+ * @author Stephan Neese
  */
 public class ProfileInfoDialog extends JFrame {
 	
@@ -37,6 +36,14 @@ public class ProfileInfoDialog extends JFrame {
 	private JScrollPane commentPane;
 	private JTextArea comment;
 	
+	/** construct a ProfileInfoDialog
+	 * 
+	 * @param profile the profile to display information
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws UnsupportedLookAndFeelException 
+	 */
 	public ProfileInfoDialog(Profile profile) 
 			throws ClassNotFoundException, 
 			InstantiationException, 
