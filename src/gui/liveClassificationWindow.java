@@ -281,9 +281,40 @@ public class liveClassificationWindow extends JPanel {
 					 */
 					public void actionPerformed(ActionEvent e){
 						JFrame frame = new JFrame();
-						
+						String msg = "Using a created profile you can classify new samples of food during a MS run.\n"
+								+ "As for the profile creation the input files must be of csv format\n"
+								+ "with the mz-value in the first column and the intensity in the second column.\n"
+								+ "Each spectrum must be in its own csv file. The program does not recognize\n"
+								+ "multiple spectrum files.\n\n"
+								+ "Elements:\n"
+								+ "folder with CSV files: The folder where the MS device saves the csv files\n"
+								+ "    containing the spectra. You can search for the folder using\n"
+								+ "    the search button to the right of the field.\n"
+								+ "Path to the profile file: The complete path to the profile file to be used\n"
+								+ "    for classification of new samples. The \"Info\" button to the right of the\n"
+								+ "    \"search\" button loads the choosen profile and gives a short overview\n"
+								+ "    of the profile properties such as MS device, number of dimensions etc.\n"
+								+ "distance measure: This dropdown menu lets you choose a classification method\n"
+								+ "    for your samples. You can choose between three distance measures, namely\n"
+								+ "    the euclidean distance, the mahalanobis distance (which accounts for the\n"
+								+ "    different variance in the individual dimensions and is therefore the most\n"
+								+ "    robust method for classification) and the linear discriminant analysis.\n"
+								+ "Where to save the results: Choose a path and filename to a log file\n"
+								+ "    containing the results.\n"
+								+ "minimal score: Every distance measure additionally calculates a score\n"
+								+ "    to verify the quality of the classification. A low score usually\n"
+								+ "    indicates an insignificant classification (how confident are we\n"
+								+ "    that our classification is correct). This score works quite well\n"
+								+ "    with the euclidean and mahalanobis distance but has shown to be\n"
+								+ "    often non significant when using LDA. If you want all spectra\n"
+								+ "    classified just type 0 in the field.\n\n"
+								+ "When you have everything filled out just click the \"classify\" button.\n"
+								+ "The profile will be loaded and a small window will appear on the\n"
+								+ "lower right corner of the screen. In this window the classification results\n"
+								+ "for just measured spectra will be shown. The results will additionally be saved\n"
+								+ "to your log file.";
 						JOptionPane.showMessageDialog(frame, 
-									Help.LIVE_CLASSIFICATION_HELP, 
+									msg, 
 									"Help", 
 									JOptionPane.QUESTION_MESSAGE);
 					}

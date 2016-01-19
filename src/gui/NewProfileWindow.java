@@ -392,9 +392,36 @@ public class NewProfileWindow extends JPanel {
 					 */
 					public void actionPerformed(ActionEvent e){
 						JFrame frame = new JFrame();
-						
+						String msg = "In this Tab you can create a profile of several food items that have been measured via MS. The data is transformed into\n"
+								+ "PC space via PCA. These profiles can be used later to classify unknown spectra of food items.\n\n"
+								+ "Elements:\n"
+								+ "folder containing csv files: This is where you choose what goes into the profile. Choose a root folder. \n"
+								+ "    In the subfolders should lie the spectra to each group of food. If you have for ex. cow milk, goat milk and soy milk \n"
+								+ "    as food items then there should only be three subfolders in your choosen root folder: cow milk, goat milk, soy milk (or whatever \n"
+								+ "    you would like to name them) each group is named by the subfolder it lies in. You can also have multiple layers of subfolders for ex. milk->cow etc.\n"
+								+ "    then the group name will be milk_cow for this group. By clicking the desired subfolders you can choose what food items should go into the profile.\n"
+								+ "type of machine: The MS device used for measuring.\n"
+								+ "csv column separator: The character that separates the column in the csv files containing the spectra. Each spectrum\n"
+								+ "    must be in its own csv file with the mz-value in the first column and the intensity value in the second column.\n"
+								+ "size of bin: The size used to create the mz-bins.\n"
+								+ "PCA Algorithm: The algorithm used to find the eigenvectors which are used to transform our data matrix (the mz-bins of all spectra) into PC space.\n"
+								+ "variance covered: This is the amount of variance of the original dataset that should be covered by PCA.\n"
+								+ "    This must be a number between 0 and 1 where 0 is no variance at all and 1 ist all the variance from\n"
+								+ "    the original dataset (all dimensions (mz-bins) will get transformed). The amount of covered variance is only available for QR algorithm.\n"
+								+ "number of dimensions: When using the NIPALS algorithm for transformation into PC space you cannot choose how much\n"
+								+ "    variance should be covered. You can only choose the number of dimensions from the original data matrix to transform into PC space.\n"
+								+ "    If you are not shure to how much variance this number of dimensions amountsyou can create a test profile using the QR algorithm\n"
+								+ "    first and then open the profile info in one of the plot tabs or classification tabs and look up the number of dimensions in that profile.\n"
+								+ "    Doing that you can get a rough glimpse what number of dimensions make up what percentage of the total variance.\n"
+								+ "name + path to profile: Where and under what name should the profile be saved.\n"
+								+ "Path to background spectra: If you want to substract background data from all of your spectra then you can give the path to a folder\n"
+								+ "    containing csv files containing background data. The csv files must be formatted the same way as the other csv files\n"
+								+ "    (two columns (mz, intensity) and same separator). The program calculates the means of every mz-bin\n"
+								+ "    of the background over all spectra in the folder and substracts them from the mz-bins of the original data.\n"
+								+ "log transformation: Should the data input be log transformed.\n\n"
+								+ "Once you filled out all the information you can click on the \"create\" button to create the profile.";
 						JOptionPane.showMessageDialog(frame, 
-									Help.NEW_PROFILE_HELP, 
+									msg, 
 									"Help", 
 									JOptionPane.QUESTION_MESSAGE);
 					}
