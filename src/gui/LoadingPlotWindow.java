@@ -26,6 +26,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.math.plot.Plot2DPanel;
 import org.math.plot.Plot3DPanel;
+import org.math.plot.plots.ScatterPlot;
 
 /** This class is the GUI panel for creating 
  * loading plots in the main Window.
@@ -206,7 +207,15 @@ public class LoadingPlotWindow extends JPanel {
 								if(dim==3){
 									Plot3DPanel plot = new Plot3DPanel("SOUTH");
 									
+									// adding the labels with the original mz bins to the loadings
+									String[] tags = new String[eigenVectors[0].length];
+									double[] mzBins = data.getMzBins();
+									for(int x=0; x<tags.length; x++){
+										tags[x] = "mz = " + String.valueOf(mzBins[x]);
+									}
+									
 									plot.addScatterPlot("data points", eigenVectors[0], eigenVectors[1], eigenVectors[2]);
+									((ScatterPlot) plot.getPlot(0)).setTags(tags);
 									plot.setAxisLabels("PC1", "PC2", "PC3");
 								
 									// show plot
@@ -217,7 +226,15 @@ public class LoadingPlotWindow extends JPanel {
 								}else{
 									Plot2DPanel plot = new Plot2DPanel("SOUTH");
 									
+									// adding the labels with the original mz bins to the loadings
+									String[] tags = new String[eigenVectors[0].length];
+									double[] mzBins = data.getMzBins();
+									for(int x=0; x<tags.length; x++){
+										tags[x] = "mz = " + String.valueOf(mzBins[x]);
+									}
+									
 									plot.addScatterPlot("data points", eigenVectors[0], eigenVectors[1]);
+									((ScatterPlot) plot.getPlot(0)).setTags(tags);
 									plot.setAxisLabels("PC1", "PC2");
 									
 									// show plot
@@ -289,7 +306,7 @@ public class LoadingPlotWindow extends JPanel {
 								+ "dimensions: The dropdown menu for the number of dimensions\n"
 								+ "    to be plottet.\n\n"
 								+ "Once you filled everything out you can click on the\"create\" button\n"
-								+ "and the plot will be rendered for you.";;
+								+ "and the plot will be rendered for you.";
 						JOptionPane.showMessageDialog(frame, 
 									msg, 
 									"Help", 

@@ -195,7 +195,7 @@ public class Profile {
 	
 	/** returns the Hash containing the covariance matrices for the classes
 	 * 
-	 * @return a hash with class(string) => inv-covariancematrix(double[][])
+	 * @return a hash with class(string) mapped to inv-covariancematrix(double[][])
 	 */
 	public HashMap<String, double[][]> getInvertedCovarianceMatrices(){
 		return invertedCovarianceMatrices;
