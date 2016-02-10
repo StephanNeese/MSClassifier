@@ -4,24 +4,15 @@ import Spectrum.ClassificationResult;
 import Spectrum.Profile;
 import Spectrum.SpectraMatrix;
 import Spectrum.Spectrum;
-import gui.liveWindow;
-import java.io.FileNotFoundException;
 import preprocessing.PCA;
 import io.Reader;
 import java.io.IOException;
 import preprocessing.PCADataSet;
 import io.ProfileBuilder;
-import io.crossValidation;
 import java.io.File;
-import java.io.PrintWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import preprocessing.LDA;
 import preprocessing.LDADataSet;
 import java.util.ArrayList;
-import java.util.Date;
-import preprocessing.EigenVector;
-import weka.core.matrix.Matrix;
 
 /** This is a test class for methods and other classes.
  * 
@@ -31,6 +22,67 @@ import weka.core.matrix.Matrix;
 public class Main {
 	
 	public static void main(String[] args) throws IOException, Exception {
+		
+		int mb = 1024*1024;
+		Runtime runtime = Runtime.getRuntime();
+		
+		
+		// create profile
+		System.out.println("total: " + runtime.totalMemory()/mb);
+		String profilePaths[] = {"/home/wens/mini_all/cow-milk", "/home/wens/mini_all/goat-milk", "/home/wens/mini_all/soy-milk"};
+		SpectraMatrix data = Reader.readData(
+				profilePaths, 
+				"/home/wens/mini_all", 
+				2, 
+				"Mini 11", 
+				false, 
+				"", 
+				",");
+			System.out.println("after spectramatrix: " + ((runtime.totalMemory() - runtime.freeMemory()) / mb));
+		data.deleteEmptyBins();
+		data.calculateDimensionMeans();
+		PCADataSet pca_data = new PCADataSet();
+		int dimensionsUsed = 60;
+		pca_data = PCA.performPCAusingNIPALS(data, dimensionsUsed);
+//		double variance = 0.9;
+//		pca_data = PCA.performPCAusingQR(data, varianceCovered);
+			System.out.println("after PCA: " + (runtime.totalMemory() - runtime.freeMemory()) / mb);
+		LDADataSet lda_data = LDA.performLDA(pca_data, data);
+			System.out.println("after LDA: " + (runtime.totalMemory() - runtime.freeMemory()) / mb);
+		// create profile
+		ProfileBuilder.build(
+				pca_data, 
+				lda_data,
+				data, 
+				"Mini 11", 
+				",",
+				"NIPALS",
+				"/home/wens/mini_all", 
+				"/home/wens/profiles/speedtest1.profile", 
+				1.0,
+				"");
+			System.out.println("after building profile: " + (runtime.totalMemory() - runtime.freeMemory()) / mb);
+		
+		// open profile
+		Profile profile = Reader.readProfile("/home/wens/profiles/speedtest1.profile");
+		System.out.println("after profile reading: " + (runtime.totalMemory() - runtime.freeMemory()) / mb);
+		
+		// open folder with csv files to classify
+		String[] csv = Reader.readFolder("/home/wens/mini_all/speedtest");
+		// classify
+		String method = "ed";
+		for(int i=0; i<csv.length; i++){
+			Spectrum spectrum = new Spectrum(csv[i], null, profile.getMzBins(), profile.getBinSize(), "Mini 11", profile.getLog(), profile.getSeparator());
+			
+			if(method.equals("ed")){
+				ClassificationResult res_ed = profile.euclideanDistance(spectrum);
+			}else if(method.equals("md")){
+				ClassificationResult res_ed = profile.mahalanobisDistance(spectrum);
+			}else if(method.equals("lda")){
+				ClassificationResult res_ed = profile.ldaCoefficient(spectrum);
+			}
+		}
+		
 		
 //		crossValidation.evaluate("/home/wens/cross-validation/crossValidation/results");
 		
