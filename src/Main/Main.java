@@ -11,7 +11,9 @@ import preprocessing.LDA;
 import preprocessing.LDADataSet;
 import java.util.ArrayList;
 
-/** This is a test class for methods and other classes.
+/** This is a test class for methods, other classes and benchmarks.
+ * This class used to serve as main class before the implementation
+ * of a GUI.
  * 
  * @author Stephan Neese
  */

@@ -352,7 +352,7 @@ public class Reader {
 	 * 
 	 * @param block the block from the profile file containing information 
 	 * about the covariance matrices
-	 * @return a HasMap with class (String) => matrix (double[][])
+	 * @return a HasMap with class (String) to matrix (double[][])
 	 */
 	private static HashMap<String, double[][]> obtainCovarianceMatrices(String block){
 		HashMap<String, double[][]> res = new HashMap<>();
