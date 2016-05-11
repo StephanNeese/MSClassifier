@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /** This class provides a datastructure for an array of
  * spectras. During construction of the object the spectras
@@ -22,7 +23,7 @@ public class SpectraMatrix {
 	private double mean;				// mean of all values in the matrix
 	private double[] dimensionsMean;	// mean for each dimension
 	private boolean log;				// logarithmic scaling or not
-	private double[] mzBackground;		// mz values of background
+	private double[] mzBackground;
 	private double[] voltBackground;	// voltage values of the background
 	
 	/** constructs a SpectraMatrix from a Spectrum array
@@ -89,16 +90,16 @@ public class SpectraMatrix {
 		}
 		
 		// init background as empty
-		mzBackground = new double[mz.length];
+		mzBackground = Arrays.copyOf(mz, mz.length);
 		voltBackground = new double[mz.length];
 		for(int i=0; i<mz.length; i++){
-			mzBackground[i] = mz[i];
 			voltBackground[i] = 0.0;
 		}
 		
 		// mean centering
 		mean = calculateMean();
 		this.normalizationDivideByMean();
+		calculateDimensionMeans();
 	}
 	
 	
@@ -169,9 +170,13 @@ public class SpectraMatrix {
 			}
 		}
 		
+		// mz bins are also mz bins for background 
+		mzBackground = Arrays.copyOf(mz, mz.length);
+		
 		// mean centering
 		mean = calculateMean();
 		this.normalizationDivideByMean();
+		calculateDimensionMeans();
 		// substract the background from all the values
 		substractBackground(background);
 	}
@@ -454,44 +459,32 @@ public class SpectraMatrix {
 	}
 	
 	
-	/** substracts the given background matrix from this spectraMatrix object
+	/** substracts the given background matrix from this spectraMatrix object.
+	 * It is nessessary for that the two matrices have the same mz range
+	 * for this function to work.
 	 * 
 	 * @param background the background matrix to substract 
 	 */
 	private void substractBackground(SpectraMatrix background){
-		mzBackground = background.getMz();
+		double[] mzBg = background.getMz();
 		voltBackground = background.getDimensionsMean();
-		
-		// find beginning of background bins in this matrix
-		int indexMatrixStart = 0;
-		int indexBGStart = 0;
-		if((int)((mz[0] - mzBackground[0])/(mz[1] - mz[0]))>0){
-			// background bins start earlier
-			indexBGStart = (int) ((mz[0] - mzBackground[0])/(mz[1] - mz[0]));
-		}else if((int)((mz[0] - mzBackground[0])/(mz[1] - mz[0]))<0){
-			// background bins start later
-			indexMatrixStart = (int)((mz[0] - mzBackground[0])/(mz[1] - mz[0]));
-		}
-		// find end of background bins in this matrix
-		int EndIndex = 0;
-		if((mzBackground.length + indexBGStart) >= (mz.length + indexMatrixStart)){
-			EndIndex = mz.length-1;
+		// check if the background matrix has the same mz range as our data
+		if(mzBg[0]!=mz[0] || mzBg[mzBg.length-1]!=mz[mz.length-1]){
+			throw new IllegalArgumentException("background mz range: " + mzBg[0] + " to " + mzBg[mzBg.length-1]
+				+ "\ndata mz range: " + mz[0] + " to " + mz[mz.length-1]);
 		}else{
-			EndIndex = mzBackground.length + indexBGStart;
-		}
-		
-		// use found starting and ending points in matrices to substract the background
-		for(int i=0; i<EndIndex; i++){
-			// substract from every spectra in matrix
-			for(int spec=0; spec<voltage.length; spec++){
-				if((voltage[spec][indexMatrixStart + i] -= voltBackground[indexBGStart + i]) > 0){
-					voltage[spec][indexMatrixStart + i] -= voltBackground[indexBGStart + i];
-				}else{
-					voltage[spec][indexMatrixStart + i] = 0.0;
+			// if booth have the same mz range then proceed
+			for(int dim=0; dim<voltage.length; dim++){
+				for(int i=0; i<mz.length; i++){
+					// substract
+					if((voltage[dim][i] - voltBackground[i])>=0){
+						voltage[dim][i] -= voltBackground[i];
+					}else{
+						voltage[dim][i] = 0.0;
+					}
 				}
-				
 			}
-		}
+		}	
 	}
 	
 	/** prints the values of this matrix to the console.
@@ -514,8 +507,8 @@ public class SpectraMatrix {
 			System.out.println("");
 		}
 		System.out.println("Background:");
-		for(int i=0; i<mzBackground.length; i++){
-			System.out.println(mzBackground[i] + "\t" + voltBackground[i]);
+		for(int i=0; i<mz.length; i++){
+			System.out.println(mz[i] + "\t" + voltBackground[i]);
 		}
 		System.out.println("");
 	}

@@ -23,6 +23,10 @@ public class Profile {
 	private final String path;				// path to profile (original path)
 	private final double variance;			// covered variance by profile
 	private final boolean log;				// log transformation of data or not?
+	/** the variable mzBackground is from an old version of this program
+	* bins and mzBackground contain the same numbers now as the background
+	* is now adjusted to the mz length of the main data
+	* removing it makes a lot of refactoring nessessary though. **/
 	private final double[] mzBackground;	// mz bins for the background data substracted from this profiles raw data
 	private final double[] voltBackground;	// voltage for the background data substracted from this profiles raw data
 	private final String[] sampleGroups;	// sampleGroups of original csv files 
@@ -367,12 +371,11 @@ public class Profile {
 	public ClassificationResult mahalanobisDistance(Spectrum spectrum){
 		// preprocessing of spectrum to adjust range and delete bins
 		// keep this order even if changes in the method are made
-//		adjustRangeOfSpectrum(spectrum);
+		spectrum.normalizationDivideByMean(originalMean);
 		substractBackgroundFromSpectrum(spectrum);
 		deleteEmptyBins(spectrum);
 		
 		// normalize and center the spectrum
-		spectrum.normalizationDivideByMean(originalMean);
 		spectrum.center(originalMeans);
 		// transform the spectrum into PCA space
 		double[] pca_spectrum = PCA.transformSpectrum(spectrum, features);
@@ -433,12 +436,11 @@ public class Profile {
 	public ClassificationResult euclideanDistance(Spectrum spectrum){
 		// preprocessing of spectrum to adjust range and delete bins
 		// keep this order even if changes in the method are made
-//		adjustRangeOfSpectrum(spectrum);
+		spectrum.normalizationDivideByMean(originalMean);
 		substractBackgroundFromSpectrum(spectrum);
 		deleteEmptyBins(spectrum);
 		
 		// normalize and center the spectrum
-		spectrum.normalizationDivideByMean(originalMean);
 		spectrum.center(originalMeans);
 		// transform the spectrum into PCA space
 		double[] pca_spectrum = PCA.transformSpectrum(spectrum, features);
@@ -483,12 +485,11 @@ public class Profile {
 	public ClassificationResult ldaCoefficient(Spectrum spectrum){
 		// preprocessing of spectrum to adjust range and delete bins
 		// keep this order even if changes in the method are made
-//		adjustRangeOfSpectrum(spectrum);
+		spectrum.normalizationDivideByMean(originalMean);
 		substractBackgroundFromSpectrum(spectrum);
 		deleteEmptyBins(spectrum);
 		
 		// normalize and center the spectrum
-		spectrum.normalizationDivideByMean(originalMean);
 		spectrum.center(originalMeans);
 		// transform the spectrum into PCA space
 		double[] pca_spectrum = PCA.transformSpectrum(spectrum, features);
@@ -615,27 +616,35 @@ public class Profile {
 		double[] mz = spectrum.getMz();
 		double[] voltage = spectrum.getVoltage();
 		
-		// find beginning of background bins in this matrix
-		int indexMatrixStart = 0;
-		int indexBGStart = 0;
-		if((int)((mz[0] - mzBackground[0])/(mz[1] - mz[0]))>0){
-			// background bins start earlier
-			indexBGStart = (int) ((mz[0] - mzBackground[0])/(mz[1] - mz[0]));
-		}else if((int)((mz[0] - mzBackground[0])/(mz[1] - mz[0]))<0){
-			// background bins start later
-			indexMatrixStart = (int)((mz[0] - mzBackground[0])/(mz[1] - mz[0]));
-		}
-		// find end of background bins in this matrix
-		int EndIndex = 0;
-		if((mzBackground.length + indexBGStart) >= (mz.length + indexMatrixStart)){
-			EndIndex = mz.length-1;
-		}else{
-			EndIndex = mzBackground.length + indexBGStart;
-		}
-		
-		// use found starting and ending points in matrices to substract the background
-		for(int i=0; i<EndIndex; i++){
-			voltage[indexMatrixStart + i] -= voltBackground[indexBGStart + i];
+//		// find beginning of background bins in this matrix
+//		int indexMatrixStart = 0;
+//		int indexBGStart = 0;
+//		if((int)((mz[0] - mzBackground[0])/(mz[1] - mz[0]))>0){
+//			// background bins start earlier
+//			indexBGStart = (int) ((mz[0] - mzBackground[0])/(mz[1] - mz[0]));
+//		}else if((int)((mz[0] - mzBackground[0])/(mz[1] - mz[0]))<0){
+//			// background bins start later
+//			indexMatrixStart = (int)((mz[0] - mzBackground[0])/(mz[1] - mz[0]));
+//		}
+//		// find end of background bins in this matrix
+//		int EndIndex = 0;
+//		if((mzBackground.length + indexBGStart) >= (mz.length + indexMatrixStart)){
+//			EndIndex = mz.length-1;
+//		}else{
+//			EndIndex = mzBackground.length + indexBGStart;
+//		}
+//		
+//		// use found starting and ending points in matrices to substract the background
+//		for(int i=0; i<EndIndex; i++){
+//			voltage[indexMatrixStart + i] -= voltBackground[indexBGStart + i];
+//		}
+
+		for(int i=0; i<mzBackground.length; i++){
+			if((voltage[i] - voltBackground[i]) >= 0){
+				voltage[i] -= voltBackground[i];
+			}else{
+				voltage[i] = 0.0;
+			}
 		}
 		
 		spectrum.setMz(mz);

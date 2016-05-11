@@ -96,15 +96,22 @@ public class Reader {
 			spectra[i] = tmp.get(i);
 		}
 		
-		// call garbage collector 
-		// this is nessessary in windows to be able to remove files
-//		System.gc();
-		
 		// if backgroundPath contains a path then get backgrounddata 
 		// and init background substracted matrix by calling constructor
 		// SpectraMatrix(Spectrum[] spectra, SpectraMatrix background, double binSize)
 		if(!("".equals(backgroundPath))){
-			SpectraMatrix background = Reader.readData(group, backgroundPath, binSize, device, log, "", separator);
+			// get background spectras using the same mz range as for the other data
+			String[] csv = readFolder(backgroundPath);
+			tmp = new ArrayList<>();
+			for(int i=0; i<csv.length; i++){
+				tmp.add(new Spectrum(csv[i], "", mz, binSize, device, log, separator));
+			}
+			Spectrum[] backgroundSpectra = new Spectrum[tmp.size()];
+			for(int i=0; i<tmp.size(); i++){
+				backgroundSpectra[i] = tmp.get(i);
+			}
+			
+			SpectraMatrix background = new SpectraMatrix(backgroundSpectra, binSize);
 			return new SpectraMatrix(spectra, background, binSize);
 		}else{
 			return new SpectraMatrix(spectra, binSize);
