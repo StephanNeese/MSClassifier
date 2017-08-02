@@ -89,7 +89,7 @@ public class ScorePlotWindow extends JPanel {
 		this.add(profileSearch);
 		this.add(profileInfo);
 		
-		dimensionLabel = new JLabel("chose how many dimensions should be plottet");
+		dimensionLabel = new JLabel("choose how many dimensions should be plotted");
 		dimension = new JComboBox();
 		dimension.addItem("2 Dimensions");
 		dimension.addItem("3 Dimensions");

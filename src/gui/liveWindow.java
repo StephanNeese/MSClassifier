@@ -21,6 +21,7 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -234,8 +235,8 @@ public class liveWindow extends Thread {
 													+ "NA");
 								}else{
 									substance.setText(res.getAssignedClass());
-									probability.setText("P=" + res.getScore());
-									distance.setText("d=" + res.getDistance());
+									probability.setText("P=" + new DecimalFormat("##.##").format(res.getScore()));
+									distance.setText("d=" + new DecimalFormat("##.##").format(res.getDistance()));
 									// write log
 									writer.println(
 											file.toString() 
@@ -265,8 +266,8 @@ public class liveWindow extends Thread {
 													+ "NA");
 								}else{
 									substance.setText(res.getAssignedClass());
-									probability.setText("P=" + res.getScore());
-									distance.setText("d=" + res.getDistance());
+									probability.setText("P=" + new DecimalFormat("##.##").format(res.getScore()));
+									distance.setText("d=" + new DecimalFormat("##.##").format(res.getDistance()));
 									// write log
 									writer.println(
 											file.toString() 
@@ -295,8 +296,8 @@ public class liveWindow extends Thread {
 													+ "NA");
 								}else{
 									substance.setText(res.getAssignedClass());
-									probability.setText("P=" + res.getScore());
-									distance.setText("d=" + res.getDistance());
+									probability.setText("P=" + new DecimalFormat("##.##").format(res.getScore()));
+									distance.setText("d=" + new DecimalFormat("##.##").format(res.getDistance()));
 									// write log
 									writer.println(
 											file.toString() 
